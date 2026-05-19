@@ -1,0 +1,184 @@
+Board tab - implementation plan
+
+Goal
+Create a new tab called Board with:
+- Left panel split in two sections:
+  - Top: list of Visual board tickets + button to create new Visual board
+  - Bottom: reusable issue list (existing hierarchy list pattern for Epic/Feature/Story)
+- Right panel: whiteboard where ticket objects can be created, moved, cloned, and linked parent-child
+- Persist board via Azure DevOps work item type Visual board using field board_state (multiline text)
+
+1) Tab registration and routing
+- Add 'board' to UTILITY_TABS so it is always visible
+- Add Board button in tab bar (left of Audit)
+- Add showTab('board') branch that calls renderBoard()
+
+2) Base layout
+- Reuse two-panel layout concept from sprint focus mode
+- Left: split panel
+  - Top pane: Visual board selector + New Visual board button
+  - Bottom pane: issue list panel (hierarchy list cells: Epic/Feature/Story)
+- Right: whiteboard canvas area with SVG layer for links
+
+2.1) Visual board storage and selection (Alt 1)
+- Work item type: Visual board
+- Persistence field: board_state (multiline text)
+- Top pane behavior:
+  - Load and list all Visual board tickets (id + title)
+  - Selecting a Visual board loads its board_state into current board model
+  - New Visual board button creates a Visual board ticket and initializes empty board_state
+- Save behavior:
+  - Save current board model JSON to selected Visual board board_state
+  - Show local save status and basic error handling on failed save/load
+
+3) Local data model (in-memory)
+- boardNodes = []
+  Node shape:
+  - id
+  - title
+  - type: Epic | Feature | Story | Task
+  - x, y
+  - parentId (nullable)
+  - collapsed (boolean, default false)
+  - sourceWorkItemId (nullable, if created from real issue list item)
+
+- boardViewState:
+  - panX, panY
+  - zoom
+  - selectedNodeId
+  - selectedNodeIds (Set)
+  - selectionRect ({x1,y1,x2,y2} | null)
+  - isSelecting (boolean)
+  - dragGroupOrigin (for moving many selected nodes)
+
+4) Visual rules by Type (added requirement)
+- Epic
+  - widest card, purple border/header tint, badge E, icon marker
+- Feature
+  - medium-wide card, blue border/header tint, badge F
+- Story
+  - compact card, green border/tint, badge S
+- Task
+  - smallest card, gray palette, optional dashed border, badge T
+
+- Child action label by current type:
+  - Epic -> + Feature
+  - Feature -> + Story
+  - Story -> + Task
+  - Task -> no child button (leaf)
+
+- Link line color follows child type color
+
+5) Node card behaviors
+Each card renders:
+- Attributes:
+  - Ticket name
+  - Ticket type
+- Actions:
+  - Clone: creates sibling node of same type, offset position
+  - Child: creates child node of next hierarchy type and sets parentId
+  - Delete: removes object locally from whiteboard
+  - Reparent: lets user choose a new valid parent and updates parentId
+  - Collapse/Expand: toggles subtree visibility from this node
+
+Validation rules for parent changes:
+- Prevent cycles (node cannot become parent of itself or its descendants)
+- Enforce hierarchy order: Epic -> Feature -> Story -> Task
+- If invalid parent selected, keep old parent and show a local warning
+
+6) Parent-child links
+- Use SVG line elements in overlay layer
+- Recompute line endpoints after each render and after drag
+- Endpoint logic: center-right of parent to center-left of child (or center-center initially)
+
+7) Whiteboard interactions
+- Free drag for nodes using pointer/mouse events (not HTML drag API)
+- Pan on background drag
+- Zoom on wheel with clamp, e.g. 0.5 to 1.8
+- Keep transforms in boardViewState
+- Marquee select: click-drag on empty board to draw selection rectangle
+- Multi-select move: dragging one selected node moves all selected nodes together
+- Keyboard Delete: removes all selected nodes
+- Inline title edit on node (double-click, Enter save, Esc cancel)
+- Hover-only controls for node ports, + buttons, and resize handles
+- Selection behavior:
+  - Single click selects one node
+  - Ctrl/Cmd click toggles node in selection
+  - Click on empty board clears selection
+
+Time-axis and timeline interactions (ported from spike):
+- Separate toggles for X-axis, time-axis, and Y-axis
+- Time-axis date range with start/end handles (default today -> +8 weeks)
+- Node range resize from axis handles and node-side handles
+- Moving node with active time-axis preserves duration while shifting start date
+- Sprint chip assignment on selected nodes
+
+Collapsed subtree behavior:
+- Collapsing a node hides all descendants recursively
+- Hidden descendants are excluded from marquee hit-test and drag
+- Expanding restores previous descendant visibility state from model
+
+8) Left list integration
+- Click issue in left bottom panel to create a node on board center
+- Initial type from issue work item type mapping
+- Node creation is local in board model until user saves board_state
+
+9) Rendering flow
+- renderBoard()
+  - build shell html
+  - render left issue list
+  - render whiteboard nodes
+  - render svg links
+  - render selection rectangle (when active)
+  - bind interactions (node drag, pan, zoom, clone, child, delete, reparent, collapse, marquee, keyboard)
+
+10) Scope limits for first version
+- Azure DevOps write limited to Visual board tickets and board_state field only
+- No Azure DevOps create/update/delete for Epic/Feature/Story/Task from Board actions
+- No auto-layout in v1
+
+11) Delivery strategy (safe rollout)
+- Implement Board directly in master file first (behind a dedicated tab branch)
+- Use breakdown_spike.html as behavior reference and source for stable interaction logic
+- Keep Board logic isolated (single namespace/object) inside master to reduce regression risk
+- Migrate in small slices with frequent manual validation (drag/link/select/zoom/save-load) after each slice
+
+11) Storage strategy update (localStorage fallback)
+- Initially tried to use board_state field in Azure DevOps
+- Field doesn't exist in current ADO setup (requires admin panel to create)
+- Fallback strategy: use localStorage per browser when field not available
+- When using localStorage: state is saved locally per device/browser
+- When field is created in ADO: automatically switches to using ADO field
+- User can create Custom.board_state field in ADO Organization Settings → Process → Custom fields
+
+Exit criteria for Board in master:
+- Node drag is stable with no jump/flicker
+- Parent-child links redraw correctly after move
+- Marquee selection works with multi-move
+- Delete key removes selected nodes correctly
+- Reparent validation prevents cycles and invalid hierarchy
+- Collapse/expand works on nested trees
+- Visual board list loads correctly in top left pane
+- New Visual board ticket can be created from Board tab
+- board_state save/load roundtrip restores board faithfully
+
+Implementation order
+1. Register Board tab in master (routing + tab button label)
+2. Add Board layout in master (left split panel + right whiteboard)
+3. Add Visual board top pane (list + create button + selected board state)
+4. Add board_state load/save service for Visual board tickets
+5. Add in-memory board model + renderBoard skeleton in master
+6. Port stable node visuals and type rules from breakdown_spike.html
+7. Port node drag and link redraw
+8. Port Clone, Child, Delete actions
+9. Port pan and zoom
+10. Port marquee select + selected styling
+11. Port group move for selected nodes
+12. Port Keyboard Delete for selected nodes
+13. Port Reparent action + hierarchy validation
+14. Port Collapse/Expand subtree behavior
+15. Connect left-bottom issue list add-to-board integration
+16. UX polish + save/load error states + final cleanup
+
+Implementation note (naming)
+- Replace user-facing label "Breakdown" with "Board" in tab text and related UI labels.

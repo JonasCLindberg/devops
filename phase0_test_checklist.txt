@@ -1,0 +1,114 @@
+Phase 0 Test Checklist
+Owner: Jonas + Copilot
+Created: 2026-04-29
+Target app for refactor track: devops_backlog_gui_v2.0.html
+Baseline reference: devops_backlog_gui_v1.0.html
+
+How to run
+1. Open v2.0 file/app.
+2. Run each test case in order.
+3. Mark PASS/FAIL and add notes.
+4. Re-run this checklist after every phase.
+
+Result summary
+- Date:
+- Run by:
+- Passed:
+- Failed:
+- Notes:
+
+Test Cases
+
+TC-01 Sprint reranking bottom -> top
+Steps:
+1. Open Sprint tab in focus mode.
+2. Pick a sprint with at least 4 goals.
+3. Drag the lowest goal to first position.
+Expected:
+- Drop placeholder appears at target position.
+- No card flicker/jitter.
+- Final order persists after refresh.
+Status: [ ] PASS  [ ] FAIL
+Notes:
+
+TC-02 Sprint reranking top -> bottom
+Steps:
+1. Drag first goal to last position in same sprint.
+Expected:
+- Correct placement at list end.
+- No visual state change on other cards.
+- Order persists after refresh.
+Status: [ ] PASS  [ ] FAIL
+Notes:
+
+TC-03 Sprint reranking middle insert
+Steps:
+1. Drag one middle goal between two other middle goals.
+2. Verify upper/lower snap zone behavior.
+Expected:
+- Upper half inserts before, lower half inserts after.
+- Placeholder height is visible and stable.
+Status: [ ] PASS  [ ] FAIL
+Notes:
+
+TC-04 Issue -> Goal linking
+Steps:
+1. Enable focus mode.
+2. Drag an issue chip to a sprint goal card.
+Expected:
+- Link is created.
+- Marker indicates linked state where applicable.
+- Link survives refresh.
+Status: [ ] PASS  [ ] FAIL
+Notes:
+
+TC-05 Goal done toggle via State
+Steps:
+1. Toggle a sprint goal done/undone.
+2. Verify state changes to Closed/New.
+Expected:
+- Visual done style updates.
+- Goal remains visible and rankable in Sprint.
+Status: [ ] PASS  [ ] FAIL
+Notes:
+
+TC-06 Focus mode controls
+Steps:
+1. Test filter only-current on/off.
+2. Test group by goal on/off.
+3. Test refresh button.
+Expected:
+- No focus reset on refresh.
+- Expand/collapse behavior works.
+Status: [ ] PASS  [ ] FAIL
+Notes:
+
+TC-07 Estimering list alignment
+Steps:
+1. Open Estimering tab.
+2. Check list width and right panel alignment.
+Expected:
+- List width uses shared width constant.
+- Headers and rows align.
+Status: [ ] PASS  [ ] FAIL
+Notes:
+
+TC-08 Prioritering list alignment
+Steps:
+1. Open Prioritering tab.
+2. Verify Tshirt/Typ/SuperEpic are inside list width.
+Expected:
+- Right panel starts after list boundary.
+- No overflow bleed from list columns.
+Status: [ ] PASS  [ ] FAIL
+Notes:
+
+TC-09 Timeline list alignment
+Steps:
+1. Open Timeline tab.
+2. Verify list width consistency with Estimering/Prioritering.
+Expected:
+- Matching list width.
+- Header/rows aligned.
+Status: [ ] PASS  [ ] FAIL
+Notes:

@@ -1,0 +1,36 @@
+Phase 0 Baseline Snapshot
+Date: 2026-04-29
+Owner: Jonas + Copilot
+Baseline app file: devops_backlog_gui_v1.0.html
+Refactor target file: devops_backlog_gui_v2.0.html
+
+Purpose
+- Freeze current observable behavior before Phase 1+ refactoring.
+- Enable quick comparison if regressions appear.
+
+Baseline Scope
+1. Sprint drag/drop reorder behavior and placeholder interaction.
+2. Sprint issue->goal link behavior.
+3. Goal done toggle using System.State (New/Closed).
+4. Focus controls behavior (filter/group/refresh, no focus reset on refresh).
+5. List width/alignment across Estimering, Prioritering, Timeline.
+
+Known Sensitive Areas
+1. Sprint reranking when dropping in gaps/placeholder region.
+2. Iteration path normalization and identity matching.
+3. Mixed drag intents (goal reorder vs issue link).
+4. Inline styles and event handlers coupled to render output.
+
+Comparison Protocol
+1. Run all TC cases in phase0_test_checklist.txt on v2.0.
+2. If fail, compare behavior with v1.0 baseline file.
+3. Log differences with precise reproduction steps.
+
+Regression Log Template
+- Date:
+- Area:
+- Repro steps:
+- Expected:
+- Actual:
+- Severity:
+- Proposed fix:
