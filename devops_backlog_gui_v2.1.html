@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Azure DevOps Backlog Explorer</title>
+<title>BDO Planner</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap');
@@ -1485,6 +1485,24 @@
     gap: 8px;
     flex-wrap: wrap;
   }
+  .timeline-zoom-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 4px;
+    border-left: 1px solid var(--border);
+  }
+  .timeline-zoom-range {
+    width: 120px;
+    accent-color: var(--accent2);
+  }
+  .timeline-zoom-value {
+    min-width: 42px;
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
   .timeline-filter-row {
     display: flex;
     align-items: center;
@@ -2030,6 +2048,12 @@
   .plan-title strong { color:var(--accent2); }
 
   .grouping-bar { display:flex; align-items:center; gap:6px; padding:6px 24px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; }
+  .grouping-bar-backlog { flex-wrap: wrap; }
+  .grouping-bar-backlog .search-box {
+    flex: 0 0 300px;
+    margin-left: 10px;
+  }
+  .grouping-bar-backlog .toggle-wrap { margin-bottom: 0; }
   .grouping-label { font-family:'JetBrains Mono',monospace; font-size:0.71rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-right:4px; }
   .group-btn { padding:4px 14px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .15s; white-space:nowrap; }
   .group-btn:hover { border-color:var(--accent2); color:var(--text); }
@@ -2391,7 +2415,7 @@
 <header>
   <div class="logo-mark">BDO</div>
   <div>
-    <h1>DevOps Backlog Explorer <span>/ v2.1</span></h1>
+    <h1>BDO Planner <span>/ v2.1</span></h1>
   </div>
   <div class="top-section-switch" aria-label="Sektioner">
     <button class="top-section-btn active" id="section-backlog" onclick="setTopSection('backlog')">Backlog</button>
@@ -2471,13 +2495,13 @@
   <div class="content">
     <!-- Tab bar -->
     <div class="tab-bar">
-      <button class="tab-btn active" id="tab-backlog" onclick="showTab('backlog')">📋 Backlog</button>
+      <button class="tab-btn active" id="tab-backlog" onclick="showTab('backlog')" disabled>📋 Backlog</button>
       <button class="tab-btn" id="tab-estimering" onclick="showTab('estimering')" disabled>📐 Estimering</button>
       <button class="tab-btn" id="tab-prioritering" onclick="showTab('prioritering')" disabled>⚡ Prioritering</button>
       <button class="tab-btn" id="tab-timeline" onclick="showTab('timeline')" disabled>📅 Timeline</button>
-      <button class="tab-btn" id="tab-sprint" onclick="showTab('sprint')" disabled>🏁 Sprint</button>
-      <button class="tab-btn" id="tab-board" onclick="showTab('board')">🧩 Board</button>
       <button class="tab-btn" id="tab-roadmap" onclick="showTab('roadmap')" disabled>🗺 Roadmap</button>
+      <button class="tab-btn" id="tab-sprint" onclick="showTab('sprint')" disabled>🏁 Sprint</button>
+      <button class="tab-btn" id="tab-board" onclick="showTab('board')" disabled>🧩 Board</button>
       <button class="tab-btn" id="tab-dashboard" onclick="showTab('dashboard')" disabled>📊 Dashboard</button>
       <button class="tab-btn" id="tab-kalkyl" onclick="showTab('kalkyl')" disabled>🧮 Kalkyl</button>
       <button class="tab-btn" id="tab-analys" onclick="showTab('analys')" disabled>🔍 Analys</button>
@@ -2489,25 +2513,28 @@
 
     <div class="tab-content-area">
       <!-- Backlog toolbar (only shown in backlog tab) -->
-      <div class="toolbar" id="backlogToolbar">
+      <div class="toolbar" id="backlogToolbar" style="display:none"></div>
+      <!-- Only show this combined row in Backlog tab -->
+      <div class="grouping-bar grouping-bar-backlog" id="searchAndTogglesBar" style="display:none;">
+        <span class="grouping-label">Gruppering:</span>
+        <button class="group-btn active" id="grp-projekt" onclick="setGrouping('projekt')">Projekt</button>
+        <button class="group-btn" id="grp-ao" onclick="setGrouping('ao')">Affärsområde</button>
+        <button class="group-btn" id="grp-roadmap" onclick="setGrouping('roadmap')">Roadmap</button>
+        <button class="group-btn" id="grp-maconomy" onclick="setGrouping('maconomy')">Maconomy</button>
         <input class="search-box" type="text" id="searchBox" placeholder="Sök titel, ID..." oninput="auditMode ? renderAuditSearch() : renderTable()" />
         <label class="toggle-wrap" data-audit-hide title="Fokusläge: visa bara hierarki + Effort">
           <input type="checkbox" id="focusToggle" onchange="toggleFocusMode()" />
           <span class="toggle-track"></span>
           <span>Fokusläge</span>
         </label>
-        <label class="toggle-wrap" data-audit-hide title="Redigera Effort direkt i listan">
-          <input type="checkbox" id="editModeToggle" onchange="toggleEditMode()" />
-          <span class="toggle-track"></span>
-          <span>Redigera</span>
-        </label>
       </div>
-      <div class="grouping-bar" data-audit-hide>
+      <!-- Restore original grouping bar for other tabs -->
+      <div class="grouping-bar" id="defaultGroupingBar" data-audit-hide>
         <span class="grouping-label">Gruppering:</span>
-        <button class="group-btn active" id="grp-projekt" onclick="setGrouping('projekt')">Projekt</button>
-        <button class="group-btn" id="grp-ao" onclick="setGrouping('ao')">Affärsområde</button>
-        <button class="group-btn" id="grp-roadmap" onclick="setGrouping('roadmap')">Roadmap</button>
-        <button class="group-btn" id="grp-maconomy" onclick="setGrouping('maconomy')">Maconomy</button>
+        <button class="group-btn active" id="grp-projekt2" onclick="setGrouping('projekt')">Projekt</button>
+        <button class="group-btn" id="grp-ao2" onclick="setGrouping('ao')">Affärsområde</button>
+        <button class="group-btn" id="grp-roadmap2" onclick="setGrouping('roadmap')">Roadmap</button>
+        <button class="group-btn" id="grp-maconomy2" onclick="setGrouping('maconomy')">Maconomy</button>
       </div>
 
 
@@ -2607,7 +2634,7 @@ let colSettings = loadColSettings();
 let isolatedCol = null; // key of currently isolated column
 
 function toggleColIsolate(colKey) {
-  if (!editMode) return;
+  if (!globalEditMode) return;
   isolatedCol = isolatedCol === colKey ? null : colKey;
   applyColCSS();
   // Update header highlights
@@ -2622,7 +2649,7 @@ function applyColCSS() {
   let css = '';
   const mode = document.body.classList.contains('focus-mode') ? 'focus' : 'normal';
 
-  if (isolatedCol && editMode) {
+  if (isolatedCol && globalEditMode) {
     // Isolation mode: hide everything except title, id, and the isolated col
     ALL_COLUMNS.forEach(c => {
       if (c.key !== isolatedCol) {
@@ -3304,7 +3331,8 @@ let auditData   = [];
 let dashboardMode = false;
 let roadmapViewMode = false;
 let dashEffortMode = false;
-let tscEditMode = false;
+// Replaced with globalEditMode
+// let tscEditMode = false;
 let tshirtCalcMode = false;
 let kalkylMode = false;
 let kalkylSwimBy = 'ao';
@@ -3405,8 +3433,8 @@ function sprintDebug(eventName, data = {}) {
   } catch (_) {}
 }
 
-const BACKLOG_SECTION_TABS = ['backlog','estimering','prioritering','timeline','sprint','board'];
-const PORTFOLIO_SECTION_TABS = ['roadmap','dashboard','kalkyl','analys','kostnader'];
+const BACKLOG_SECTION_TABS = ['backlog','estimering','prioritering','timeline','roadmap','sprint','board'];
+const PORTFOLIO_SECTION_TABS = ['dashboard','kalkyl','analys','kostnader'];
 const UTILITY_TABS = ['audit'];
 const NAV_TABS = [...BACKLOG_SECTION_TABS, ...PORTFOLIO_SECTION_TABS, ...UTILITY_TABS];
 
@@ -3427,7 +3455,7 @@ function applyTabSectionVisibility() {
     const el = document.getElementById('tab-' + t);
     if (!el) return;
     // Utility tabs (e.g. audit) are always visible regardless of section
-    el.style.display = (visible.has(t) || UTILITY_TABS.includes(t) || t === 'board') ? '' : 'none';
+    el.style.display = (visible.has(t) || UTILITY_TABS.includes(t)) ? '' : 'none';
   });
 }
 
@@ -3462,9 +3490,17 @@ function showTab(tab) {
     const el = document.getElementById('tab-'+t);
     if (el) el.classList.toggle('active', t === tab);
   });
-  const toolbar = document.getElementById('backlogToolbar');
-  if (toolbar) toolbar.style.display = tab === 'backlog' ? '' : 'none';
 
+  // Show combined grouping/search/toggles row only in Backlog tab
+  const searchAndTogglesBar = document.getElementById('searchAndTogglesBar');
+  if (searchAndTogglesBar) searchAndTogglesBar.style.display = tab === 'backlog' ? '' : 'none';
+  // Hide original grouping bar in Backlog tab
+  const groupingBar = document.getElementById('defaultGroupingBar');
+  if (groupingBar) groupingBar.style.display = tab === 'backlog' ? 'none' : '';
+
+  // Remove old Backlog toolbar if present
+  const toolbar = document.getElementById('backlogToolbar');
+  if (toolbar) toolbar.style.display = 'none';
   dashboardMode = tab === 'dashboard';
   roadmapViewMode = tab === 'roadmap';
   kalkylMode = tab === 'kalkyl';
@@ -3754,13 +3790,20 @@ function saveHiddenEpics() {
 
 
 
-let editMode = false;
+let globalEditMode = false;
 function toggleEditMode() {
-  editMode = document.getElementById('editModeToggle').checked;
-  if (!editMode) isolatedCol = null;
-  document.body.classList.toggle('edit-mode', editMode);
+  globalEditMode = !globalEditMode;
+  document.body.classList.toggle('edit-mode', globalEditMode);
   applyColCSS();
-  renderTable();
+  // Re-render active view if it needs edit mode
+  if (activeTab === 'backlog') {
+    if (globalEditMode) isolatedCol = null;
+    renderTable();
+  } else if (activeTab === 'prioritering') {
+    renderPrioritering();
+  } else if (activeTab === 'timeline') {
+    renderTimeline();
+  }
 }
 
 let aoMode = false;
@@ -3851,7 +3894,6 @@ function roadmapClass(val) {
     case 'next':      return 'roadmap-next';
     case 'later':     return 'roadmap-later';
     case 'finishing': return 'roadmap-finishing';
-    case 'continuous':
     case 'continous': return 'roadmap-continous';
     case 'completed': return 'roadmap-completed';
     default:          return 'roadmap-later';
@@ -4946,9 +4988,12 @@ function getFilteredItems() {
   const search = document.getElementById('searchBox').value.toLowerCase();
   const AFFARSOM_FIELD = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
   const allItemIds = new Set(allItems.map(i => i.id));
+  // Only show Epics, Features, and User Stories in Backlog tab (exclude Task, Sprint Goal, Bug, etc)
   return allItems.filter(item => {
+    const allowedTypes = ['Epic', 'Feature', 'User Story'];
+    const type = item.fields['System.WorkItemType'];
+    if (!allowedTypes.includes(type)) return false;
     const f = item.fields;
-    const type  = f['System.WorkItemType'] || '';
     const typeNorm = String(type).toLowerCase().trim();
     const state = workItemStateLower(item);
 
@@ -5124,7 +5169,8 @@ function buildSortedRows(filtered) {
     const epics    = getEpicItems(projectItems);
     const features = getFeatureItems(projectItems);
     const stories  = getStoryItems(projectItems);
-    const others   = projectItems.filter(i => !['Epic','Feature','Feature'].includes(i.fields['System.WorkItemType']));
+    // Exclude Epics, Features, and User Stories from 'others' to avoid duplicates
+    const others   = projectItems.filter(i => !['Epic','Feature','User Story'].includes(i.fields['System.WorkItemType']));
 
     // Build local sets for fast parent lookup within this project
     const epicIds   = new Set(epics.map(e => e.id));
@@ -5285,9 +5331,9 @@ function renderTable() {
   // Bail out if another view is active
   if (dashboardMode || roadmapViewMode || tshirtCalcMode || kalkylMode || auditMode || activeTab === 'timeline') return;
 
-  // Ensure backlog toolbar visible
+  // Legacy backlog toolbar is intentionally hidden (we use the combined backlog grouping row).
   const toolbar = document.getElementById('backlogToolbar');
-  if (toolbar) toolbar.style.display = '';
+  if (toolbar) toolbar.style.display = 'none';
   document.body.classList.remove('audit-mode', 'dashboard-mode');
   const sb = document.getElementById('searchBox');
   if (sb) { sb.style.display = ''; sb.placeholder = 'Sök titel, ID...'; }
@@ -5416,7 +5462,7 @@ function renderTable() {
     ];
     const affarVal = f[AFFARSOM_FIELD] || '';
     let valueAreaCell;
-    if (editMode) {
+    if (globalEditMode) {
       valueAreaCell = `<div style="display:flex;align-items:center;gap:3px;">
         <select class="prio-select" onchange="saveField(${item.id},'${AFFARSOM_FIELD}',this.value)">
           <option value="" ${!affarVal ? 'selected' : ''}>–</option>
@@ -5434,7 +5480,7 @@ function renderTable() {
     // Effort: use own value, or sum of children if Epic/Feature with no own value
     let ownEffort = workItemEffort(item);
     let effortDisplay;
-    if (editMode) {
+    if (globalEditMode) {
       // Always show input with own value (not summed) so user edits the actual field
       const val = (ownEffort != null && ownEffort !== '') ? ownEffort : '';
       effortDisplay = `
@@ -5494,7 +5540,7 @@ function renderTable() {
     const wsjfClass = wsjfVal == null ? '' : Number(wsjfVal) >= 5 ? 'high' : Number(wsjfVal) >= 2 ? 'med' : 'low';
 
     let wsjfCell;
-    if (editMode) {
+    if (globalEditMode) {
       wsjfCell = `<div class="wsjf-cell" style="flex-direction:row;gap:6px;justify-content:center;">
         <span class="wsjf-score ${wsjfClass}" title="WSJF = (BV+TC+(10-RR×3))/Effort">${wsjfVal != null ? wsjfVal : '–'}</span>
         <div class="wsjf-row">
@@ -5519,7 +5565,7 @@ function renderTable() {
       <td data-col="id" class="id-cell">#${item.id}</td>
       <td data-col="typ"><span class="badge ${typeBadgeClass(type)}">${type}</span></td>
       <td data-col="effort" style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.88rem; color:var(--muted); vertical-align:middle; white-space:nowrap;">${effortDisplay}</td>
-      <td data-col="tshirt" style="text-align:center;">${editMode
+      <td data-col="tshirt" style="text-align:center;">${globalEditMode
         ? `<div style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;">
             ${['XS','S','M','L','XL','XXL'].map(v => {
               const active = f['Custom.Tshirt'] === v;
@@ -5531,7 +5577,7 @@ function renderTable() {
         : f['Custom.Tshirt'] ? `<span class="tshirt-badge ${tshirtClass(f['Custom.Tshirt'])}">${f['Custom.Tshirt']}</span>` : '<span style="color:var(--muted)">–</span>'
       }</td>
       <td data-col="remaining" style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.88rem; color:var(--muted)">${remainingDisplay}</td>
-      <td data-col="roadmap" style="text-align:center;">${editMode
+      <td data-col="roadmap" style="text-align:center;">${globalEditMode
         ? `<select class="prio-select" onchange="saveField(${item.id},'Custom.Roadmap',this.value)">
             <option value="" ${!f['Custom.Roadmap']?'selected':''}>–</option>
             ${ROADMAP_CANONICAL_VALUES.map(v=>`<option value="${v}" ${normalizeRoadmapValue(f['Custom.Roadmap'], '')===v?'selected':''}>${v}</option>`).join('')}
@@ -5539,19 +5585,19 @@ function renderTable() {
         : roadmapValue(item, '') ? `<span class="roadmap-badge ${roadmapClass(roadmapValue(item, ''))}">${roadmapValue(item, '')}</span>` : '<span style="color:var(--muted)">–</span>'
       }</td>
       <td data-col="milestone" style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--accent2)">${f['Custom.Milestone'] || '<span style="color:var(--muted)">–</span>'}</td>
-      <td data-col="superepic" style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--muted)">${editMode
+      <td data-col="superepic" style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--muted)">${globalEditMode
         ? `<input type="text" class="prio-select" value="${f['Custom.SuperEpic']||''}" placeholder="–"
             onchange="saveField(${item.id},'Custom.SuperEpic',this.value)"
             style="width:110px;font-family:'JetBrains Mono',monospace;font-size:0.84rem;" />`
         : f['Custom.SuperEpic'] || '<span style="color:var(--muted)">–</span>'
       }</td>
-      <td data-col="maconomy" style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--muted)">${editMode
+      <td data-col="maconomy" style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--muted)">${globalEditMode
         ? `<input type="text" class="prio-select" value="${f['Custom.Maconomy']||''}" placeholder="–"
             onchange="saveField(${item.id},'Custom.Maconomy',this.value)"
             style="width:90px;font-family:'JetBrains Mono',monospace;font-size:0.84rem;" />`
         : f['Custom.Maconomy'] || '<span style="color:var(--muted)">–</span>'
       }</td>
-      <td data-col="targetapps" style="font-size:0.86rem;color:var(--text)">${editMode
+      <td data-col="targetapps" style="font-size:0.86rem;color:var(--text)">${globalEditMode
         ? `<input type="text" class="prio-select" value="${f['Custom.Targetapps']||''}" placeholder="–"
             onchange="saveField(${item.id},'Custom.Targetapps',this.value)"
             style="width:110px;font-family:'JetBrains Mono',monospace;font-size:0.84rem;" />`
@@ -5560,7 +5606,7 @@ function renderTable() {
       <td data-col="status"><span class="badge ${stateBadgeClass(state)}">${state}</span></td>
       <td data-col="tags" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${tagsHtml}</td>
       <td data-col="sprint"><span class="sprint-label" title="${iterPath}">${sprint}</span></td>
-      <td data-col="customtyp" style="text-align:center;">${editMode
+      <td data-col="customtyp" style="text-align:center;">${globalEditMode
         ? `<select class="prio-select" onchange="saveField(${item.id},'Custom.Typ',this.value)">
             <option value="" ${!f['Custom.Typ']?'selected':''}>–</option>
             ${['Underhåll','Projekt','Förbättring'].map(v=>`<option value="${v}" ${f['Custom.Typ']===v?'selected':''}>${v}</option>`).join('')}
@@ -5598,7 +5644,7 @@ function renderTable() {
           <th data-col="andrad">Ändrad</th>
         </tr>
         <tr class="filter-row">
-          <th><input class="col-filter" data-fcol="title" placeholder="Sök titel…" oninput="setColFilter('title',this.value)"></th>
+          <th></th>
           <th data-col="id"></th>
           <th data-col="typ">
             <select class="col-filter" data-fcol="typ" onchange="setColFilter('typ',this.value)">
@@ -5672,11 +5718,11 @@ function renderTable() {
   document.querySelectorAll('thead tr:first-child th[data-col]').forEach(th => {
     const k = th.dataset.col;
     if (!k) return;
-    th.style.cursor = editMode ? 'pointer' : '';
-    th.title = editMode ? (isolatedCol === k ? 'Klicka för att återställa' : 'Klicka för att isolera kolumnen') : '';
+    th.style.cursor = globalEditMode ? 'pointer' : '';
+    th.title = globalEditMode ? (isolatedCol === k ? 'Klicka för att återställa' : 'Klicka för att isolera kolumnen') : '';
     th.style.color = (isolatedCol && k === isolatedCol) ? 'var(--accent2)' : '';
     th.style.background = (isolatedCol && k === isolatedCol) ? 'rgba(88,166,255,.08)' : '';
-    th.onclick = editMode ? (() => { const key = k; return () => toggleColIsolate(key); })() : null;
+    th.onclick = globalEditMode ? (() => { const key = k; return () => toggleColIsolate(key); })() : null;
   });
 
   // Populate tags dropdown with live data
@@ -9638,10 +9684,10 @@ function renderTshirtCalc() {
   const rows = data.map((row, idx) => {
     const fte = (row.veckor * row.pers / 4.1).toFixed(1);
     const cls = tshirtColors[row.size] || '';
-    const veckorCell = tscEditMode
+    const veckorCell = globalEditMode
       ? `<input class="tsc-input" type="number" min="0" step="0.5" value="${row.veckor}" onchange="updateTshirtField(${idx},'veckor',this.value)" />`
       : `<span style="font-family:'JetBrains Mono',monospace;">${row.veckor}</span>`;
-    const persCell = tscEditMode
+    const persCell = globalEditMode
       ? `<input class="tsc-input" type="number" min="0" step="0.5" value="${row.pers}" onchange="updateTshirtField(${idx},'pers',this.value)" />`
       : `<span style="font-family:'JetBrains Mono',monospace;">${row.pers}</span>`;
     return `<tr>
@@ -9658,7 +9704,7 @@ function renderTshirtCalc() {
   const tshirtColors2 = { 'XS':'tshirt-xs','S':'tshirt-s','M':'tshirt-m','L':'tshirt-l','XL':'tshirt-xl','XXL':'tshirt-xxl' };
   const rows2 = loadTshirt2Data().map((row2item, idx) => {
     const cls2 = tshirtColors2[row2item.size] || '';
-    const fteCell = tscEditMode
+    const fteCell = globalEditMode
       ? `<input class="tsc-input" type="number" min="0" step="1" value="${row2item.fte}" onchange="updateTshirt2Field(${idx},'fte',this.value)" />`
       : `<span style="font-family:'JetBrains Mono',monospace;">${row2item.fte}</span>`;
     return `<tr>
@@ -9697,6 +9743,19 @@ function renderTshirtCalc() {
       </button>
     </div>
     <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:2px solid var(--border);">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:0.88rem;font-weight:700;color:var(--text);">Redigera</div>
+          <div style="font-size:0.86rem;color:var(--muted);">Global redigeringsmöjlighet för alla vyer</div>
+        </div>
+        <label class="toggle-wrap" style="margin:0;font-size:0.88rem;">
+          <input type="checkbox" ${globalEditMode ? 'checked' : ''} onchange="globalEditMode=this.checked;document.body.classList.toggle('edit-mode',globalEditMode);renderTshirtCalc()">
+          <span class="toggle-track"></span>
+          <span style="color:var(--muted);">Påslaget</span>
+        </label>
+      </div>
+    </div>
+    <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:2px solid var(--border);">
       <div class="tsc-section-title">Kolumner</div>
       <p style="font-size:0.78rem;color:var(--muted);margin:4px 0 12px;">Välj vilka kolumner som visas i normalt läge respektive fokusläge. Ändringen träder i kraft direkt.</p>
       <div class="settings-cols">
@@ -9720,11 +9779,6 @@ function renderTshirtCalc() {
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div class="tsc-section-title" style="margin-bottom:0;">T-shirt för <strong>Features och Stories</strong></div>
-      <label class="toggle-wrap" style="margin:0;font-size:0.88rem;">
-        <input type="checkbox" ${tscEditMode ? 'checked' : ''} onchange="tscEditMode=this.checked;renderTshirtCalc()">
-        <span class="toggle-track"></span>
-        <span style="color:var(--muted);">Redigera</span>
-      </label>
     </div>
     <table class="tsc-table">
       <thead>
@@ -9740,7 +9794,7 @@ function renderTshirtCalc() {
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    ${tscEditMode ? `<button class="btn btn-outline" onclick="resetTshirtData()" style="width:auto;padding:6px 16px;font-size:0.84rem;margin-top:12px;">↺ Återställ standardvärden</button>` : ''}
+    ${globalEditMode ? `<button class="btn btn-outline" onclick="resetTshirtData()" style="width:auto;padding:6px 16px;font-size:0.84rem;margin-top:12px;">↺ Återställ standardvärden</button>` : ''}
     <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
       <div class="tsc-section-title">T-shirt för <strong>Epics (Manmånader)</strong></div>
       <table class="tsc-table">
@@ -9753,7 +9807,7 @@ function renderTshirtCalc() {
         </thead>
         <tbody>${rows2}</tbody>
       </table>
-      ${tscEditMode ? `<button class="btn btn-outline" onclick="resetTshirt2Data()" style="width:auto;padding:6px 16px;font-size:0.84rem;margin-top:12px;">↺ Återställ standardvärden</button>` : ''}
+      ${globalEditMode ? `<button class="btn btn-outline" onclick="resetTshirt2Data()" style="width:auto;padding:6px 16px;font-size:0.84rem;margin-top:12px;">↺ Återställ standardvärden</button>` : ''}
     </div>
     <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
       <div class="tsc-section-title">Overheadfaktor</div>
@@ -9762,8 +9816,8 @@ function renderTshirtCalc() {
         <div style="display:flex;align-items:center;gap:6px;">
           <input type="number" min="0" max="200" step="1"
             value="${loadQaPadding()}"
-            ${tscEditMode ? `onchange="saveQaPadding(this.value);renderTshirtCalc()"` : 'disabled'}
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:0.90rem;font-weight:700;padding:3px 6px;width:60px;outline:none;text-align:right;${tscEditMode ? '' : 'opacity:0.5;cursor:default;'}" />
+            ${globalEditMode ? `onchange="saveQaPadding(this.value);renderTshirtCalc()"` : 'disabled'}
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:0.90rem;font-weight:700;padding:3px 6px;width:60px;outline:none;text-align:right;${globalEditMode ? '' : 'opacity:0.5;cursor:default;'}" />
           <span style="font-size:0.84rem;color:var(--muted);">%</span>
           <span style="font-size:0.84rem;color:var(--muted);margin-left:4px;">→ multiplicerar Manmånader med <strong style="color:var(--accent2);">${(1 + loadQaPadding()/100).toFixed(2)}x</strong> i Kalkyl</span>
         </div>
@@ -9773,8 +9827,8 @@ function renderTshirtCalc() {
         <div style="display:flex;align-items:center;gap:6px;">
           <input type="number" min="1" max="12" step="1"
             value="${loadMonthsPerYear()}"
-            ${tscEditMode ? `onchange="saveMonthsPerYear(this.value);renderTshirtCalc()"` : 'disabled'}
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:0.90rem;font-weight:700;padding:3px 6px;width:60px;outline:none;text-align:right;${tscEditMode ? '' : 'opacity:0.5;cursor:default;'}" />
+            ${globalEditMode ? `onchange="saveMonthsPerYear(this.value);renderTshirtCalc()"` : 'disabled'}
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:0.90rem;font-weight:700;padding:3px 6px;width:60px;outline:none;text-align:right;${globalEditMode ? '' : 'opacity:0.5;cursor:default;'}" />
           <span style="font-size:0.84rem;color:var(--muted);">mån</span>
           <span style="font-size:0.84rem;color:var(--muted);margin-left:4px;">→ Årspers = Manmånader / <strong style="color:var(--accent2);">${loadMonthsPerYear()}</strong> i Kalkyl</span>
         </div>
@@ -9927,7 +9981,7 @@ const RM_COLS_ALL = [
 ];
 let rmShowAll = false;
 let rmSimpleMode = false;
-let rmEditMode = false;
+let rmEditMode = false;  // Kept for Roadmap dragging — uses globalEditMode for edit state
 const AFFARSOM_FIELD_RM = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
 
 async function showRoadmapView() { showTab('roadmap'); }
@@ -10051,8 +10105,8 @@ function renderRoadmapView() {
       ${superEpic ? `<span class="rm-meta-chip" style="color:var(--accent2);">⬡ ${superEpic}</span>` : ''}
       ${milestone ? `<span class="rm-meta-chip" style="color:var(--accent2);">🏁 ${milestone}</span>` : ''}
     </div>` : '';
-    return `<div class="rm-card${rmEditMode ? ' rm-draggable' : ''}"
-      ${rmEditMode ? `draggable="true" ondragstart="event.dataTransfer.setData('epicId','${ep.id}')"` : `onclick="openWorkItemModal(${ep.id})"`}>
+    return `<div class="rm-card${globalEditMode ? ' rm-draggable' : ''}"
+      ${globalEditMode ? `draggable="true" ondragstart="event.dataTransfer.setData('epicId','${ep.id}')"` : `onclick="openWorkItemModal(${ep.id})"`}>
       <div class="rm-card-title">${title}</div>
       <div class="rm-card-meta" style="flex-direction:column;gap:5px;align-items:stretch;">
         ${row1}${row2}${row3}${row4}
@@ -10064,8 +10118,8 @@ function renderRoadmapView() {
   const makeSimpleRow = ep => {
     const f = ep.fields;
     const title = f['System.Title'] || `#${ep.id}`;
-    return `<div class="rm-simple-row${rmEditMode ? ' rm-draggable' : ''}"
-      ${rmEditMode ? `draggable="true" ondragstart="event.dataTransfer.setData('epicId','${ep.id}')"` : `onclick="openWorkItemModal(${ep.id})" title="#${ep.id} ${title}"`}>
+    return `<div class="rm-simple-row${globalEditMode ? ' rm-draggable' : ''}"
+      ${globalEditMode ? `draggable="true" ondragstart="event.dataTransfer.setData('epicId','${ep.id}')"` : `onclick="openWorkItemModal(${ep.id})" title="#${ep.id} ${title}"`}>
       <span class="rm-simple-title">${title}</span>
     </div>`;
   };
@@ -10163,9 +10217,6 @@ function renderRoadmapView() {
         <span>Förenklad</span>
       </label>
       <label class="toggle-wrap" style="margin:0;margin-left:auto;">
-        <input type="checkbox" ${rmEditMode?'checked':''} onchange="rmEditMode=this.checked;renderRoadmapView()">
-        <span class="toggle-track"></span>
-        <span>Redigera</span>
       </label>
     </div>`;
 
@@ -10190,7 +10241,7 @@ function renderRoadmapView() {
     const unswimmed = colEpicsList.filter(e => !swimKeys.includes(getSwimKey(e)));
     const unswimHtml = unswimmed.length ? unswimmed.map(rmSimpleMode ? makeSimpleRow : makeCard).join('') : '';
 
-    const dropHandlers = rmEditMode
+    const dropHandlers = globalEditMode
       ? `ondragover="event.preventDefault();this.classList.add('rm-col-drag-over')"
          ondragleave="this.classList.remove('rm-col-drag-over')"
          ondrop="this.classList.remove('rm-col-drag-over');rmDropEpic(event,'${colKey}')"`
@@ -10222,15 +10273,21 @@ function renderRoadmapView() {
 // ──────────────────────────────────────────
 let prioGroupMode = 'projekt'; // 'projekt'|'ao'|'roadmap'|'maconomy'
 let prioModel     = 'wsjf';    // 'wsjf' (extensible)
-let prioEditMode  = false;
+
 let prioTypFilter = '';
 let prioSuperFilter = '';
 let prioTargetappsFilter = '';
 
 // ── Estimering ──────────────────────────────────────────────
 let estGroupMode = 'projekt';
-let estEditMode  = false;
+// estEditMode removed - now uses globalEditMode
 let estTargetappsFilter = '';
+let estSizingGuideOpen = '';
+
+function toggleEstSizingGuide(kind) {
+  estSizingGuideOpen = estSizingGuideOpen === kind ? '' : kind;
+  if (activeTab === 'estimering') renderEstimering();
+}
 
 function renderEstimering() {
   const wrap = document.getElementById('tableWrap');
@@ -10289,9 +10346,7 @@ function renderEstimering() {
   ).join('');
   const allExpanded = filtered.length > 0 && filtered.every(ep => expandedEpicIds.has(ep.id));
 
-  const editToggle = `<label class="toggle-wrap" style="margin:0;font-size:0.88rem;margin-left:auto;">` +
-    `<input type="checkbox" ${estEditMode?'checked':''} onchange="estEditMode=this.checked;renderEstimering()">` +
-    `<span class="toggle-track"></span><span>Redigera</span></label>`;
+  const editToggle = '';  // Moved to Settings — use globalEditMode
   const listToggleBtn = `<button class="btn btn-outline btn-xs-icon" title="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" aria-label="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" onclick="setAllEpicFeatures(${allExpanded ? 'false' : 'true'})">${allExpanded ? 'v' : '>'}</button>`;
   const createEpicBtn = `<button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.72rem;line-height:1.1;" onclick="createEpicFromHierarchyList()" title="Skapa ny Epic">+ Skapa epic</button>`;
 
@@ -10309,20 +10364,17 @@ function renderEstimering() {
   const TH = (txt) => `<th style="padding:2px 8px 2px 4px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap;">${txt}</th>`;
   const TD = (content) => `<td style="padding:1px 8px 1px 4px;">${content}</td>`;
   const TDt = (txt) => `<td style="padding:1px 4px;color:var(--text);white-space:nowrap;">${txt}</td>`;
-  const mkLegend = (title, thead, tbody) =>
-    `<div style="display:flex;flex-direction:column;gap:3px;">` +
-    `<span style="font-size:0.64rem;font-weight:700;color:var(--accent2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;">${title}</span>` +
-    `<table style="border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.68rem;">` +
-    `<thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table></div>`;
+  const mkLegend = (title, tbody) =>
+    `<div style=\"display:flex;flex-direction:column;gap:3px;\">` +
+    `<table style=\"border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.68rem;\">` +
+    `<tbody>${tbody}</tbody></table></div>`;
 
   const effortLegend = mkLegend(
     'T-shirt \u2013 Ticket Effort',
-    TH('T-SHIRT') + TH('TICKET SIZE'),
     tshirtData.map(r => `<tr>${TD('<span class="tshirt-badge '+tshirtClass(r.size)+'">'+r.size+'</span>')}${TDt(r.ticketSize)}</tr>`).join('')
   );
   const tshirtLegend = mkLegend(
     'T-shirt \u2013 Epic guesstimate',
-    TH('T-SHIRT') + TH('KOMMENTAR'),
     tshirt2Data.map(r => `<tr>${TD('<span class="tshirt-badge '+tshirtClass(r.size)+'">'+r.size+'</span>')}${TDt(r.kommentar)}</tr>`).join('')
   );
   const sep = `<div style="width:1px;background:var(--border);flex-shrink:0;align-self:stretch;margin:0 8px;"></div>`;
@@ -10357,7 +10409,7 @@ function renderEstimering() {
       const active = Number(val)===v;
       return `<button onclick="setEffort(${item.id}, ${v}, this.parentElement.querySelector('.effort-input'))" style="padding:1px 4px;font-size:0.64rem;font-family:'JetBrains Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'transparent':'var(--border)'};background:${active?'rgba(88,166,255,.2)':'var(--surface2)'};color:${active?'var(--accent)':'var(--muted)'};transition:all .1s;flex-shrink:0;">${lbl}</button>`;
     }).join('');
-    const effortCell = estEditMode
+    const effortCell = globalEditMode
       ? `<div style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;"><input class="effort-input" type="text" inputmode="numeric" value="${val}" placeholder="\u2013" onblur="saveEffort(${item.id}, this)" onkeydown="effortKeydown(event,${item.id},this,'${val}')" style="width:54px;"/>${effortBtns}</div>`
       : `<span style="font-family:'JetBrains Mono',monospace;font-size:0.88rem;color:var(--muted);">${val||'\u2013'}</span>`;
 
@@ -10366,7 +10418,7 @@ function renderEstimering() {
       const active = ts===v;
       return `<button onclick="saveField(${item.id},'Custom.Tshirt','${active?'':v}')" style="padding:1px 4px;font-size:0.64rem;font-family:'JetBrains Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'transparent':'var(--border)'};background:${active?'rgba(88,166,255,.2)':'var(--surface2)'};color:${active?'var(--accent)':'var(--muted)'};transition:all .1s;flex-shrink:0;" title="${active?'Klicka för att rensa':v}">${v}</button>`;
     }).join('');
-    const tshirtCell = estEditMode
+    const tshirtCell = globalEditMode
       ? `<div style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;">${tshirtBtns}</div>`
       : (ts ? `<span class="tshirt-badge ${tshirtClass(ts)}">${ts}</span>` : `<span style="color:var(--muted)">\u2013</span>`);
 
@@ -10397,24 +10449,39 @@ function renderEstimering() {
   const scrollEl = wrap.querySelector('[style*="overflow-y:auto"]');
   const savedScroll = scrollEl ? scrollEl.scrollTop : 0;
 
-  wrap.innerHTML = `<div class="prio-view">` +
+  const sizingGuideTitle = estSizingGuideOpen === 'effort' ? 'T-shirt - Ticket Effort' : 'T-shirt - Epic guesstimate';
+  const sizingGuideBody = estSizingGuideOpen === 'effort' ? effortLegend : tshirtLegend;
+  const sizingGuidePanel = estSizingGuideOpen
+    ? `<div style="position:absolute;top:108px;right:14px;z-index:12;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 16px 28px rgba(0,0,0,.35);padding:10px 12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;text-transform:uppercase;color:var(--muted);">${sizingGuideTitle}</span>
+          <button class="btn btn-outline btn-xs-icon" onclick="toggleEstSizingGuide('${estSizingGuideOpen}')" title="Stang">x</button>
+        </div>
+        ${sizingGuideBody}
+      </div>`
+    : '';
+
+  wrap.innerHTML = `<div class="prio-view" style="position:relative;">` +
     `<div class="prio-toolbar" style="flex-wrap:wrap;">` +
       `<span style="font-size:0.71rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;flex-shrink:0;">Gruppering:</span>` +
       grpBtns +
-      sep + effortLegend + sep + tshirtLegend +
       editToggle +
     `</div>` +
     filterRow +
     `<div style="flex:1;overflow:hidden;display:flex;flex-direction:column;">` +
-      `<div style="display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:6px 12px;border-bottom:1px solid var(--border);background:var(--surface2);">${listToggleBtn}${createEpicBtn}</div>` +
       `<div style="display:flex;height:32px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);align-items:center;">` +
-        `<div style="width:${EST_LIST_W}px;flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-right:2px solid var(--border);box-sizing:border-box;">Epic</div>` +
-        `<div class="est-col-effort" style="flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:2px solid var(--border);box-sizing:border-box;">Effort</div>` +
-        `<div class="est-col-tshirt" style="flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--border);box-sizing:border-box;">T-shirt</div>` +
+        `<div style="width:${EST_LIST_W}px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-right:2px solid var(--border);box-sizing:border-box;">${listToggleBtn}${createEpicBtn}<span>Epic</span></div>` +
+        `<div class="est-col-effort" style="flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:2px solid var(--border);box-sizing:border-box;">` +
+          `<button class="btn btn-outline" style="width:auto;padding:2px 8px;font-size:0.64rem;line-height:1.1;" onclick="toggleEstSizingGuide('effort')">Effort</button>` +
+        `</div>` +
+        `<div class="est-col-tshirt" style="flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--border);box-sizing:border-box;">` +
+          `<button class="btn btn-outline" style="width:auto;padding:2px 8px;font-size:0.64rem;line-height:1.1;" onclick="toggleEstSizingGuide('tshirt')">T-shirt</button>` +
+        `</div>` +
         `<div class="est-col-bar" style="flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--border);box-sizing:border-box;">Storlek</div>` +
       `</div>` +
       `<div style="flex:1;overflow-y:auto;" id="est-scroll">${rowsHtml}</div>` +
     `</div>` +
+    sizingGuidePanel +
   `</div>`;
 
   const newScroll = document.getElementById('est-scroll');
@@ -10577,11 +10644,7 @@ function renderPrioritering() {
   const BAR_W = 130;
   const EFF_W = 56;
 
-  const editToggle = `<label class="toggle-wrap toggle-wrap-compact">
-    <input type="checkbox" ${prioEditMode?'checked':''} onchange="prioEditMode=this.checked;renderPrioritering()">
-    <span class="toggle-track"></span>
-    <span>Redigera</span>
-  </label>`;
+  const editToggle = '';  // Moved to Settings page — use globalEditMode
   const allExpanded = filtered.length > 0 && filtered.every(ep => expandedEpicIds.has(ep.id));
   const listToggleBtn = `<button class="btn btn-outline btn-xs-icon" title="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" aria-label="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" onclick="setAllEpicFeatures(${allExpanded ? 'false' : 'true'})">${allExpanded ? 'v' : '>'}</button>`;
   const createEpicBtn = `<button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.72rem;line-height:1.1;" onclick="createEpicFromHierarchyList()" title="Skapa ny Epic">+ Skapa epic</button>`;
@@ -10642,16 +10705,16 @@ function renderPrioritering() {
 
       const barCell = (val, color, field) => {
         const pct = val != null ? Math.round(val / FIB_MAX * 100) : 0;
-        const drag = prioEditMode ? `onmousedown="wsjfBarDrag(event,${item.id},'${field}',${FIB_MAX})"` : '';
+        const drag = globalEditMode ? `onmousedown="wsjfBarDrag(event,${item.id},'${field}',${FIB_MAX})"` : '';
         return `<div style="width:${BAR_W}px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
-          <div class="wsjf-bar-track" ${drag} style="flex:1;${prioEditMode?'cursor:ew-resize;':''}">
+          <div class="wsjf-bar-track" ${drag} style="flex:1;${globalEditMode?'cursor:ew-resize;':''}">
             <div class="wsjf-bar-fill" style="width:${pct}%;background:${color};"></div>
           </div>
           <span style="font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--text);width:18px;flex-shrink:0;text-align:right;">${val!=null?val:'–'}</span>
         </div>`;
       };
 
-      const trashBtn = prioEditMode
+      const trashBtn = globalEditMode
         ? `<button onclick="prioResetWsjfFields(${item.id})"
             style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.90rem;flex-shrink:0;padding:0 6px;opacity:0.6;" title="Nollställ BV, TC, RR">🗑</button>`
         : '';
@@ -10683,7 +10746,7 @@ function renderPrioritering() {
       const REACH_MAX  = 5;
 
       // Reach buttons 1–5
-      const reachBtns = prioEditMode
+      const reachBtns = globalEditMode
         ? [1,2,3,4,5].map(v => {
             const active = reach === v;
             return `<button onclick="prioSetReach(${item.id},${v})"
@@ -10692,7 +10755,7 @@ function renderPrioritering() {
         : `<span style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--text);">${reach != null ? reach : '–'}</span>`;
 
       // Confidence buttons
-      const confBtns = prioEditMode
+      const confBtns = globalEditMode
         ? CONF_OPTS.map(o => {
             const active = confidence === o.val;
             return `<button onclick="prioSetConfidence(${item.id},${o.val})"
@@ -10700,7 +10763,7 @@ function renderPrioritering() {
           }).join('')
         : `<span style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--text);">${confidence != null ? (confidence*100)+'%' : '–'}</span>`;
 
-      const trashRice = prioEditMode
+      const trashRice = globalEditMode
         ? `<button onclick="prioResetRiceFields(${item.id})"
             style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.90rem;padding:0 4px;opacity:0.6;" title="Rensa Reach & Confidence">🗑</button>`
         : '';
@@ -10713,7 +10776,7 @@ function renderPrioritering() {
 
       // Reach: bar in view, buttons in edit
       const reachPct = reach != null ? Math.round(reach / 5 * 100) : 0;
-      const reachCell = prioEditMode
+      const reachCell = globalEditMode
         ? `<div style="width:${RICE_REACH_W}px;flex-shrink:0;display:flex;align-items:center;gap:3px;padding:0 8px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
             ${[1,2,3,4,5].map(v => {
               const active = reach === v;
@@ -10727,14 +10790,14 @@ function renderPrioritering() {
 
       // Impact: bar, draggable in edit mode (BV field, Fibonacci 1-13)
       const impactPct = impact != null ? Math.round(impact / 13 * 100) : 0;
-      const impactDrag = prioEditMode ? `onmousedown="wsjfBarDrag(event,${item.id},'Microsoft.VSTS.Common.BusinessValue',13)"` : '';
+      const impactDrag = globalEditMode ? `onmousedown="wsjfBarDrag(event,${item.id},'Microsoft.VSTS.Common.BusinessValue',13)"` : '';
       const impactCell = `<div style="width:${RICE_IMPACT_W}px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
-        <div class="wsjf-bar-track" ${impactDrag} style="flex:1;${prioEditMode?'cursor:ew-resize;':''}"><div class="wsjf-bar-fill" style="width:${impactPct}%;background:#79c0ff;"></div></div>
+        <div class="wsjf-bar-track" ${impactDrag} style="flex:1;${globalEditMode?'cursor:ew-resize;':''}"><div class="wsjf-bar-fill" style="width:${impactPct}%;background:#79c0ff;"></div></div>
         <span style="font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--text);width:14px;text-align:right;">${impact!=null?impact:'–'}</span>
       </div>`;
 
       // Confidence: buttons or text
-      const confCell = prioEditMode
+      const confCell = globalEditMode
         ? `<div style="width:${RICE_CONF_W}px;flex-shrink:0;display:flex;align-items:center;gap:4px;padding:0 8px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
             ${CONF_OPTS.map(o => {
               const active = confidence === o.val;
@@ -10761,7 +10824,7 @@ function renderPrioritering() {
     const MOSCOW_COLORS = { 'Must':'#ff8a80','Should':'#f0c040','Could':'#6bdb78',"Won't":'#b0bcc8' };
     const curPrio = f[PRIORITY_FIELD] || null;
 
-    const moscowPanel = prioEditMode
+    const moscowPanel = globalEditMode
       ? `<div style="display:flex;align-items:center;gap:5px;padding:0 14px;">
           ${MOSCOW_OPTS.map(v => {
             const active = curPrio === v;
@@ -10791,27 +10854,9 @@ function renderPrioritering() {
     </div>
     ${filterRow}
     <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
-      <div class="prio-list-toggle-row" style="display:flex;align-items:center;gap:6px;">${listToggleBtn}${createEpicBtn}</div>
       <!-- Sticky header row -->
       <div style="display:flex;height:${HEADER_H}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);">
-        <div style="width:${PRIO_LIST_W}px;flex-shrink:0;display:flex;align-items:center;border-right:2px solid var(--border);gap:0;padding:0 10px;box-sizing:border-box;overflow:hidden;">
-          <span style="flex:1;font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;color:var(--muted);">Epic</span>
-          <span style="width:38px;flex-shrink:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">T-shirt</span>
-          <span style="width:90px;flex-shrink:0;padding-left:8px;">
-            <select class="col-filter inline-muted-select"
-              onchange="prioTypFilter=this.value.toLowerCase();renderPrioritering()">
-              <option value="">Typ: Alla</option>
-              ${typVals.map(v=>`<option value="${v.toLowerCase()}" ${prioTypFilter===v.toLowerCase()?'selected':''}>${v}</option>`).join('')}
-            </select>
-          </span>
-          <span style="width:120px;flex-shrink:0;padding-left:8px;">
-            <select class="col-filter inline-muted-select"
-              onchange="prioSuperFilter=this.value.toLowerCase();renderPrioritering()">
-              <option value="">Super Epic: Alla</option>
-              ${superVals.map(v=>`<option value="${v.toLowerCase()}" ${prioSuperFilter===v.toLowerCase()?'selected':''}>${v}</option>`).join('')}
-            </select>
-          </span>
-        </div>
+        <div style="width:${PRIO_LIST_W}px;flex-shrink:0;border-right:2px solid var(--border);"></div>
         <div style="flex:1;display:flex;align-items:center;min-width:fit-content;">
           ${prioModel === 'moscow'
             ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:6px;">
@@ -10838,7 +10883,25 @@ function renderPrioritering() {
       </div>
       <!-- Column sub-headers for panel -->
       <div style="display:flex;height:32px;flex-shrink:0;background:var(--surface2);border-bottom:1px solid var(--border);">
-        <div style="width:${PRIO_LIST_W}px;flex-shrink:0;border-right:2px solid var(--border);"></div>
+        <div style="width:${PRIO_LIST_W}px;flex-shrink:0;display:flex;align-items:center;border-right:2px solid var(--border);gap:0;padding:0 10px;box-sizing:border-box;overflow:hidden;">
+          <span style="display:flex;align-items:center;gap:6px;padding-right:8px;">${listToggleBtn}${createEpicBtn}</span>
+          <span style="flex:1;font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;color:var(--muted);">Epic</span>
+          <span style="width:38px;flex-shrink:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">T-shirt</span>
+          <span style="width:90px;flex-shrink:0;padding-left:8px;">
+            <select class="col-filter inline-muted-select"
+              onchange="prioTypFilter=this.value.toLowerCase();renderPrioritering()">
+              <option value="">Typ: Alla</option>
+              ${typVals.map(v=>`<option value="${v.toLowerCase()}" ${prioTypFilter===v.toLowerCase()?'selected':''}>${v}</option>`).join('')}
+            </select>
+          </span>
+          <span style="width:120px;flex-shrink:0;padding-left:8px;">
+            <select class="col-filter inline-muted-select"
+              onchange="prioSuperFilter=this.value.toLowerCase();renderPrioritering()">
+              <option value="">Super Epic: Alla</option>
+              ${superVals.map(v=>`<option value="${v.toLowerCase()}" ${prioSuperFilter===v.toLowerCase()?'selected':''}>${v}</option>`).join('')}
+            </select>
+          </span>
+        </div>
         <div style="flex:1;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);min-width:fit-content;">
           ${(prioModel === 'moscow' || prioModel === 'rice') ? '' : `
           <span style="min-width:48px;text-align:center;flex-shrink:0;">WSJF</span>
@@ -10900,10 +10963,29 @@ function wsjfBarDrag(e, itemId, field, maxVal) {
 
 // Timeline view
 // ──────────────────────────────────────────
-let timelineEditMode = false;
+
 let timelineRoadmapFilter = new Set(ROADMAP_CANONICAL_VALUES);
 let timelineGroupMode = 'projekt'; // 'projekt'|'ao'|'roadmap'|'maconomy'
 let timelineTargetappsFilter = '';
+const TIMELINE_MONTH_COL_MIN = 36;
+const TIMELINE_MONTH_COL_MAX = 140;
+const TIMELINE_MONTH_COL_STEP = 8;
+const TIMELINE_MONTH_COL_BASE = 60;
+let timelineMonthColWidth = TIMELINE_MONTH_COL_BASE;
+
+function setTimelineZoom(nextWidth) {
+  const widthNum = Number(nextWidth);
+  if (!Number.isFinite(widthNum)) return;
+  const clamped = Math.max(TIMELINE_MONTH_COL_MIN, Math.min(TIMELINE_MONTH_COL_MAX, Math.round(widthNum)));
+  if (clamped === timelineMonthColWidth) return;
+  timelineMonthColWidth = clamped;
+  if (activeTab === 'timeline') renderTimeline();
+}
+
+function nudgeTimelineZoom(direction) {
+  const dir = Number(direction) >= 0 ? 1 : -1;
+  setTimelineZoom(timelineMonthColWidth + (dir * TIMELINE_MONTH_COL_STEP));
+}
 
 function saveTimelineDate(itemId, field, value) {
   saveField(itemId, field, value);
@@ -10996,7 +11078,7 @@ function renderTimeline() {
   let cur = new Date(rangeStart);
   while (cur < rangeEnd) { months.push(new Date(cur)); cur = new Date(cur.getFullYear(), cur.getMonth()+1, 1); }
 
-  const COL_W = 60;
+  const COL_W = timelineMonthColWidth;
   const totalW = months.length * COL_W;
   const totalMs = rangeEnd - rangeStart;
   const dateToX = d => d ? Math.round((new Date(d) - rangeStart) / totalMs * totalW) : null;
@@ -11038,7 +11120,7 @@ function renderTimeline() {
     if (r.type==='group') return `<div style="height:${GROUP_H}px;background:var(--surface);${groupBorder}box-sizing:border-box;"></div>`;
     const item = r.item;
     const v = fmt(item.fields[field]);
-    if (timelineEditMode) {
+    if (globalEditMode) {
       return `<div style="height:${ROW_H}px;${borderBtm}box-sizing:border-box;display:flex;align-items:center;padding:0 4px;gap:2px;">
         <input class="tl-date-input" type="date" value="${v}" style="flex:1;min-width:0;"
           onchange="allItems.find(i=>i.id===${item.id}).fields['${field}']=this.value;saveField(${item.id},'${field}',this.value)">
@@ -11111,13 +11193,13 @@ function renderTimeline() {
 
     // Click empty row in edit mode to create bar
     const noBar = x1===null && x2===null;
-    const clickHandler = timelineEditMode && noBar ? `onclick="tlCreateBar(${item.id})"` : '';
-    const hoverCursor = timelineEditMode && noBar ? 'cursor:pointer;' : '';
+    const clickHandler = globalEditMode && noBar ? `onclick="tlCreateBar(${item.id})"` : '';
+    const hoverCursor = globalEditMode && noBar ? 'cursor:pointer;' : '';
 
     if (x1!==null && x2!==null && x2>x1) {
       const w = x2-x1;
       const dimmed = !t ? ';opacity:0.65' : '';
-      if (timelineEditMode) {
+      if (globalEditMode) {
         bar = `<div class="tl-draggable" data-id="${item.id}" data-sf="${SF}" data-tf="${TF}"
           style="position:absolute;left:${x1}px;width:${w}px;height:16px;top:${(ROW_H-16)/2}px;border-radius:8px;background:${color}${dimmed};display:flex;align-items:center;padding:0 4px;overflow:hidden;font-size:0.86rem;font-family:'JetBrains Mono',monospace;color:#fff;font-weight:700;white-space:nowrap;cursor:grab;"
           title="${fmt(s)} → ${t?fmt(t):'idag'}${!t?' ⚠':''}" >
@@ -11161,43 +11243,77 @@ function renderTimeline() {
       ).join('')}
       <div class="timeline-toolbar-divider"></div>
       <div class="timeline-legend-wrap">${legendHtml}</div>
-      <label class="toggle-wrap toggle-wrap-compact" style="flex-shrink:0;">
-        <input type="checkbox" ${timelineEditMode?'checked':''} onchange="timelineEditMode=this.checked;renderTimeline()">
-        <span class="toggle-track"></span>
-        <span>Redigera datum</span>
-      </label>
+      <div class="timeline-zoom-wrap">
+        <span class="timeline-toolbar-label">Zoom</span>
+        <button class="btn btn-outline btn-xs-icon" onclick="nudgeTimelineZoom(-1)" title="Zooma ut">-</button>
+        <input class="timeline-zoom-range" type="range"
+          min="${TIMELINE_MONTH_COL_MIN}" max="${TIMELINE_MONTH_COL_MAX}" step="${TIMELINE_MONTH_COL_STEP}" value="${timelineMonthColWidth}"
+          oninput="setTimelineZoom(this.value)">
+        <button class="btn btn-outline btn-xs-icon" onclick="nudgeTimelineZoom(1)" title="Zooma in">+</button>
+        <span class="timeline-zoom-value">${Math.round((timelineMonthColWidth / TIMELINE_MONTH_COL_BASE) * 100)}%</span>
+      </div>
+
     </div>
     ${selectedProjects.has('Roadmap') ? `
     <div class="timeline-filter-row">
       <select class="col-filter timeline-targetapps-select"
         onchange="timelineTargetappsFilter=this.value.toLowerCase();renderTimeline()">
         <option value="">Target Apps: Alla</option>
-        ${[...new Set(allItems.filter(i=>i.fields['System.WorkItemType']==='Epic'&&(i.fields['System.TeamProject']||i.fields['System.AreaPath']||'').split('\\\\')[0]==='Roadmap').flatMap(i=>(i.fields['Custom.Targetapps']||'').split(',').map(s=>s.trim())).filter(Boolean))].sort().map(v=>`<option value="${v.toLowerCase()}" ${timelineTargetappsFilter===v.toLowerCase()?'selected':''}>${v}</option>`).join('')}
+        ${[...new Set(allItems.filter(i=>i.fields['System.WorkItemType']==='Epic'&&(i.fields['System.TeamProject']||i.fields['System.AreaPath']||'').split('\\')[0]==='Roadmap').flatMap(i=>(i.fields['Custom.Targetapps']||'').split(',').map(s=>s.trim())).filter(Boolean))].sort().map(v=>`<option value="${v.toLowerCase()}" ${timelineTargetappsFilter===v.toLowerCase()?'selected':''}>${v}</option>`).join('')}
       </select>
     </div>` : ''}
-    <div class="timeline-list-toggle-row" style="display:flex;align-items:center;gap:6px;">${listToggleBtn}${createEpicBtn}</div>
     <div class="tl-body">
-      <!-- Epic labels -->
+      <!-- Epic labels + Score columns: WSJF | MoSCoW | RICE -->
       <div style="flex-shrink:0;width:${TL_LIST_W}px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
-        <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;padding:0 12px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">Epic</div>
-        ${labelHtml}
-      </div>
-      <!-- Score columns: WSJF | MoSCoW | RICE -->
-      <div style="flex-shrink:0;width:${SCORE_W*3}px;border-right:2px solid var(--border);display:flex;flex-direction:column;">
-        <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;color:var(--muted);">
+        <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;padding:0 12px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">
+          <span style="display:flex;align-items:center;gap:6px;padding-right:8px;">${listToggleBtn}${createEpicBtn}</span>
+          <span style="flex:1;">Epic</span>
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;">WSJF</span>
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;border-left:1px solid var(--border);">MoSCoW</span>
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;border-left:1px solid var(--border);">RICE</span>
         </div>
-        ${scoreHtml}
+        ${rows.map((r,i) => {
+          // Bygg rad: label + score
+          const rLabel = r.type==='group'
+            ? `<div style=\"height:${GROUP_H}px;display:flex;align-items:center;background:var(--surface);${groupBorder}box-sizing:border-box;flex:1;\">${hierarchyGroupRowLeadHtml(r.label, { width: `${TL_LIST_W}px`, height: GROUP_H, borderRight: 'none', prefix: '▸ ' })}</div>`
+            : hierarchyListCellHtml(r.item, {
+                type: r.type,
+                width: `calc(${TL_LIST_W}px - ${SCORE_W*3}px)`,
+                height: ROW_H,
+                borderRight: 'none',
+                rowExtraStyle: `${borderBtm}overflow:hidden;`,
+                hasChildren: hierarchyRowHasChildren(r.item, r.type, features, stories),
+              });
+          const rScore = r.type==='group'
+            ? `<div style=\"height:${GROUP_H}px;background:var(--surface);${groupBorder}box-sizing:border-box;display:flex;\"><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span></div>`
+            : (() => {
+                const f = r.item.fields;
+                const bv  = f['Microsoft.VSTS.Common.BusinessValue'] ?? null;
+                const tc  = f['Microsoft.VSTS.Common.TimeCriticality'] ?? null;
+                const rrRaw = f['Custom.RiskreductionOpportunityEnablement'] ?? null;
+                const rr  = rrRaw != null ? Number(rrRaw)||null : null;
+                const eff = tlGetEffort(r.item);
+                const wsjf = calcWsjf(bv, tc, rr, eff);
+                const moscow = f[PRIORITY_FIELD] || null;
+                const moscowColor = moscow ? (MOSCOW_C[moscow]||'var(--muted)') : null;
+                const reach = f['Custom.Reach'] != null ? Number(f['Custom.Reach']) : null;
+                const conf  = f['Custom.Confidence'] != null ? Number(f['Custom.Confidence']) : null;
+                const impact = bv != null ? Number(bv) : null;
+                const rice = (reach!=null&&impact!=null&&conf!=null&&eff) ? +((reach*impact*conf)/eff).toFixed(1) : null;
+                return `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${wsjf!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;\" title=\"WSJF\">${wsjf!=null?wsjf:'–'}</span>`+
+                  `<span style=\"width:${SCORE_W}px;text-align:center;font-size:0.74rem;flex-shrink:0;border-left:1px solid var(--border);\" title=\"MoSCoW\">${moscow?`<span style=\\"color:${moscowColor};font-weight:700;font-size:0.66rem;\\">${moscow}</span>`:'–'}</span>`+
+                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${rice!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"RICE\">${rice!=null?rice:'–'}</span>`;
+              })();
+          return `<div style=\"display:flex;align-items:center;\">${rLabel}${rScore}</div>`;
+        }).join('')}
       </div>
       <!-- Chart -->
       <div style="flex:1;overflow-x:auto;display:flex;flex-direction:column;">
         <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;width:${totalW}px;">${monthHeaders}</div>
         <div id="tl-chart-rows" style="position:relative;width:${totalW}px;">${gridLines}${todayLine}${chartRowsHtml}</div>
       </div>
-      <!-- Date columns — only in edit mode, directly after chart -->
-      ${timelineEditMode ? `
+      <!-- Date columns — only in edit mode, direkt efter chart -->
+      ${globalEditMode ? `
       <div style="flex-shrink:0;width:${DATE_COL_W}px;border-left:2px solid var(--border);display:flex;flex-direction:column;">
         <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">Start</div>
         ${startHtml}
@@ -11209,7 +11325,7 @@ function renderTimeline() {
     </div>
   </div>`;
 
-  if (timelineEditMode) attachTimelineDrag(rangeStart, totalMs, totalW, SF, TF);
+  if (globalEditMode) attachTimelineDrag(rangeStart, totalMs, totalW, SF, TF);
 }
 
 function tlCreateBar(itemId) {
