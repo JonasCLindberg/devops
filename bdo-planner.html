@@ -12746,7 +12746,8 @@ function boardNativeNodeWidth(runtime, node) {
   if (!Number.isFinite(s) || !Number.isFinite(e) || e <= s) return base;
   const x1 = boardNativeDateToBoardX(runtime, s);
   const x2 = boardNativeDateToBoardX(runtime, e);
-  return Math.max(80, x2 - x1);
+  // Keep current layout width as floor to avoid tiny visual shrink from date rounding.
+  return Math.max(80, base, x2 - x1);
 }
 
 function boardNativeSyncNodeFromDates(runtime, node) {
@@ -13472,9 +13473,6 @@ function boardNativeRenderAxes(runtime) {
 }
 
 function boardNativeRender(runtime) {
-  if (runtime.state.showTimeAxis) {
-    runtime.state.nodes.forEach(n => boardNativeSyncNodeFromDates(runtime, n));
-  }
   const selectedIds = runtime.selectedIds || new Set();
   const visibleIds = boardNativeVisibleNodeIds(runtime);
   const nodeById = new Map(runtime.state.nodes.map(n => [n.id, n]));
@@ -13792,7 +13790,6 @@ function boardNativeRender(runtime) {
       if (side !== 'start' && side !== 'end') return;
       const node = runtime.state.nodes.find(n => n.id === nodeId);
       if (!node) return;
-      if (!node.timeStartDate || !node.timeEndDate) boardNativeSyncNodeDatesFromLayout(runtime, node);
       runtime.nodeTimeDrag = {
         nodeId,
         side,
@@ -13875,6 +13872,12 @@ function boardNativeMount() {
     selectionBaseIds: new Set(),
   };
 
+  // Sync once on mount when time axis is enabled.
+  // Avoid syncing on every render to prevent click-induced position jumps.
+  if (runtime.state.showTimeAxis) {
+    runtime.state.nodes.forEach(n => boardNativeSyncNodeFromDates(runtime, n));
+  }
+
   const updateSelectionRectVisual = (rt) => {
     if (!rt.selectionEl || !rt.selecting) {
       if (rt.selectionEl) rt.selectionEl.style.display = 'none';
@@ -13922,6 +13925,23 @@ function boardNativeMount() {
     window.addEventListener('pointermove', (e) => {
       const rt = boardNativeRuntime;
       if (!rt) return;
+      const leftPressed = (e.buttons & 1) === 1;
+      const middlePressed = (e.buttons & 4) === 4;
+
+      // Failsafe: if button state is lost, cancel active drags to avoid ghost moves.
+      if (rt.panDrag && !middlePressed) {
+        rt.panDrag = null;
+      }
+      if (!leftPressed && (rt.drag || rt.markerDrag || rt.timeAxisDrag || rt.nodeTimeDrag || rt.linkDrag || rt.selecting)) {
+        rt.drag = null;
+        rt.markerDrag = null;
+        rt.timeAxisDrag = null;
+        rt.nodeTimeDrag = null;
+        rt.linkDrag = null;
+        rt.selecting = null;
+        if (rt.selectionEl) rt.selectionEl.style.display = 'none';
+      }
+
       if (rt.panDrag) {
         const dx = e.clientX - rt.panDrag.startX;
         const dy = e.clientY - rt.panDrag.startY;
@@ -13941,7 +13961,8 @@ function boardNativeMount() {
         const { startMs, endMs } = boardNativeTimeRange(rt);
         if (rt.timeAxisDrag) {
           const dx = e.clientX - rt.timeAxisDrag.startX;
-          if (!rt.timeAxisDrag.didMove && Math.abs(dx) > 2) {
+          if (!rt.timeAxisDrag.didMove) {
+            if (Math.abs(dx) <= 10) return;
             boardNativePushUndo(rt);
             rt.timeAxisDrag.didMove = true;
           }
@@ -13962,7 +13983,8 @@ function boardNativeMount() {
         }
         if (rt.nodeTimeDrag) {
           const dx = e.clientX - rt.nodeTimeDrag.startX;
-          if (!rt.nodeTimeDrag.didMove && Math.abs(dx) > 2) {
+          if (!rt.nodeTimeDrag.didMove) {
+            if (Math.abs(dx) <= 10) return;
             boardNativePushUndo(rt);
             rt.nodeTimeDrag.didMove = true;
           }
@@ -13988,7 +14010,8 @@ function boardNativeMount() {
         const rect = rt.viewport.getBoundingClientRect();
         const mx = e.clientX - rt.markerDrag.startX;
         const my = e.clientY - rt.markerDrag.startY;
-        if (!rt.markerDrag.didMove && ((mx * mx) + (my * my) > 9)) {
+        if (!rt.markerDrag.didMove) {
+          if ((mx * mx) + (my * my) <= 9) return;
           boardNativePushUndo(rt);
           rt.markerDrag.didMove = true;
         }
@@ -14069,7 +14092,13 @@ function boardNativeMount() {
       // A bare click (no movement) must NOT call boardNativeRender here because
       // pointerup fires before the 'click' event — re-rendering first would detach
       // the clicked element from the DOM and prevent its click listener from firing.
-      const hadDrag = (rt.drag && rt.drag.moved) || !!rt.linkDrag || !!rt.markerDrag || !!rt.selecting || (rt.timeAxisDrag && rt.timeAxisDrag.didMove) || (rt.nodeTimeDrag && rt.nodeTimeDrag.didMove);
+      const hadDrag =
+        (rt.drag && rt.drag.moved) ||
+        (rt.linkDrag && rt.linkDrag.didMove) ||
+        (rt.markerDrag && rt.markerDrag.didMove) ||
+        !!rt.selecting ||
+        (rt.timeAxisDrag && rt.timeAxisDrag.didMove) ||
+        (rt.nodeTimeDrag && rt.nodeTimeDrag.didMove);
       if (rt.linkDrag) {
         const source = rt.state.nodes.find(n => n.id === rt.linkDrag.sourceId);
         const target = rt.linkDrag.targetId ? rt.state.nodes.find(n => n.id === rt.linkDrag.targetId) : null;
@@ -14259,8 +14288,11 @@ function boardToggleTimeAxis(checked) {
     boardNativeRuntime.state.timeStartDate = boardNativeIsoDate(startMs);
     boardNativeRuntime.state.timeEndDate = boardNativeIsoDate(endMs);
     boardNativeRuntime.state.nodes.forEach(n => {
-      if (!n.timeStartDate || !n.timeEndDate) boardNativeSyncNodeDatesFromLayout(boardNativeRuntime, n);
-      boardNativeSyncNodeFromDates(boardNativeRuntime, n);
+      const layoutWidth = Number.isFinite(Number(n.boardWidth)) ? Math.max(80, Number(n.boardWidth)) : 220;
+      const startDateMs = boardNativeBoardXToDate(boardNativeRuntime, n.x);
+      const endDateMs = boardNativeBoardXToDate(boardNativeRuntime, n.x + layoutWidth);
+      n.timeStartDate = boardNativeIsoDate(startDateMs);
+      n.timeEndDate = boardNativeIsoDate(endDateMs);
     });
   }
   boardNativeRender(boardNativeRuntime);
