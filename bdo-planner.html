@@ -2601,7 +2601,7 @@
       </div>
       <div id="manageHint" class="manage-hint">Klicka på ett projekt för att dölja/visa det i listan.</div>
       <div class="checkbox-group" id="projectCheckboxes">
-        <div class="project-placeholder">Klicka "Hämta projekt"...</div>
+        <div class="project-placeholder">Hämtar team...</div>
       </div>
       <button class="btn btn-outline create-favorite-main-btn" id="createFavoriteMainBtn" onclick="createFavorite()" title="Skapa team" aria-label="Skapa team">+</button>
     </div>
@@ -4655,39 +4655,121 @@ function uniqueStringList(values) {
   return [...new Set((values || []).map(v => String(v || '').trim()).filter(Boolean))];
 }
 
-function coerceFavoriteKeys(values) {
-  const out = [];
-  const pushValue = (value) => {
-    if (Array.isArray(value)) {
-      value.forEach(pushValue);
-      return;
-    }
-    if (value && typeof value === 'object') {
-      const fromObj = extractFavoriteKeysFromObject(value);
-      if (fromObj.length) fromObj.forEach(pushValue);
-      return;
+function decodeHtmlEntities(text) {
+  const raw = String(text || '');
+  if (!raw || (!raw.includes('&') && !raw.includes('&quot;') && !raw.includes('&amp;'))) return raw;
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = raw;
+  return textarea.value;
+}
+
+function extractKnownFavoriteKeysFromText(text) {
+  const haystack = decodeHtmlEntities(String(text || '')).trim();
+  if (!haystack) return [];
+
+  const allowed = favoriteSelectionKeys();
+  if (!allowed.length) return [];
+
+  return uniqueStringList(
+    allowed
+      .filter(key => key && haystack.includes(key))
+      .sort((a, b) => b.length - a.length)
+  );
+}
+
+function collectFavoriteKeyStrings(value, out = [], seen = new Set()) {
+  if (value == null) return out;
+
+  if (Array.isArray(value)) {
+    value.forEach(item => collectFavoriteKeyStrings(item, out, seen));
+    return out;
+  }
+
+  if (value && typeof value === 'object') {
+    const extracted = extractFavoriteKeysFromObject(value);
+    if (extracted.length) {
+      extracted.forEach(item => collectFavoriteKeyStrings(item, out, seen));
+      return out;
     }
 
-    const raw = String(value || '').trim();
-    if (!raw) return;
+    Object.values(value).forEach(item => collectFavoriteKeyStrings(item, out, seen));
+    return out;
+  }
 
-    if ((raw.startsWith('{') && raw.endsWith('}')) || (raw.startsWith('[') && raw.endsWith(']'))) {
+  let text = decodeHtmlEntities(String(value || '').trim());
+  if (!text) return out;
+
+  const knownMatches = extractKnownFavoriteKeysFromText(text);
+  if (knownMatches.length) {
+    knownMatches.forEach(item => {
+      const clean = String(item || '').trim();
+      if (clean) out.push(clean);
+    });
+    return out;
+  }
+
+  const guard = `${text.slice(0, 240)}|${text.length}`;
+  if (seen.has(guard)) return out;
+  seen.add(guard);
+
+  for (let i = 0; i < 8; i += 1) {
+    if (!text || typeof text !== 'string') break;
+    const trimmed = text.trim();
+    if (!trimmed) break;
+
+    if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('"') && trimmed.endsWith('"'))) {
       try {
-        const parsed = JSON.parse(raw);
-        pushValue(parsed);
-        return;
+        const parsed = JSON.parse(trimmed);
+        if (parsed !== text) {
+          if (Array.isArray(parsed) || (parsed && typeof parsed === 'object')) {
+            collectFavoriteKeyStrings(parsed, out, seen);
+            return out;
+          }
+          text = String(parsed);
+          continue;
+        }
       } catch (_) {}
     }
 
-    out.push(raw);
-  };
+    const unescaped = trimmed
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, '\\')
+      .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 
-  pushValue(values);
-  return uniqueStringList(out);
+    if (unescaped !== trimmed) {
+      text = unescaped;
+      continue;
+    }
+
+    if (/[,\n;]+/.test(trimmed)) {
+      trimmed.split(/[,\n;]+/g).forEach(part => collectFavoriteKeyStrings(part, out, seen));
+      return out;
+    }
+
+    out.push(trimmed);
+    return out;
+  }
+
+  if (typeof text === 'string' && text.trim()) out.push(text.trim());
+  return out;
+}
+
+function coerceFavoriteKeys(values) {
+  return uniqueStringList(collectFavoriteKeyStrings(values));
 }
 
 function extractFavoriteKeysFromObject(obj) {
   if (!obj || typeof obj !== 'object') return [];
+
+  // Legacy single-entry formats, e.g. { proj: 'A', team: 'B' }.
+  const proj = String(obj.proj ?? obj.project ?? obj.projectName ?? '').trim();
+  const team = String(obj.team ?? obj.teamName ?? '').trim();
+  if (proj && team) return [`${proj}::${team}`];
+  if (proj) return [proj];
+
+  const key = String(obj.key ?? obj.value ?? '').trim();
+  if (key) return [key];
+
   const candidates = [
     obj.keys,
     obj.projects,
@@ -4701,17 +4783,19 @@ function extractFavoriteKeysFromObject(obj) {
   for (const candidate of candidates) {
     if (Array.isArray(candidate)) return uniqueStringList(candidate);
   }
+
+  // Legacy map formats, e.g. { "Project A": true, "Project B::Team X": 1 }.
+  const boolMapKeys = Object.keys(obj).filter(k => {
+    const v = obj[k];
+    return typeof k === 'string' && k.trim() && (v === true || v === 1 || v === '1');
+  });
+  if (boolMapKeys.length) return uniqueStringList(boolMapKeys);
+
   return [];
 }
 
 function favoriteFieldToKeys(rawValue) {
-  const raw = String(rawValue || '').trim();
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw);
-    return coerceFavoriteKeys(parsed);
-  } catch (_) {}
-  return coerceFavoriteKeys(raw.split(/[\n,;]+/g));
+  return coerceFavoriteKeys(rawValue);
 }
 
 function favoriteKeysToField(keys) {
@@ -4828,30 +4912,90 @@ function parseApiErrorText(text, fallback = '') {
 }
 
 async function fetchFavoriteWorkItemsForProject(project) {
-  const wiType = activeFavoritesWiType();
+  const wiTypes = [...new Set([
+    activeFavoritesWiType(),
+    FAVORITES_WI_TYPE_DEFAULT,
+    'Teamdef',
+  ].map(t => String(t || '').trim()).filter(Boolean))];
+
+  // Expand with any process-specific team-like types in this project.
+  try {
+    const typeDefs = await fetchWorkItemTypesForProject(project);
+    typeDefs.forEach(t => {
+      const n = String(t?.name || '').trim();
+      const r = String(t?.referenceName || '').trim();
+      if (/team/i.test(n) || /team/i.test(r)) wiTypes.push(n || r);
+    });
+  } catch (_) {
+    // Ignore type lookup errors and continue with default type candidates.
+  }
+
   const escProject = String(project || '').replace(/'/g, "''");
   const wiqlUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/wiql?api-version=7.1`;
-  const wiqlBody = {
-    query: `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' AND [System.WorkItemType] = '${wiType.replace(/'/g, "''")}' ORDER BY [System.ChangedDate] DESC`
-  };
-  const wiqlRes = await apiPost(wiqlUrl, wiqlBody);
-  if (!wiqlRes.ok) {
+  const wiTypeClause = [...new Set(wiTypes.map(t => String(t || '').trim()).filter(Boolean))]
+    .map(t => `'${t.replace(/'/g, "''")}'`).join(', ');
+  const queryByType = `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' AND [System.WorkItemType] IN (${wiTypeClause}) ORDER BY [System.ChangedDate] DESC`;
+  let ids = [];
+  let broadFallbackUsed = false;
+
+  const wiqlRes = await apiPost(wiqlUrl, { query: queryByType });
+  if (wiqlRes.ok) {
+    const wiqlData = await wiqlRes.json();
+    ids = (wiqlData.workItems || []).map(w => Number(w.id)).filter(Number.isFinite);
+  } else {
     const txt = await wiqlRes.text().catch(() => '');
     throw new Error(parseApiErrorText(txt, `WIQL ${project} ${wiqlRes.status}`));
   }
-  const wiqlData = await wiqlRes.json();
-  const ids = (wiqlData.workItems || []).map(w => Number(w.id)).filter(Number.isFinite);
+
+  // Fallback: team work item type can differ between processes.
+  // Query recent work items and keep only those that look like team definitions by field/title.
+  if (!ids.length) {
+    try {
+      const fallbackQuery = `SELECT TOP 2000 [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' ORDER BY [System.ChangedDate] DESC`;
+      const fallbackRes = await apiPost(wiqlUrl, { query: fallbackQuery });
+      if (fallbackRes.ok) {
+        const fallbackData = await fallbackRes.json();
+        ids = (fallbackData.workItems || []).map(w => Number(w.id)).filter(Number.isFinite);
+        broadFallbackUsed = true;
+      }
+    } catch (_) {
+      // Ignore fallback parsing/query errors and continue with empty result.
+    }
+  }
+
   if (!ids.length) return [];
 
   const fields = ['System.Id', 'System.Title', ...[...new Set(FAVORITES_FIELD_REFS)]];
   const batchUrl = `https://dev.azure.com/${ORG}/_apis/wit/workitemsbatch?api-version=7.1`;
-  const batchRes = await apiPost(batchUrl, { ids, fields });
-  if (!batchRes.ok) {
-    const txt = await batchRes.text().catch(() => '');
-    throw new Error(parseApiErrorText(txt, `Batch ${project} ${batchRes.status}`));
+  const batchValues = [];
+  for (let i = 0; i < ids.length; i += 200) {
+    const idChunk = ids.slice(i, i + 200);
+    let batchRes = await apiPost(batchUrl, { ids: idChunk, fields });
+
+    // Some projects/processes expose only one variant of the custom team field.
+    // Retry with narrower field sets before falling back to system-only fields.
+    if (batchRes.status === 400) {
+      for (const ref of FAVORITES_FIELD_REFS) {
+        batchRes = await apiPost(batchUrl, { ids: idChunk, fields: ['System.Id', 'System.Title', ref] });
+        if (batchRes.ok) break;
+      }
+    }
+
+    // Last resort: at least list teams by title/id even if custom field cannot be read.
+    if (batchRes.status === 400) {
+      batchRes = await apiPost(batchUrl, { ids: idChunk, fields: ['System.Id', 'System.Title'] });
+    }
+
+    if (!batchRes.ok) {
+      const txt = await batchRes.text().catch(() => '');
+      throw new Error(parseApiErrorText(txt, `Batch ${project} ${batchRes.status}`));
+    }
+
+    const batchData = await batchRes.json();
+    batchValues.push(...(batchData.value || []));
   }
-  const batchData = await batchRes.json();
-  return (batchData.value || []).map(item => {
+
+  return batchValues.map(item => {
     const wiId = Number(item?.id);
     if (!Number.isFinite(wiId)) return null;
     const title = String(item?.fields?.['System.Title'] || `Team ${wiId}`).trim();
@@ -4859,6 +5003,7 @@ async function fetchFavoriteWorkItemsForProject(project) {
       .map(ref => item?.fields?.[ref])
       .find(v => v != null && String(v).trim() !== '');
     const keys = favoriteFieldToKeys(fieldValue);
+    if (broadFallbackUsed && keys.length === 0 && !/team/i.test(title)) return null;
     return {
       id: `wi_${wiId}`,
       name: title || `Team ${wiId}`,
@@ -4878,16 +5023,42 @@ async function loadProjectFavoritesFromDevOps(projectNames = []) {
   const preferred = defaultFavoritesStorageProject(names);
   const candidateProjects = [...new Set(names)];
   const loaded = [];
+  const loadErrors = [];
+  let checkedProjects = 0;
+  const isPermissionError = (msg) => /(401|403|unauthor|forbidden|denied|tf400813|not authorized|permission)/i.test(String(msg || ''));
+
   for (const project of candidateProjects) {
     try {
       const items = await fetchFavoriteWorkItemsForProject(project);
+      checkedProjects += 1;
       if (items.length) loaded.push(...items);
-    } catch (_) {
-      // Ignore per-project favorite load failures to keep project loading resilient.
+    } catch (err) {
+      loadErrors.push({ project, message: String(err?.message || err || 'Okänt fel') });
     }
   }
 
   if (!loaded.length) {
+    if (loadErrors.length) {
+      const denied = loadErrors.filter(e => isPermissionError(e.message));
+      const firstDenied = denied[0];
+      const first = firstDenied || loadErrors[0];
+      const hint = firstDenied
+        ? ' Kontrollera att PAT har Work Items (Read) och att du har läsrättighet i projektet.'
+        : '';
+
+      if (checkedProjects > 0 && firstDenied) {
+        showToast('Inga team hittades i projekt du har åtkomst till. Vissa projekt är behörighetsstyrda.');
+      } else {
+        showToast(`Kunde inte läsa team från DevOps (${first.project}).${hint}`.trim());
+      }
+
+      try {
+        const summary = checkedProjects > 0
+          ? `Team hittades inte i tillgängliga projekt. ${loadErrors.length} projekt gav fel, t.ex. ${first.project}: ${first.message}${hint}`
+          : `Team-laddning misslyckades i ${first.project}: ${first.message}${hint}`;
+        setConnectionMessage(summary.trim(), true);
+      } catch (_) {}
+    }
     favoritesStorageProject = preferred;
     saveProjectFavorites();
     return false;
@@ -4905,6 +5076,17 @@ async function loadProjectFavoritesFromDevOps(projectNames = []) {
   });
 
   projectFavorites = merged;
+  const mappedCount = projectFavorites.filter(f => Array.isArray(f?.keys) && f.keys.length > 0).length;
+  if (projectFavorites.length > 0 && mappedCount === 0) {
+    projectFavorites = projectFavorites.map(f => ({
+      ...f,
+      keys: f?.wiProject ? [String(f.wiProject).trim()].filter(Boolean) : [],
+    }));
+    showToast('Team hittades utan kopplingar. Projektval återställdes till respektive källprojekt.');
+    try {
+      setConnectionMessage('Teamfält kunde inte läsas i detta projekt. Fallback används: varje team är kopplat till sitt källprojekt.', false);
+    } catch (_) {}
+  }
   if (!projectFavorites.some(f => f.id === activeFavoriteId)) {
     activeFavoriteId = projectFavorites[0]?.id || '';
   }
@@ -5364,15 +5546,26 @@ function renderProjectCheckboxes(projects) {
       const multiTeam = (teams || []).length > 1;
 
       if (multiTeam) {
+        const safeProjectKey = projectKeyToDomId(p);
+        const projectChecked = favKeys.has(p);
+        const projectDiv = document.createElement('div');
+        projectDiv.className = `cb-item${projectChecked ? ' checked' : ''}`;
+        projectDiv.id = `pcb-wrap-${safeProjectKey}`;
+        projectDiv.onclick = () => toggleFavoriteEntry(p, fav.id);
+        projectDiv.innerHTML = `
+          <input type="checkbox" id="pcb-${safeProjectKey}" data-key="${p}" ${projectChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleFavoriteEntry('${p.replace(/'/g,"\\'")}', '${fav.id.replace(/'/g,"\\'")}')"/>
+          <span style="font-size:0.8rem">${p}</span>`;
+        container.appendChild(projectDiv);
+
         const header = document.createElement('div');
         header.style.cssText = 'padding:5px 2px 2px 2px;font-size:0.84rem;color:var(--muted);font-family:"JetBrains Mono",monospace;letter-spacing:.04em;';
-        header.textContent = p;
+        header.textContent = `Team i ${p}`;
         container.appendChild(header);
 
         (teams || []).forEach(team => {
           const key = `${p}::${team}`;
           const safeTeamKey = projectKeyToDomId(key);
-          const isChecked = favKeys.has(key);
+          const isChecked = favKeys.has(key) || projectChecked;
           const div = document.createElement('div');
           div.className = `cb-item${isChecked ? ' checked' : ''}`;
           div.id = `pcb-wrap-${safeTeamKey}`;
