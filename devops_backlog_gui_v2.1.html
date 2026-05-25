@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BDO Planner</title>
+<link rel="icon" type="image/png" href="favicon.png" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap');
@@ -178,12 +179,14 @@
     position: relative;
   }
   .logo-mark {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 8px;
+    height: 36px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 800; color: #fff;
     flex-shrink: 0;
+  }
+  .logo-mark img {
+    height: 100%;
+    width: auto;
+    display: block;
   }
   header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
   header span { color: var(--muted); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; margin-left: 4px; }
@@ -431,6 +434,119 @@
     color: var(--muted);
     font-size: 0.88rem;
     padding: 6px 0;
+  }
+  .project-mode-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg);
+    margin-bottom: 8px;
+  }
+  .project-mode-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .project-mode-btn {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .project-mode-btn.active {
+    background: var(--accent2);
+    color: var(--bg);
+  }
+  .favorite-list-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 2px;
+  }
+  .favorite-row-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .favorite-settings-menu {
+    margin: 2px 0 6px 0;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface2);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .favorite-settings-btn {
+    width: auto;
+    min-width: 0;
+    height: 22px;
+    padding: 0 7px;
+    font-size: 0.66rem;
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 5px;
+  }
+  .favorite-list-name {
+    font-size: 0.82rem;
+    color: var(--text);
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .favorite-list-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    cursor: pointer;
+  }
+  .favorite-source {
+    font-size: 0.64rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .favorite-list-name.active {
+    color: var(--accent2);
+    font-weight: 700;
+  }
+  .favorite-row-btn {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .create-favorite-main-btn {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    margin-top: 6px;
+    display: none;
   }
   #projectCheckboxes.checkbox-group { gap: 4px; }
   #projectCheckboxes .cb-item {
@@ -1798,6 +1914,26 @@
   .descr-popup-body { color: var(--text); }
   .descr-popup-body p { margin: 0 0 8px; }
   .descr-popup-body ul, .descr-popup-body ol { margin: 0 0 8px; padding-left: 20px; }
+  .storage-project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 340px;
+    overflow: auto;
+    margin-top: 8px;
+  }
+  .storage-project-btn {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 7px 10px;
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .storage-project-btn.active {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: rgba(0, 180, 216, 0.08);
+  }
   .wi-modal-meta {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2413,9 +2549,9 @@
 <body>
 
 <header>
-  <div class="logo-mark">BDO</div>
+  <div class="logo-mark"><img src="getsitelogo.png" alt="BDO logo" /></div>
   <div>
-    <h1>BDO Planner <span>/ v2.1</span></h1>
+    <h1>BDO Planner <span>/ v2.2</span></h1>
   </div>
   <div class="top-section-switch" aria-label="Sektioner">
     <button class="top-section-btn active" id="section-backlog" onclick="setTopSection('backlog')">Backlog</button>
@@ -2445,8 +2581,15 @@
 
     <!-- Projects as checkboxes -->
     <div>
+      <div class="section-label">Projektval</div>
+      <div class="project-mode-row">
+        <div class="project-mode-switch" role="group" aria-label="Projektläge">
+          <button id="projectModeAllBtn" class="project-mode-btn active" onclick="setProjectPanelMode('all')">Projekt</button>
+          <button id="projectModeFavoritesBtn" class="project-mode-btn" onclick="setProjectPanelMode('favorites')">Team</button>
+        </div>
+      </div>
       <div class="projects-header-row">
-        <div class="section-label section-label-tight">Projekt</div>
+        <div class="section-label section-label-tight">Välj</div>
         <div class="projects-actions-row">
           <span id="projSelectLinks" class="proj-select-links">
             <span onclick="selectAllProjects(true)" class="proj-select-link all">alla</span>
@@ -2460,6 +2603,7 @@
       <div class="checkbox-group" id="projectCheckboxes">
         <div class="project-placeholder">Klicka "Hämta projekt"...</div>
       </div>
+      <button class="btn btn-outline create-favorite-main-btn" id="createFavoriteMainBtn" onclick="createFavorite()" title="Skapa team" aria-label="Skapa team">+</button>
     </div>
 
     <hr class="divider"/>
@@ -2468,6 +2612,9 @@
     <div class="sidebar-actions">
       <button class="btn btn-primary" id="fetchBtn" onclick="fetchData()" disabled>
         <span>🔍</span> Hämta data
+      </button>
+      <button class="btn btn-outline" id="createTeamFromProjectsBtn" onclick="createTeamFromCurrentProjects()" disabled>
+        <span>👥</span> Skapa team
       </button>
 
     </div>
@@ -2521,6 +2668,7 @@
         <button class="group-btn" id="grp-ao" onclick="setGrouping('ao')">Affärsområde</button>
         <button class="group-btn" id="grp-roadmap" onclick="setGrouping('roadmap')">Roadmap</button>
         <button class="group-btn" id="grp-maconomy" onclick="setGrouping('maconomy')">Maconomy</button>
+        <button class="btn btn-outline" id="ticketListRefreshBtnBacklog" style="width:auto;padding:5px 8px;" onclick="refreshStandardTicketLists()" title="Uppdatera listan">↻</button>
         <input class="search-box" type="text" id="searchBox" placeholder="Sök titel, ID..." oninput="auditMode ? renderAuditSearch() : renderTable()" />
         <label class="toggle-wrap" data-audit-hide title="Fokusläge: visa bara hierarki + Effort">
           <input type="checkbox" id="focusToggle" onchange="toggleFocusMode()" />
@@ -2551,6 +2699,14 @@
       <div class="descr-popup">
         <h3 id="childTitle">Skapa child issue <button onclick="closeCreateChildModal()">✕</button></h3>
         <div class="descr-popup-body" id="childBody"></div>
+      </div>
+    </div>
+
+    <!-- Storage project picker modal -->
+    <div class="descr-popup-overlay" id="storageProjectModal" onclick="if(event.target===this)closeStorageProjectPicker()">
+      <div class="descr-popup">
+        <h3 id="storageProjectTitle">Välj lagringsprojekt <button onclick="closeStorageProjectPicker()">✕</button></h3>
+        <div class="descr-popup-body" id="storageProjectBody"></div>
       </div>
     </div>
 
@@ -3497,6 +3653,9 @@ function showTab(tab) {
   // Hide original grouping bar in Backlog tab
   const groupingBar = document.getElementById('defaultGroupingBar');
   if (groupingBar) groupingBar.style.display = tab === 'backlog' ? 'none' : '';
+  const isTicketListTab = ['backlog','estimering','prioritering','timeline'].includes(tab);
+  const refreshBtnBacklog = document.getElementById('ticketListRefreshBtnBacklog');
+  if (refreshBtnBacklog) refreshBtnBacklog.style.display = isTicketListTab && tab === 'backlog' ? '' : 'none';
 
   // Remove old Backlog toolbar if present
   const toolbar = document.getElementById('backlogToolbar');
@@ -3584,6 +3743,19 @@ function toggleOrphans() {
 
 // Hidden projects — persisted in localStorage
 const LS_PROJ_KEY = 'devops_hidden_projects';
+const LS_PROJECT_PANEL_MODE = 'devops_project_panel_mode_v1';
+const LS_PROJECT_FAVORITES = 'devops_project_favorites_v1';
+const LS_ACTIVE_FAVORITE = 'devops_active_favorite_v1';
+const LS_FAVORITES_STORAGE_PROJECT = 'devops_favorites_storage_project_v1';
+const FAVORITES_WI_TYPE_DEFAULT = 'Teamref';
+const LS_FAVORITES_WI_TYPE = 'devops_favorites_wi_type_v1';
+const FAVORITES_FIELD_REF = 'Custom.teamprojekt';
+const FAVORITES_FIELD_REFS = [
+  FAVORITES_FIELD_REF,
+  'Custom.Teamprojekt',
+  'Custom.teamProjekt',
+  'Custom.teamProject',
+];
 let hiddenProjects = new Set();
 try {
   hiddenProjects = new Set(JSON.parse(localStorage.getItem(LS_PROJ_KEY) || '[]'));
@@ -3591,6 +3763,13 @@ try {
   hiddenProjects = new Set();
 }
 let manageProjectsMode = false;
+let projectPanelMode = 'all';
+let projectFavorites = [];
+let activeFavoriteId = '';
+let favoriteManageId = '';
+let favoriteSettingsId = '';
+let favoritesStorageProject = '';
+let favoritesWiType = FAVORITES_WI_TYPE_DEFAULT;
 
 // WSJF Risk mapping: DevOps stores "1 - High", "2 - Medium", "3 - Low"
 // We display/edit as 1/2/3 and convert on read/write
@@ -3991,6 +4170,12 @@ function initCheckboxes() {
 }
 
 function toggleTimelineRoadmap(key) {
+  if (key === '__MISSING__') {
+    if (timelineRoadmapFilter.has('__MISSING__')) timelineRoadmapFilter.delete('__MISSING__');
+    else timelineRoadmapFilter.add('__MISSING__');
+    renderTimeline();
+    return;
+  }
   const normalized = normalizeRoadmapValue(key, key);
   if (timelineRoadmapFilter.has(normalized)) timelineRoadmapFilter.delete(normalized);
   else timelineRoadmapFilter.add(normalized);
@@ -4185,6 +4370,19 @@ function renderActiveView() {
     renderBoardTab();
   }
   else renderTable();
+}
+
+async function refreshStandardTicketLists() {
+  const tabBefore = activeTab;
+  const loadedCount = await fetchItems({ preserveUiState: true });
+  if (!loadedCount) {
+    setTabBtnsEnabled(true);
+    return;
+  }
+  if (['backlog','estimering','prioritering','timeline'].includes(tabBefore)) {
+    showTab(tabBefore);
+    setTabBtnsEnabled(true);
+  }
 }
 
 let sprintRenderQueued = false;
@@ -4396,16 +4594,692 @@ function saveHiddenProjects() {
   } catch (_) {}
 }
 
-function toggleManageProjects() {
-  manageProjectsMode = !manageProjectsMode;
-  const btn  = document.getElementById('manageProjBtn');
-  const hint = document.getElementById('manageHint');
+function saveProjectFavorites() {
+  try {
+    localStorage.setItem(LS_PROJECT_FAVORITES, JSON.stringify(projectFavorites));
+    localStorage.setItem(LS_ACTIVE_FAVORITE, activeFavoriteId || '');
+    localStorage.setItem(LS_FAVORITES_STORAGE_PROJECT, favoritesStorageProject || '');
+  } catch (_) {}
+}
+
+function loadProjectFavorites() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(LS_PROJECT_FAVORITES) || '[]');
+    projectFavorites = Array.isArray(raw)
+      ? raw.map(f => ({
+          id: String(f?.id || ''),
+          name: String(f?.name || '').trim() || 'Namnlost team',
+          keys: Array.isArray(f?.keys) ? [...new Set(f.keys.map(k => String(k || '').trim()).filter(Boolean))] : [],
+          wiId: Number(f?.wiId) || null,
+          wiProject: String(f?.wiProject || '').trim(),
+        })).filter(f => f.id)
+      : [];
+  } catch (_) {
+    projectFavorites = [];
+  }
+
+  try {
+    favoritesStorageProject = String(localStorage.getItem(LS_FAVORITES_STORAGE_PROJECT) || '').trim();
+  } catch (_) {
+    favoritesStorageProject = '';
+  }
+
+  favoritesWiType = FAVORITES_WI_TYPE_DEFAULT;
+
+  try {
+    const savedMode = localStorage.getItem(LS_PROJECT_PANEL_MODE);
+    projectPanelMode = savedMode === 'favorites' ? 'favorites' : 'all';
+  } catch (_) {
+    projectPanelMode = 'all';
+  }
+
+  try {
+    activeFavoriteId = String(localStorage.getItem(LS_ACTIVE_FAVORITE) || '');
+  } catch (_) {
+    activeFavoriteId = '';
+  }
+  if (!projectFavorites.some(f => f.id === activeFavoriteId)) {
+    activeFavoriteId = projectFavorites[0]?.id || '';
+  }
+}
+
+function getActiveFavorite() {
+  return projectFavorites.find(f => f.id === activeFavoriteId) || null;
+}
+
+function getFavoriteById(favoriteId) {
+  return projectFavorites.find(f => f.id === String(favoriteId || '')) || null;
+}
+
+function uniqueStringList(values) {
+  return [...new Set((values || []).map(v => String(v || '').trim()).filter(Boolean))];
+}
+
+function coerceFavoriteKeys(values) {
+  const out = [];
+  const pushValue = (value) => {
+    if (Array.isArray(value)) {
+      value.forEach(pushValue);
+      return;
+    }
+    if (value && typeof value === 'object') {
+      const fromObj = extractFavoriteKeysFromObject(value);
+      if (fromObj.length) fromObj.forEach(pushValue);
+      return;
+    }
+
+    const raw = String(value || '').trim();
+    if (!raw) return;
+
+    if ((raw.startsWith('{') && raw.endsWith('}')) || (raw.startsWith('[') && raw.endsWith(']'))) {
+      try {
+        const parsed = JSON.parse(raw);
+        pushValue(parsed);
+        return;
+      } catch (_) {}
+    }
+
+    out.push(raw);
+  };
+
+  pushValue(values);
+  return uniqueStringList(out);
+}
+
+function extractFavoriteKeysFromObject(obj) {
+  if (!obj || typeof obj !== 'object') return [];
+  const candidates = [
+    obj.keys,
+    obj.projects,
+    obj.projectKeys,
+    obj.selected,
+    obj.selectedKeys,
+    obj.selectedProjects,
+    obj.values,
+    obj.items,
+  ];
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) return uniqueStringList(candidate);
+  }
+  return [];
+}
+
+function favoriteFieldToKeys(rawValue) {
+  const raw = String(rawValue || '').trim();
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return coerceFavoriteKeys(parsed);
+  } catch (_) {}
+  return coerceFavoriteKeys(raw.split(/[\n,;]+/g));
+}
+
+function favoriteKeysToField(keys) {
+  return JSON.stringify({ keys: coerceFavoriteKeys(keys) });
+}
+
+function activeFavoritesWiType() {
+  return String(favoritesWiType || FAVORITES_WI_TYPE_DEFAULT).trim() || FAVORITES_WI_TYPE_DEFAULT;
+}
+
+function defaultFavoritesStorageProject(projectNames = []) {
+  const names = Array.isArray(projectNames) ? projectNames : [];
+  if (favoritesStorageProject && names.includes(favoritesStorageProject)) return favoritesStorageProject;
+  if (names.includes('Roadmap')) return 'Roadmap';
+  return names[0] || '';
+}
+
+function isTeamdefUnavailableError(error) {
+  const msg = String(error?.message || error || '');
+  return msg.includes('VS402323') || msg.toLowerCase().includes(`work item type ${activeFavoritesWiType().toLowerCase()} does not exist`);
+}
+
+let storageProjectPickerResolve = null;
+
+function closeStorageProjectPicker() {
+  const modal = document.getElementById('storageProjectModal');
+  if (modal) modal.classList.remove('open');
+  if (storageProjectPickerResolve) {
+    const resolve = storageProjectPickerResolve;
+    storageProjectPickerResolve = null;
+    resolve(false);
+  }
+}
+
+function pickStorageProject(projectName) {
+  if (!projectName) return;
+  favoritesStorageProject = String(projectName);
+  saveProjectFavorites();
+  renderProjectCheckboxes(window._allProjects || []);
+  showToast(`Team lagras nu i ${projectName}.`);
+
+  const modal = document.getElementById('storageProjectModal');
+  if (modal) modal.classList.remove('open');
+  if (storageProjectPickerResolve) {
+    const resolve = storageProjectPickerResolve;
+    storageProjectPickerResolve = null;
+    resolve(true);
+  }
+}
+
+async function chooseFavoritesStorageProject() {
+  const names = [...new Set((window._allProjects || []).map(n => String(n || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  if (!names.length) {
+    showToast('Ladda projekt först så du kan välja lagringsprojekt.');
+    return false;
+  }
+
+  const current = defaultFavoritesStorageProject(names);
+  const body = document.getElementById('storageProjectBody');
+  const modal = document.getElementById('storageProjectModal');
+  if (!body || !modal) return false;
+
+  body.innerHTML = `
+    <p style="margin-bottom:6px;color:var(--muted)">Välj projekt för teamlagring (${escHtml(activeFavoritesWiType())}).</p>
+    <div class="storage-project-list">
+      ${names.map(name => `<button class="btn btn-outline storage-project-btn ${name === current ? 'active' : ''}" onclick="pickStorageProject('${name.replace(/'/g,"\\'")}')">${escHtml(name)}</button>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+      <button class="btn btn-outline" style="width:auto;padding:6px 10px;font-size:0.78rem;" onclick="closeStorageProjectPicker()">Avbryt</button>
+    </div>`;
+
+  modal.classList.add('open');
+  return await new Promise(resolve => {
+    storageProjectPickerResolve = resolve;
+  });
+}
+
+async function fetchWorkItemTypesForProject(project) {
+  if (!project) return [];
+  const url = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/workitemtypes?api-version=7.1`;
+  const res = await apiGet(url);
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    throw new Error(parseApiErrorText(txt, `Kunde inte läsa work item-typer (${res.status})`));
+  }
+  const data = await res.json();
+  return (data.value || []).map(t => ({
+    name: String(t?.name || '').trim(),
+    referenceName: String(t?.referenceName || '').trim(),
+  })).filter(t => t.name);
+}
+
+async function ensureFavoritesWiTypeForProject(project) {
+  const types = await fetchWorkItemTypesForProject(project);
+  if (!types.length) throw new Error('Inga work item-typer hittades i valt projekt.');
+  const current = activeFavoritesWiType().toLowerCase();
+  const existing = types.find(t => t.name.toLowerCase() === current || t.referenceName.toLowerCase() === current);
+  if (existing) {
+    favoritesWiType = existing.name;
+    saveProjectFavorites();
+    return favoritesWiType;
+  }
+
+  throw new Error(`Work item-typen ${activeFavoritesWiType()} finns inte i projektet ${project}.`);
+}
+
+async function chooseFavoritesStorageType() {
+  showToast(`Lagringstyp är låst till ${FAVORITES_WI_TYPE_DEFAULT}.`);
+}
+
+function parseApiErrorText(text, fallback = '') {
+  const msg = String(text || '').replace(/\s+/g, ' ').trim();
+  return msg ? msg.slice(0, 200) : fallback;
+}
+
+async function fetchFavoriteWorkItemsForProject(project) {
+  const wiType = activeFavoritesWiType();
+  const escProject = String(project || '').replace(/'/g, "''");
+  const wiqlUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/wiql?api-version=7.1`;
+  const wiqlBody = {
+    query: `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' AND [System.WorkItemType] = '${wiType.replace(/'/g, "''")}' ORDER BY [System.ChangedDate] DESC`
+  };
+  const wiqlRes = await apiPost(wiqlUrl, wiqlBody);
+  if (!wiqlRes.ok) {
+    const txt = await wiqlRes.text().catch(() => '');
+    throw new Error(parseApiErrorText(txt, `WIQL ${project} ${wiqlRes.status}`));
+  }
+  const wiqlData = await wiqlRes.json();
+  const ids = (wiqlData.workItems || []).map(w => Number(w.id)).filter(Number.isFinite);
+  if (!ids.length) return [];
+
+  const fields = ['System.Id', 'System.Title', ...[...new Set(FAVORITES_FIELD_REFS)]];
+  const batchUrl = `https://dev.azure.com/${ORG}/_apis/wit/workitemsbatch?api-version=7.1`;
+  const batchRes = await apiPost(batchUrl, { ids, fields });
+  if (!batchRes.ok) {
+    const txt = await batchRes.text().catch(() => '');
+    throw new Error(parseApiErrorText(txt, `Batch ${project} ${batchRes.status}`));
+  }
+  const batchData = await batchRes.json();
+  return (batchData.value || []).map(item => {
+    const wiId = Number(item?.id);
+    if (!Number.isFinite(wiId)) return null;
+    const title = String(item?.fields?.['System.Title'] || `Team ${wiId}`).trim();
+    const fieldValue = FAVORITES_FIELD_REFS
+      .map(ref => item?.fields?.[ref])
+      .find(v => v != null && String(v).trim() !== '');
+    const keys = favoriteFieldToKeys(fieldValue);
+    return {
+      id: `wi_${wiId}`,
+      name: title || `Team ${wiId}`,
+      keys,
+      wiId,
+      wiProject: project,
+    };
+  }).filter(Boolean);
+}
+
+async function loadProjectFavoritesFromDevOps(projectNames = []) {
+  const pat = (document.getElementById('patInput')?.value || '').trim();
+  if (!pat) return false;
+  const names = Array.isArray(projectNames) ? projectNames : [];
+  if (!names.length) return false;
+
+  const preferred = defaultFavoritesStorageProject(names);
+  const candidateProjects = [...new Set(names)];
+  const loaded = [];
+  for (const project of candidateProjects) {
+    try {
+      const items = await fetchFavoriteWorkItemsForProject(project);
+      if (items.length) loaded.push(...items);
+    } catch (_) {
+      // Ignore per-project favorite load failures to keep project loading resilient.
+    }
+  }
+
+  if (!loaded.length) {
+    favoritesStorageProject = preferred;
+    saveProjectFavorites();
+    return false;
+  }
+
+  const cachedById = new Map((projectFavorites || []).map(f => [String(f?.id || ''), f]));
+  const merged = loaded.map(f => {
+    const id = String(f?.id || '');
+    const cached = cachedById.get(id);
+    if (Array.isArray(f?.keys) && f.keys.length > 0) return f;
+    if (Array.isArray(cached?.keys) && cached.keys.length > 0) {
+      return { ...f, keys: uniqueStringList(cached.keys) };
+    }
+    return f;
+  });
+
+  projectFavorites = merged;
+  if (!projectFavorites.some(f => f.id === activeFavoriteId)) {
+    activeFavoriteId = projectFavorites[0]?.id || '';
+  }
+  favoritesStorageProject = preferred || projectFavorites[0]?.wiProject || defaultFavoritesStorageProject(names);
+  saveProjectFavorites();
+  return true;
+}
+
+async function updateFavoriteInDevOps(favorite) {
+  if (!favorite?.wiId || !favorite?.wiProject) return;
+  const ops = [
+    { op: 'add', path: '/fields/System.Title', value: String(favorite.name || '').trim() || `Team ${favorite.wiId}` },
+    { op: 'add', path: `/fields/${FAVORITES_FIELD_REF}`, value: favoriteKeysToField(favorite.keys || []) },
+  ];
+  const res = await witPatchByProjectItem(favorite.wiProject, favorite.wiId, ops);
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    throw new Error(parseApiErrorText(txt, `Kunde inte uppdatera team (${res.status})`));
+  }
+}
+
+async function createFavoriteInDevOps(name, keys = []) {
+  const projectNames = window._allProjects || [];
+  const targetProject = defaultFavoritesStorageProject(projectNames);
+  if (!targetProject) {
+    throw new Error('Inget lagringsprojekt valt.');
+  }
+
+  const wiType = await ensureFavoritesWiTypeForProject(targetProject);
+
+  const ops = [
+    { op: 'add', path: '/fields/System.Title', value: String(name || '').trim() || 'Nytt team' },
+    { op: 'add', path: `/fields/${FAVORITES_FIELD_REF}`, value: favoriteKeysToField(keys) },
+  ];
+
+  const createUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(targetProject)}/_apis/wit/workitems/$${encodeURIComponent(wiType)}?api-version=7.1`;
+  const res = await witCreate(createUrl, ops);
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    throw new Error(parseApiErrorText(txt, `Kunde inte skapa team (${res.status})`));
+  }
+  const data = await res.json();
+  const wiId = Number(data?.id);
+  if (!Number.isFinite(wiId)) throw new Error('Skapat team saknar work item-id.');
+  favoritesStorageProject = targetProject;
+  return {
+    id: `wi_${wiId}`,
+    name: String(name || '').trim() || `Team ${wiId}`,
+    keys: uniqueStringList(keys),
+    wiId,
+    wiProject: targetProject,
+  };
+}
+
+async function deleteFavoriteInDevOps(favorite) {
+  if (!favorite?.wiId || !favorite?.wiProject) return;
+  const url = `https://dev.azure.com/${ORG}/${encodeURIComponent(favorite.wiProject)}/_apis/wit/workitems/${favorite.wiId}?api-version=7.1`;
+  const res = await apiDelete(url);
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    throw new Error(parseApiErrorText(txt, `Kunde inte ta bort team (${res.status})`));
+  }
+}
+
+function favoriteSelectionKeys() {
+  const projectTeams = window._projectTeams || (window._allProjects || []).map(p => ({ proj: p, teams: [] }));
+  const keys = [];
+  projectTeams.forEach(({ proj, teams }) => {
+    keys.push(proj);
+    (teams || []).forEach(team => keys.push(`${proj}::${team}`));
+  });
+  return [...new Set(keys)];
+}
+
+function normalizeFavoriteKeys(keys) {
+  const allowed = new Set(favoriteSelectionKeys());
+  return coerceFavoriteKeys(keys).filter(k => allowed.has(k));
+}
+
+function updateProjectSelectionButtons() {
+  const fetchBtn = document.getElementById('fetchBtn');
+  if (fetchBtn) fetchBtn.disabled = selectedProjects.size === 0;
+  const createTeamBtn = document.getElementById('createTeamFromProjectsBtn');
+  if (createTeamBtn) createTeamBtn.disabled = selectedProjects.size === 0;
+  const auditTabBtn = document.getElementById('tab-audit');
+  if (auditTabBtn) auditTabBtn.disabled = selectedProjects.size === 0;
+  document.body.classList.toggle('roadmap-selected', selectedProjects.has('Roadmap'));
+}
+
+function applyActiveFavoriteSelection() {
+  const fav = getActiveFavorite();
+  const rawKeys = coerceFavoriteKeys(fav?.keys || []);
+  const normalized = normalizeFavoriteKeys(rawKeys);
+  // Before project/team metadata is loaded, keep plain key strings as a temporary fallback.
+  const fallback = rawKeys.filter(k => !/^[\[{"']/.test(k));
+  selectedProjects = new Set(normalized.length ? normalized : fallback);
+  updateProjectSelectionButtons();
+}
+
+function updateProjectModeUI() {
+  const allBtn = document.getElementById('projectModeAllBtn');
+  const favBtn = document.getElementById('projectModeFavoritesBtn');
+  if (allBtn) allBtn.classList.toggle('active', projectPanelMode === 'all');
+  if (favBtn) favBtn.classList.toggle('active', projectPanelMode === 'favorites');
+
+  const createMainBtn = document.getElementById('createFavoriteMainBtn');
+  if (createMainBtn) createMainBtn.style.display = projectPanelMode === 'favorites' ? 'inline-flex' : 'none';
+
+  const fetchBtn = document.getElementById('fetchBtn');
+  if (fetchBtn) fetchBtn.style.display = projectPanelMode === 'favorites' ? 'none' : '';
+  const createTeamBtn = document.getElementById('createTeamFromProjectsBtn');
+  if (createTeamBtn) createTeamBtn.style.display = projectPanelMode === 'favorites' ? 'none' : '';
+
   const links = document.getElementById('projSelectLinks');
-  btn.textContent  = manageProjectsMode ? '✓ Klar' : '⚙ Hantera';
-  btn.style.color  = manageProjectsMode ? 'var(--accent2)' : 'var(--muted)';
-  btn.style.borderColor = manageProjectsMode ? 'var(--accent2)' : 'var(--border)';
-  if (hint) hint.style.display  = manageProjectsMode ? 'block' : 'none';
-  links.style.display = manageProjectsMode ? 'none'  : 'flex';
+  if (links) links.style.display = projectPanelMode === 'all' && !manageProjectsMode ? 'flex' : 'none';
+
+  const globalManageBtn = document.getElementById('manageProjBtn');
+  if (globalManageBtn) globalManageBtn.style.display = projectPanelMode === 'all' ? '' : 'none';
+
+  const hint = document.getElementById('manageHint');
+  if (hint) {
+    if (projectPanelMode === 'all') {
+      hint.textContent = 'Klicka på ett projekt för att dölja/visa det i listan.';
+      hint.style.display = manageProjectsMode ? 'block' : 'none';
+    } else {
+      hint.textContent = 'Klicka på projekt/team för att lägga till eller ta bort från team.';
+      hint.style.display = favoriteManageId ? 'block' : 'none';
+    }
+  }
+
+  const btn = document.getElementById('manageProjBtn');
+  const activeManage = manageProjectsMode;
+  if (btn) {
+    btn.textContent = activeManage ? '✓ Klar' : '⚙ Hantera';
+    btn.style.color = activeManage ? 'var(--accent2)' : 'var(--muted)';
+    btn.style.borderColor = activeManage ? 'var(--accent2)' : 'var(--border)';
+  }
+}
+
+function setProjectPanelMode(mode) {
+  projectPanelMode = mode === 'favorites' ? 'favorites' : 'all';
+  if (projectPanelMode === 'favorites') {
+    manageProjectsMode = false;
+    favoriteManageId = '';
+    favoriteSettingsId = '';
+    if (!activeFavoriteId && projectFavorites.length) activeFavoriteId = projectFavorites[0].id;
+    applyActiveFavoriteSelection();
+  } else {
+    favoriteManageId = '';
+    favoriteSettingsId = '';
+  }
+  try {
+    localStorage.setItem(LS_PROJECT_PANEL_MODE, projectPanelMode);
+  } catch (_) {}
+  updateProjectModeUI();
+  renderProjectCheckboxes(window._allProjects || []);
+}
+
+async function setActiveFavorite(favoriteId, autoLoad = false) {
+  activeFavoriteId = String(favoriteId || '');
+  if (!projectFavorites.some(f => f.id === activeFavoriteId)) {
+    activeFavoriteId = projectFavorites[0]?.id || '';
+  }
+  favoriteSettingsId = '';
+  saveProjectFavorites();
+  applyActiveFavoriteSelection();
+  updateProjectModeUI();
+  renderProjectCheckboxes(window._allProjects || []);
+
+  if (!autoLoad || projectPanelMode !== 'favorites' || favoriteManageId) return;
+  const pat = (document.getElementById('patInput')?.value || '').trim();
+  if (!pat) return;
+  if (selectedProjects.size === 0) return;
+  await fetchData();
+}
+
+function startManageFavorite(favoriteId) {
+  const fav = getFavoriteById(favoriteId);
+  if (!fav) return;
+  activeFavoriteId = fav.id;
+  favoriteManageId = fav.id;
+  favoriteSettingsId = '';
+  saveProjectFavorites();
+  applyActiveFavoriteSelection();
+  updateProjectModeUI();
+  renderProjectCheckboxes(window._allProjects || []);
+}
+
+function stopManageFavorite() {
+  favoriteManageId = '';
+  applyActiveFavoriteSelection();
+  updateProjectModeUI();
+  renderProjectCheckboxes(window._allProjects || []);
+}
+
+async function createFavorite() {
+  const name = window.prompt('Namn på team:', 'Mitt team');
+  if (name == null) return;
+  const clean = String(name).trim();
+  if (!clean) {
+    showToast('Teamet måste ha ett namn.');
+    return;
+  }
+
+  const selectedStorage = await chooseFavoritesStorageProject();
+  if (!selectedStorage) return;
+
+  const createAndRender = async () => {
+    const favorite = await createFavoriteInDevOps(clean, []);
+    projectFavorites.push(favorite);
+    activeFavoriteId = favorite.id;
+    favoriteManageId = '';
+    favoriteSettingsId = '';
+    saveProjectFavorites();
+    setProjectPanelMode('favorites');
+    updateProjectModeUI();
+    renderProjectCheckboxes(window._allProjects || []);
+    showToast(`Team "${clean}" skapat.`);
+  };
+
+  try {
+    await createAndRender();
+  } catch (e) {
+    if (isTeamdefUnavailableError(e)) {
+      showToast(`Work item-typen ${activeFavoritesWiType()} saknas i valt lagringsprojekt. Välj lagringsprojekt igen.`);
+      const changed = await chooseFavoritesStorageProject();
+      if (!changed) return;
+      try {
+        await createAndRender();
+      } catch (e2) {
+        showToast(explainFetchError(e2));
+      }
+      return;
+    }
+    showToast(explainFetchError(e));
+  }
+}
+
+async function createTeamFromCurrentProjects() {
+  if (projectPanelMode !== 'all') {
+    showToast('Byt till läget Alla projekt för att skapa team från aktuell selektion.');
+    return;
+  }
+  const keys = [...selectedProjects].map(k => String(k || '').trim()).filter(Boolean);
+  if (!keys.length) {
+    showToast('Välj minst ett projekt/team först.');
+    return;
+  }
+
+  const defaultName = `Team ${new Date().toLocaleDateString('sv-SE')}`;
+  const name = window.prompt('Namn på team:', defaultName);
+  if (name == null) return;
+  const clean = String(name).trim();
+  if (!clean) {
+    showToast('Teamet måste ha ett namn.');
+    return;
+  }
+
+  const selectedStorage = await chooseFavoritesStorageProject();
+  if (!selectedStorage) return;
+
+  try {
+    const team = await createFavoriteInDevOps(clean, keys);
+    projectFavorites.push(team);
+    activeFavoriteId = team.id;
+    favoriteManageId = '';
+    favoriteSettingsId = '';
+    saveProjectFavorites();
+    showToast(`Team "${clean}" skapat från aktuell projektselektion.`);
+  } catch (e) {
+    if (isTeamdefUnavailableError(e)) {
+      showToast(`Work item-typen ${activeFavoritesWiType()} saknas i valt lagringsprojekt. Välj lagringsprojekt igen.`);
+      const changed = await chooseFavoritesStorageProject();
+      if (!changed) return;
+      try {
+        const teamRetry = await createFavoriteInDevOps(clean, keys);
+        projectFavorites.push(teamRetry);
+        activeFavoriteId = teamRetry.id;
+        favoriteManageId = '';
+        favoriteSettingsId = '';
+        saveProjectFavorites();
+        showToast(`Team "${clean}" skapat från aktuell projektselektion.`);
+      } catch (e2) {
+        showToast(explainFetchError(e2));
+      }
+      return;
+    }
+    showToast(explainFetchError(e));
+  }
+}
+
+async function deleteFavorite(favoriteId) {
+  const fav = getFavoriteById(favoriteId);
+  if (!fav) return;
+  if (!window.confirm(`Ta bort team "${fav.name}"?`)) return;
+
+  try {
+    await deleteFavoriteInDevOps(fav);
+    projectFavorites = projectFavorites.filter(f => f.id !== fav.id);
+    activeFavoriteId = projectFavorites[0]?.id || '';
+    if (favoriteManageId === fav.id) favoriteManageId = '';
+    if (favoriteSettingsId === fav.id) favoriteSettingsId = '';
+    saveProjectFavorites();
+    applyActiveFavoriteSelection();
+    updateProjectModeUI();
+    renderProjectCheckboxes(window._allProjects || []);
+  } catch (e) {
+    showToast(explainFetchError(e));
+  }
+}
+
+async function renameFavorite(favoriteId) {
+  const fav = getFavoriteById(favoriteId);
+  if (!fav) return;
+  const nextName = window.prompt('Nytt namn på team:', fav.name || '');
+  if (nextName == null) return;
+  const clean = String(nextName).trim();
+  if (!clean) {
+    showToast('Teamet måste ha ett namn.');
+    return;
+  }
+
+  const previous = fav.name;
+  fav.name = clean;
+  favoriteSettingsId = '';
+  saveProjectFavorites();
+  updateProjectModeUI();
+  renderProjectCheckboxes(window._allProjects || []);
+
+  try {
+    await updateFavoriteInDevOps(fav);
+  } catch (e) {
+    fav.name = previous;
+    saveProjectFavorites();
+    renderProjectCheckboxes(window._allProjects || []);
+    showToast(explainFetchError(e));
+  }
+}
+
+function toggleFavoriteSettings(favoriteId) {
+  const fav = getFavoriteById(favoriteId);
+  if (!fav) return;
+  favoriteSettingsId = favoriteSettingsId === fav.id ? '' : fav.id;
+  renderProjectCheckboxes(window._allProjects || []);
+}
+
+async function toggleFavoriteEntry(key, favoriteId = '') {
+  const fav = favoriteId ? getFavoriteById(favoriteId) : getActiveFavorite();
+  if (!fav) return;
+  const previous = uniqueStringList(fav.keys || []);
+  const next = new Set(fav.keys || []);
+  if (next.has(key)) next.delete(key);
+  else next.add(key);
+  fav.keys = uniqueStringList([...next]);
+  saveProjectFavorites();
+  renderProjectCheckboxes(window._allProjects || []);
+
+  try {
+    await updateFavoriteInDevOps(fav);
+  } catch (e) {
+    fav.keys = previous;
+    saveProjectFavorites();
+    renderProjectCheckboxes(window._allProjects || []);
+    showToast(explainFetchError(e));
+  }
+}
+
+function toggleManageProjects() {
+  if (projectPanelMode === 'favorites') {
+    if (favoriteManageId) stopManageFavorite();
+    else showToast('Använd Hantera bredvid ett team.');
+  } else {
+    manageProjectsMode = !manageProjectsMode;
+  }
+  updateProjectModeUI();
   renderProjectCheckboxes(window._allProjects || []);
 }
 
@@ -4425,6 +5299,105 @@ function renderProjectCheckboxes(projects) {
   window._allProjects = projects;
   const container = document.getElementById('projectCheckboxes');
   container.innerHTML = '';
+
+  if (projectPanelMode === 'favorites') {
+    const projectTeams = window._projectTeams || projects.map(p => ({ proj: p, teams: [] }));
+    if (!projectFavorites.length) {
+      container.innerHTML = '<div class="project-empty-note">Inga Team. Klicka + för att skapa ett team.</div>';
+      return;
+    }
+
+    if (!favoriteManageId) {
+      projectFavorites.forEach(fav => {
+        const row = document.createElement('div');
+        row.className = 'favorite-list-row';
+        row.innerHTML = `
+          <span class="favorite-list-meta" onclick="setActiveFavorite('${fav.id.replace(/'/g,"\\'")}', true)">
+            <span class="favorite-list-name ${fav.id === activeFavoriteId ? 'active' : ''}">${escHtml(fav.name)}</span>
+            <span class="favorite-source">Projekt: ${escHtml(fav.wiProject || 'Okant')}</span>
+          </span>
+          <span class="favorite-row-actions">
+            <button class="btn btn-outline favorite-row-btn" onclick="toggleFavoriteSettings('${fav.id.replace(/'/g,"\\'")}')" title="Inställningar för team" aria-label="Inställningar för team">⚙</button>
+          </span>`;
+        container.appendChild(row);
+
+        if (favoriteSettingsId === fav.id) {
+          const menu = document.createElement('div');
+          menu.className = 'favorite-settings-menu';
+          menu.innerHTML = `
+            <button class="btn btn-outline favorite-settings-btn" onclick="startManageFavorite('${fav.id.replace(/'/g,"\\'")}')" title="Välj projekt" aria-label="Välj projekt">📋</button>
+            <button class="btn btn-outline favorite-settings-btn" onclick="chooseFavoritesStorageProject()" title="Lagringsprojekt" aria-label="Lagringsprojekt">🗂</button>
+            <button class="btn btn-outline favorite-settings-btn" onclick="renameFavorite('${fav.id.replace(/'/g,"\\'")}')" title="Byt namn" aria-label="Byt namn">✎</button>
+            <button class="btn btn-outline favorite-settings-btn" onclick="deleteFavorite('${fav.id.replace(/'/g,"\\'")}')" title="Ta bort" aria-label="Ta bort">🗑</button>
+            <button class="btn btn-outline favorite-settings-btn" onclick="toggleFavoriteSettings('${fav.id.replace(/'/g,"\\'")}')" title="OK" aria-label="OK">OK</button>`;
+          container.appendChild(menu);
+        }
+      });
+      return;
+    }
+
+    const fav = getFavoriteById(favoriteManageId);
+    if (!fav) {
+      favoriteManageId = '';
+      renderProjectCheckboxes(projects);
+      return;
+    }
+
+    const favKeys = new Set(uniqueStringList(fav.keys || []));
+
+    const editInfo = document.createElement('div');
+    editInfo.className = 'project-empty-note';
+    editInfo.style.padding = '0 0 8px 0';
+    editInfo.innerHTML = `Redigerar team: <strong style="color:var(--accent2)">${escHtml(fav.name)}</strong> <button class="btn btn-outline favorite-row-btn" style="margin-left:8px;" onclick="stopManageFavorite()" title="Klar" aria-label="Klar">✓</button>`;
+    container.appendChild(editInfo);
+
+    if (!projectTeams.length) {
+      const empty = document.createElement('div');
+      empty.className = 'project-empty-note';
+      empty.textContent = 'Ladda projekt först för att välja innehåll i teamet.';
+      container.appendChild(empty);
+      return;
+    }
+
+    const visible = projectTeams.filter(pt => !hiddenProjects.has(pt.proj));
+    visible.forEach(({ proj: p, teams }) => {
+      const multiTeam = (teams || []).length > 1;
+
+      if (multiTeam) {
+        const header = document.createElement('div');
+        header.style.cssText = 'padding:5px 2px 2px 2px;font-size:0.84rem;color:var(--muted);font-family:"JetBrains Mono",monospace;letter-spacing:.04em;';
+        header.textContent = p;
+        container.appendChild(header);
+
+        (teams || []).forEach(team => {
+          const key = `${p}::${team}`;
+          const safeTeamKey = projectKeyToDomId(key);
+          const isChecked = favKeys.has(key);
+          const div = document.createElement('div');
+          div.className = `cb-item${isChecked ? ' checked' : ''}`;
+          div.id = `pcb-wrap-${safeTeamKey}`;
+          div.onclick = () => toggleFavoriteEntry(key, fav.id);
+          div.innerHTML = `
+            <input type="checkbox" id="pcb-${safeTeamKey}" data-key="${key}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleFavoriteEntry('${key.replace(/'/g,"\\'")}', '${fav.id.replace(/'/g,"\\'")}')"/>
+            <span style="font-size:0.84rem;padding-left:8px;color:var(--accent2)">↳ ${team}</span>`;
+          container.appendChild(div);
+        });
+      } else {
+        const safeProjectKey = projectKeyToDomId(p);
+        const projectChecked = favKeys.has(p);
+        const projectDiv = document.createElement('div');
+        projectDiv.className = `cb-item${projectChecked ? ' checked' : ''}`;
+        projectDiv.id = `pcb-wrap-${safeProjectKey}`;
+        projectDiv.onclick = () => toggleFavoriteEntry(p, fav.id);
+        projectDiv.innerHTML = `
+          <input type="checkbox" id="pcb-${safeProjectKey}" data-key="${p}" ${projectChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleFavoriteEntry('${p.replace(/'/g,"\\'")}', '${fav.id.replace(/'/g,"\\'")}')"/>
+          <span style="font-size:0.8rem">${p}</span>`;
+        container.appendChild(projectDiv);
+      }
+    });
+
+    return;
+  }
 
   // ── 1. Data preparation: apply hide/manage mode and project-team source ──
   const projectTeams = window._projectTeams || projects.map(p => ({ proj: p, teams: [] }));
@@ -4494,6 +5467,10 @@ function renderProjectCheckboxes(projects) {
 }
 
 function toggleProject(name) {
+  if (projectPanelMode === 'favorites' && favoriteManageId) {
+    toggleFavoriteEntry(name);
+    return;
+  }
   const safeKey = projectKeyToDomId(name);
   if (selectedProjects.has(name)) {
     selectedProjects.delete(name);
@@ -4504,14 +5481,11 @@ function toggleProject(name) {
   const wrap = document.getElementById(`pcb-wrap-${safeKey}`);
   if (cb)   cb.checked = selectedProjects.has(name);
   if (wrap) wrap.className = `cb-item ${selectedProjects.has(name) ? 'checked' : ''}`;
-  document.getElementById('fetchBtn').disabled = selectedProjects.size === 0;
-  const auditTabBtn = document.getElementById('tab-audit');
-  if (auditTabBtn) auditTabBtn.disabled = selectedProjects.size === 0;
-  // Show/hide targetapps column based on Roadmap selection
-  document.body.classList.toggle('roadmap-selected', selectedProjects.has('Roadmap'));
+  updateProjectSelectionButtons();
 }
 
 function selectAllProjects(checked) {
+  if (projectPanelMode === 'favorites' && favoriteManageId) return;
   document.querySelectorAll('#projectCheckboxes .cb-item').forEach(wrap => {
     const cb = wrap.querySelector('input[type="checkbox"]');
     const projectName = cb ? cb.getAttribute('data-key') || wrap.querySelector('span').textContent.replace(/^↳\s*/, '').trim() : '';
@@ -4521,10 +5495,7 @@ function selectAllProjects(checked) {
     if (checked) selectedProjects.add(projectName);
     else selectedProjects.delete(projectName);
   });
-  document.getElementById('fetchBtn').disabled = selectedProjects.size === 0;
-  const auditTabBtn2 = document.getElementById('tab-audit');
-  if (auditTabBtn2) auditTabBtn2.disabled = selectedProjects.size === 0;
-  document.body.classList.toggle('roadmap-selected', selectedProjects.has('Roadmap'));
+  updateProjectSelectionButtons();
 }
 
 async function fetchProjectTeams(proj) {
@@ -4621,9 +5592,16 @@ async function loadProjects() {
     window._projectTeams = teamResults;
     window._allProjects = projectNames; // keep for compat
 
-    selectedProjects = new Set();
+    await loadProjectFavoritesFromDevOps(projectNames);
+
+    if (projectPanelMode === 'favorites') {
+      applyActiveFavoriteSelection();
+    } else {
+      selectedProjects = new Set();
+    }
+    updateProjectModeUI();
     renderProjectCheckboxes(projectNames);
-    document.getElementById('fetchBtn').disabled = true;
+    updateProjectSelectionButtons();
   } catch (e) {
     const message = explainFetchError(e);
     showToast(`Kunde inte hämta projekt: ${message}`);
@@ -4644,33 +5622,36 @@ if (typeof window !== 'undefined') {
   window.loadProjects = loadProjects;
 }
 
-async function fetchItems() {
+async function fetchItems(options = {}) {
+  const preserveUiState = !!options.preserveUiState;
   if (selectedProjects.size === 0) { showToast('Välj minst ett projekt'); return; }
 
-  // Reset all column filters
-  colFilters = {};
-  orphanFilter = false;
-  groupingMode = 'projekt';
-  aoMode = false;
-  roadmapModeBacklog = false;
-  document.body.classList.remove('ao-mode');
-  ['projekt','ao','roadmap','maconomy'].forEach(m => {
-    const btn = document.getElementById('grp-'+m);
-    if (btn) btn.classList.toggle('active', m === 'projekt');
-  });
-  if (!dashboardMode && !roadmapViewMode && !tshirtCalcMode && !kalkylMode) {
-    document.body.classList.remove('audit-mode', 'dashboard-mode');
-    document.getElementById('searchBox').placeholder = 'Sök titel, ID...';
-    document.getElementById('searchBox').style.display = '';
+  if (!preserveUiState) {
+    // Reset all column filters
+    colFilters = {};
+    orphanFilter = false;
+    groupingMode = 'projekt';
+    aoMode = false;
+    roadmapModeBacklog = false;
+    document.body.classList.remove('ao-mode');
+    ['projekt','ao','roadmap','maconomy'].forEach(m => {
+      const btn = document.getElementById('grp-'+m);
+      if (btn) btn.classList.toggle('active', m === 'projekt');
+    });
+    if (!dashboardMode && !roadmapViewMode && !tshirtCalcMode && !kalkylMode) {
+      document.body.classList.remove('audit-mode', 'dashboard-mode');
+      document.getElementById('searchBox').placeholder = 'Sök titel, ID...';
+      document.getElementById('searchBox').style.display = '';
+    }
+    auditMode = false;
+    auditData = [];
   }
-  auditMode = false;
-  auditData = [];
 
   const btn = document.getElementById('fetchBtn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> Hämtar...';
 
-  if (!dashboardMode && !roadmapViewMode && !kalkylMode) showLoading();
+  if (!preserveUiState && !dashboardMode && !roadmapViewMode && !kalkylMode) showLoading();
 
   try {
     const queryTypes = [...new Set([...WORK_ITEM_TYPES.map(t => t.key), 'Sprint goal', 'Sprint Goal'])];
@@ -4679,10 +5660,16 @@ async function fetchItems() {
     const fetchWarnings = [];
     // idOrder maps id → position across all projects (for final sort)
     const idOrder = new Map();
+    const validProjects = new Set((window._allProjects || []).map(p => String(p || '').trim()).filter(Boolean));
 
     for (const entry of selectedProjects) {
       // entry is either "ProjectName" or "ProjectName::TeamName"
       const [project, team] = entry.includes('::') ? entry.split('::') : [entry, null];
+
+      if (!project || (validProjects.size > 0 && !validProjects.has(project))) {
+        fetchWarnings.push(`Ignorerade ogiltigt projektval: ${String(entry || '').slice(0, 60)}`);
+        continue;
+      }
 
       // For team-scoped queries, fetch the team's area paths and filter WIQL
       let areaFilter = '';
@@ -4963,7 +5950,7 @@ async function fetchItems() {
       allItems.flatMap(i => (i.fields['System.Tags'] || '').split(';').map(t => t.trim()).filter(Boolean))
     )].sort((a, b) => a.localeCompare(b));
 
-    if (!dashboardMode && !roadmapViewMode && !kalkylMode && !auditMode) renderTable();
+    if (!preserveUiState && !dashboardMode && !roadmapViewMode && !kalkylMode && !auditMode) renderTable();
     setTabBtnsEnabled(true);
 
     // Auto-detect the Priority level field name
@@ -10349,6 +11336,7 @@ function renderEstimering() {
   const editToggle = '';  // Moved to Settings — use globalEditMode
   const listToggleBtn = `<button class="btn btn-outline btn-xs-icon" title="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" aria-label="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" onclick="setAllEpicFeatures(${allExpanded ? 'false' : 'true'})">${allExpanded ? 'v' : '>'}</button>`;
   const createEpicBtn = `<button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.72rem;line-height:1.1;" onclick="createEpicFromHierarchyList()" title="Skapa ny Epic">+ Skapa epic</button>`;
+  const refreshBtn = `<button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.72rem;line-height:1.1;" onclick="refreshStandardTicketLists()" title="Uppdatera listan">↻</button>`;
 
   const taOpts = [...new Set(getEpicItems(allItems).filter(i => workItemProject(i, '') === 'Roadmap').flatMap(i => (i.fields['Custom.Targetapps'] || '').split(',').map(s => s.trim())).filter(Boolean))].sort();
   const filterRow = selectedProjects.has('Roadmap')
@@ -10470,7 +11458,7 @@ function renderEstimering() {
     filterRow +
     `<div style="flex:1;overflow:hidden;display:flex;flex-direction:column;">` +
       `<div style="display:flex;height:32px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);align-items:center;">` +
-        `<div style="width:${EST_LIST_W}px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-right:2px solid var(--border);box-sizing:border-box;">${listToggleBtn}${createEpicBtn}<span>Epic</span></div>` +
+        `<div style="width:${EST_LIST_W}px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-right:2px solid var(--border);box-sizing:border-box;">${listToggleBtn}${createEpicBtn}${refreshBtn}<span>Epic</span></div>` +
         `<div class="est-col-effort" style="flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:2px solid var(--border);box-sizing:border-box;">` +
           `<button class="btn btn-outline" style="width:auto;padding:2px 8px;font-size:0.64rem;line-height:1.1;" onclick="toggleEstSizingGuide('effort')">Effort</button>` +
         `</div>` +
@@ -10648,6 +11636,7 @@ function renderPrioritering() {
   const allExpanded = filtered.length > 0 && filtered.every(ep => expandedEpicIds.has(ep.id));
   const listToggleBtn = `<button class="btn btn-outline btn-xs-icon" title="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" aria-label="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" onclick="setAllEpicFeatures(${allExpanded ? 'false' : 'true'})">${allExpanded ? 'v' : '>'}</button>`;
   const createEpicBtn = `<button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.72rem;line-height:1.1;" onclick="createEpicFromHierarchyList()" title="Skapa ny Epic">+ Skapa epic</button>`;
+  const refreshBtn = `<button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.72rem;line-height:1.1;" onclick="refreshStandardTicketLists()" title="Uppdatera listan">↻</button>`;
 
   // Formula header for panel
   const formulaHeader = `<div style="display:flex;align-items:center;padding:0 10px;background:var(--surface2);border-bottom:2px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:4px;height:100%;box-sizing:border-box;">
@@ -10884,7 +11873,7 @@ function renderPrioritering() {
       <!-- Column sub-headers for panel -->
       <div style="display:flex;height:32px;flex-shrink:0;background:var(--surface2);border-bottom:1px solid var(--border);">
         <div style="width:${PRIO_LIST_W}px;flex-shrink:0;display:flex;align-items:center;border-right:2px solid var(--border);gap:0;padding:0 10px;box-sizing:border-box;overflow:hidden;">
-          <span style="display:flex;align-items:center;gap:6px;padding-right:8px;">${listToggleBtn}${createEpicBtn}</span>
+          <span style="display:flex;align-items:center;gap:6px;padding-right:8px;">${listToggleBtn}${createEpicBtn}${refreshBtn}</span>
           <span style="flex:1;font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;color:var(--muted);">Epic</span>
           <span style="width:38px;flex-shrink:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">T-shirt</span>
           <span style="width:90px;flex-shrink:0;padding-left:8px;">
@@ -10964,7 +11953,7 @@ function wsjfBarDrag(e, itemId, field, maxVal) {
 // Timeline view
 // ──────────────────────────────────────────
 
-let timelineRoadmapFilter = new Set(ROADMAP_CANONICAL_VALUES);
+let timelineRoadmapFilter = new Set([...ROADMAP_CANONICAL_VALUES, '__MISSING__']);
 let timelineGroupMode = 'projekt'; // 'projekt'|'ao'|'roadmap'|'maconomy'
 let timelineTargetappsFilter = '';
 const TIMELINE_MONTH_COL_MIN = 36;
@@ -11039,16 +12028,22 @@ function renderTimeline() {
 
   // Build rows early (needed for label/date/chart rendering below)
   const LEGEND_ITEMS = [
-    { label:'Now',       color:'#6bdb78' },
-    { label:'Next',      color:'#79c0ff' },
-    { label:'Later',     color:'#ff8a80' },
-    { label:'Finishing', color:'#f0c040' },
-    { label:'Continous', color:'#d2a8ff' },
-    { label:'Completed', color:'#b0bcc8' },
+    { key:'Now',       label:'Now',            color:'#6bdb78' },
+    { key:'Next',      label:'Next',           color:'#79c0ff' },
+    { key:'Later',     label:'Later',          color:'#ff8a80' },
+    { key:'Finishing', label:'Finishing',      color:'#f0c040' },
+    { key:'Continous', label:'Continous',      color:'#d2a8ff' },
+    { key:'Completed', label:'Completed',      color:'#b0bcc8' },
+    { key:'__MISSING__', label:'Saknar roadmap', color:'#000000' },
   ];
+  const matchesTimelineRoadmap = item => {
+    const rm = roadmapValue(item, '');
+    return rm ? timelineRoadmapFilter.has(rm) : timelineRoadmapFilter.has('__MISSING__');
+  };
   const visibleEpics = epics.filter(ep => {
-    const rm = roadmapValue(ep, '');
-    if (rm && !timelineRoadmapFilter.has(rm)) return false;
+    if (!matchesTimelineRoadmap(ep)) {
+      return false;
+    }
     // Targetapps filter only applies to epics in the "Roadmap" project
     if (timelineTargetappsFilter && selectedProjects.has('Roadmap')) {
       const proj = workItemProject(ep, '');
@@ -11060,7 +12055,21 @@ function renderTimeline() {
     return true;
   });
   const apps = [...new Set(visibleEpics.map(appKey))].sort((a,b) => a==='–'?1:b==='–'?-1:a.localeCompare(b));
-  const rows = buildGroupedHierarchyRows(apps, visibleEpics, appKey, features, stories, true);
+  const rawRows = buildGroupedHierarchyRows(apps, visibleEpics, appKey, features, stories, true);
+  const rows = [];
+  let pendingGroupRow = null;
+  rawRows.forEach(r => {
+    if (r.type === 'group') {
+      pendingGroupRow = r;
+      return;
+    }
+    if (r.type !== 'epic' && !matchesTimelineRoadmap(r.item)) return;
+    if (pendingGroupRow) {
+      rows.push(pendingGroupRow);
+      pendingGroupRow = null;
+    }
+    rows.push(r);
+  });
 
   const fmt = d => d ? String(d).slice(0,10) : '';
   const today = new Date(); today.setHours(0,0,0,0);
@@ -11084,7 +12093,10 @@ function renderTimeline() {
   const dateToX = d => d ? Math.round((new Date(d) - rangeStart) / totalMs * totalW) : null;
 
   const ROADMAP_COLORS = { Now:'#6bdb78', Next:'#79c0ff', Later:'#ff8a80', Finishing:'#f0c040', Continous:'#d2a8ff', Completed:'#b0bcc8' };
-  const barColor = ep => ROADMAP_COLORS[roadmapValue(ep, '')] || '#79c0ff';
+  const barColor = ep => {
+    const rm = roadmapValue(ep, '');
+    return rm ? (ROADMAP_COLORS[rm] || '#79c0ff') : '#000000';
+  };
 
   const todayX = dateToX(today);
   const todayLine = todayX>=0 && todayX<=totalW ? `<div style="position:absolute;left:${todayX}px;top:0;bottom:0;width:2px;background:var(--accent2);opacity:0.45;z-index:3;pointer-events:none;"></div>` : '';
@@ -11221,9 +12233,9 @@ function renderTimeline() {
   }).join('');
 
   const legendHtml = LEGEND_ITEMS.map(l => {
-    const checked = timelineRoadmapFilter.has(l.label);
+    const checked = timelineRoadmapFilter.has(l.key);
     return `<label class="timeline-legend-item">
-      <input class="timeline-legend-input" type="checkbox" ${checked?'checked':''} onchange="toggleTimelineRoadmap('${l.label}')">
+      <input class="timeline-legend-input" type="checkbox" ${checked?'checked':''} onchange="toggleTimelineRoadmap('${l.key}')">
       <span class="timeline-legend-swatch" style="background:${checked?l.color:'transparent'};border:2px solid ${l.color};"></span>
       ${l.label}
     </label>`;
@@ -11231,6 +12243,7 @@ function renderTimeline() {
   const allExpanded = visibleEpics.length > 0 && visibleEpics.every(ep => expandedEpicIds.has(ep.id));
   const listToggleBtn = `<button class="btn btn-outline btn-xs-icon" title="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" aria-label="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" onclick="setAllEpicFeatures(${allExpanded ? 'false' : 'true'})">${allExpanded ? 'v' : '>'}</button>`;
   const createEpicBtn = `<button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.72rem;line-height:1.1;" onclick="createEpicFromHierarchyList()" title="Skapa ny Epic">+ Skapa epic</button>`;
+  const refreshBtn = `<button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.72rem;line-height:1.1;" onclick="refreshStandardTicketLists()" title="Uppdatera listan">↻</button>`;
 
   // ── 2. DOM write: toolbar, filters, timeline grid and edit columns ──
   wrap.innerHTML = `<div class="tl-wrap">
@@ -11266,7 +12279,7 @@ function renderTimeline() {
       <!-- Epic labels + Score columns: WSJF | MoSCoW | RICE -->
       <div style="flex-shrink:0;width:${TL_LIST_W}px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
         <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;padding:0 12px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">
-          <span style="display:flex;align-items:center;gap:6px;padding-right:8px;">${listToggleBtn}${createEpicBtn}</span>
+          <span style="display:flex;align-items:center;gap:6px;padding-right:8px;">${listToggleBtn}${createEpicBtn}${refreshBtn}</span>
           <span style="flex:1;">Epic</span>
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;">WSJF</span>
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;border-left:1px solid var(--border);">MoSCoW</span>
@@ -15150,10 +16163,10 @@ async function renderBoardTab() {
         </section>
         <section class="board-pane">
           <div class="board-pane-head">
-            <span>Epic/Feature/Story (Träd)</span>
+            <span>Epic/Feature/Story</span>
             <div style="display:flex;gap:6px;">
               <button class="btn btn-outline" style="width:auto;padding:5px 8px;" onclick="createEpicFromHierarchyList(boardActiveTicketProject())" title="Skapa ny Epic">+ Skapa epic</button>
-              <button class="btn btn-outline" style="width:auto;padding:5px 8px;" onclick="boardRefreshTickets()" title="Uppdatera endast Visual board-listan">↻</button>
+              <button class="btn btn-outline" style="width:auto;padding:5px 8px;" onclick="boardRefreshTickets()" title="Uppdatera listan">↻</button>
             </div>
           </div>
           <div id="boardIssueTree" class="board-pane-list" style="gap:0;">${issueRows}</div>
@@ -15267,6 +16280,8 @@ initSidebarCollapse();
 initCheckboxes();
 initRenderPerfInstrumentation();
 applyColCSS();
+loadProjectFavorites();
+updateProjectModeUI();
 setTopSection('backlog');
 
 // Restore saved PAT and auto-save on change
