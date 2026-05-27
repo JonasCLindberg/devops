@@ -3370,6 +3370,8 @@ const FIELDS = [
   'Custom.RiskreductionOpportunityEnablement',
   'Custom.Reach',
   'Custom.Confidence',
+  'Custom.valueTimeSaveInt',
+  'Custom.valueTimeSaveText',
   'Custom.Targetapps',
   'Custom.Prioritylevel',
   'Custom.Typ',
@@ -5939,7 +5941,7 @@ async function fetchItems(options = {}) {
         if (batchRes.status === 400) {
           const AO_FIELD = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
           const PRIO_FIELDS = ['Custom.Prioritylevel', 'Custom.PriorityLevel'];
-          const KNOWN_CUSTOM_ALL = [AO_FIELD, ...PRIO_FIELDS, 'Custom.Typ', 'Custom.Tshirt', 'Custom.Roadmap', 'Custom.Milestone', 'Custom.SuperEpic', 'Custom.Maconomy', 'Custom.RiskreductionOpportunityEnablement', 'Custom.Reach', 'Custom.Confidence', 'Custom.Targetapps', 'Custom.Team'];
+          const KNOWN_CUSTOM_ALL = [AO_FIELD, ...PRIO_FIELDS, 'Custom.Typ', 'Custom.Tshirt', 'Custom.Roadmap', 'Custom.Milestone', 'Custom.SuperEpic', 'Custom.Maconomy', 'Custom.RiskreductionOpportunityEnablement', 'Custom.Reach', 'Custom.Confidence', 'Custom.valueTimeSaveInt', 'Custom.valueTimeSaveText', 'Custom.Targetapps', 'Custom.Team'];
           // Step 2: try with all known custom fields
           const fieldsStep2 = FIELDS.filter(f => !f.startsWith('Custom.') || KNOWN_CUSTOM_ALL.includes(f));
           batchRes = await apiPost(batchUrl, { ids: batch, fields: fieldsStep2 });
@@ -11670,6 +11672,8 @@ function renderEstimering() {
 }
 
 const AFFARSOM_FIELD_P = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
+const PRIO_TIME_SAVE_INT_FIELD = 'Custom.valueTimeSaveInt';
+const PRIO_TIME_SAVE_TEXT_FIELD = 'Custom.valueTimeSaveText';
 
 function prioSetReach(itemId, val) {
   const item = allItems.find(i => i.id === itemId);
@@ -11685,6 +11689,36 @@ function prioSetConfidence(itemId, val) {
   const newVal = item.fields['Custom.Confidence'] === val ? null : val;
   item.fields['Custom.Confidence'] = newVal;
   saveField(itemId, 'Custom.Confidence', newVal == null ? '' : newVal);
+}
+
+function prioSaveTimeSaveInt(itemId, inputEl) {
+  const item = allItems.find(i => i.id === itemId);
+  if (!item || !inputEl) return;
+  const raw = String(inputEl.value || '').trim();
+  if (raw === '') {
+    item.fields[PRIO_TIME_SAVE_INT_FIELD] = null;
+    saveField(itemId, PRIO_TIME_SAVE_INT_FIELD, '');
+    return;
+  }
+  const num = Number(raw);
+  if (!Number.isFinite(num)) {
+    inputEl.classList.add('wsjf-error');
+    setTimeout(() => inputEl.classList.remove('wsjf-error'), 1200);
+    inputEl.value = item.fields[PRIO_TIME_SAVE_INT_FIELD] != null ? String(item.fields[PRIO_TIME_SAVE_INT_FIELD]) : '';
+    return;
+  }
+  const asInt = Math.round(num);
+  item.fields[PRIO_TIME_SAVE_INT_FIELD] = asInt;
+  inputEl.value = String(asInt);
+  saveField(itemId, PRIO_TIME_SAVE_INT_FIELD, asInt);
+}
+
+function prioSaveTimeSaveText(itemId, inputEl) {
+  const item = allItems.find(i => i.id === itemId);
+  if (!item || !inputEl) return;
+  const text = String(inputEl.value || '').trim();
+  item.fields[PRIO_TIME_SAVE_TEXT_FIELD] = text || null;
+  saveField(itemId, PRIO_TIME_SAVE_TEXT_FIELD, text || '');
 }
 
 async function prioResetWsjfFields(itemId) {
@@ -11773,6 +11807,7 @@ function renderPrioritering() {
     <button class="group-btn${prioModel==='wsjf'?' active':''}" onclick="prioModel='wsjf';renderPrioritering()">WSJF</button>
     <button class="group-btn${prioModel==='moscow'?' active':''}" onclick="prioModel='moscow';renderPrioritering()">MoSCoW</button>
     <button class="group-btn${prioModel==='rice'?' active':''}" onclick="prioModel='rice';renderPrioritering()">RICE</button>
+    <button class="group-btn${prioModel==='timesave'?' active':''}" onclick="prioModel='timesave';renderPrioritering()">Tidsbesparing</button>
   </div>
 `;
 
@@ -12001,6 +12036,40 @@ function renderPrioritering() {
       </div>`;
     }
 
+    // ── Tidsbesparing panel ──
+    if (prioModel === 'timesave') {
+      const timeSaveInt = f[PRIO_TIME_SAVE_INT_FIELD] != null && f[PRIO_TIME_SAVE_INT_FIELD] !== ''
+        ? Number(f[PRIO_TIME_SAVE_INT_FIELD])
+        : null;
+      const timeSaveText = String(f[PRIO_TIME_SAVE_TEXT_FIELD] || '').trim();
+
+      const intCell = globalEditMode
+        ? `<div style="width:160px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
+            <input class="wsjf-input" type="text" inputmode="numeric" value="${timeSaveInt != null && Number.isFinite(timeSaveInt) ? timeSaveInt : ''}"
+              style="width:78px;text-align:center;"
+              placeholder="0"
+              onblur="prioSaveTimeSaveInt(${item.id},this)"
+              onclick="event.stopPropagation()" />
+          </div>`
+        : `<div style="width:160px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--text);">${timeSaveInt != null && Number.isFinite(timeSaveInt) ? timeSaveInt : '–'}</div>`;
+
+      const textCell = globalEditMode
+        ? `<div style="flex:1;min-width:240px;display:flex;align-items:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
+            <input class="col-filter" type="text" value="${escHtml(timeSaveText)}"
+              style="width:100%;font-size:0.82rem;padding:4px 8px;"
+              placeholder="Beskrivning av tidsbesparing..."
+              onblur="prioSaveTimeSaveText(${item.id},this)"
+              onclick="event.stopPropagation()" />
+          </div>`
+        : `<div style="flex:1;min-width:240px;display:flex;align-items:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;font-size:0.84rem;color:${timeSaveText ? 'var(--text)' : 'var(--muted)'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escHtml(timeSaveText)}">${timeSaveText ? escHtml(timeSaveText) : '–'}</div>`;
+
+      return `<div style="display:flex;height:${ROW_H}px;border-bottom:1px solid rgba(125,133,144,.08);box-sizing:border-box;flex-shrink:0;align-items:center;">
+        ${listSide}
+        ${intCell}
+        ${textCell}
+      </div>`;
+    }
+
     // ── MoSCoW panel ──
     const MOSCOW_OPTS = ['Must','Should','Could',"Won't"];
     const MOSCOW_COLORS = { 'Must':'#ff8a80','Should':'#f0c040','Could':'#6bdb78',"Won't":'#b0bcc8' };
@@ -12048,6 +12117,11 @@ function renderPrioritering() {
                 <span>·</span><span style="color:#6bdb78;">Could</span>
                 <span>·</span><span style="color:#b0bcc8;">Won't</span>
               </span>`
+            : prioModel === 'timesave'
+            ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:6px;">
+                <span style="color:var(--accent2);font-weight:700;">Tidsbesparing</span>
+                <span>·</span><span>Bedömd besparing och motivering</span>
+              </span>`
             : prioModel === 'rice'
             ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:4px;">
                 <span style="color:var(--accent2);font-weight:700;">RICE</span>
@@ -12085,7 +12159,7 @@ function renderPrioritering() {
           </span>
         </div>
         <div style="flex:1;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);min-width:fit-content;">
-          ${(prioModel === 'moscow' || prioModel === 'rice') ? '' : `
+          ${(prioModel === 'moscow' || prioModel === 'rice' || prioModel === 'timesave') ? '' : `
           <span style="min-width:48px;text-align:center;flex-shrink:0;">WSJF</span>
           <span style="width:${BAR_W}px;flex-shrink:0;text-align:center;border-left:1px solid var(--border);">Business Value</span>
           <span style="width:${BAR_W}px;flex-shrink:0;text-align:center;border-left:1px solid var(--border);">Time Criticality</span>
@@ -12097,6 +12171,9 @@ function renderPrioritering() {
           <span style="width:${BAR_W}px;flex-shrink:0;text-align:center;border-left:1px solid var(--border);">Impact (BV)</span>
           <span style="width:160px;flex-shrink:0;text-align:center;border-left:1px solid var(--border);">Confidence</span>
           <span style="width:${EFF_W}px;flex-shrink:0;text-align:center;border-left:1px solid var(--border);">Effort</span>` : ''}
+          ${prioModel === 'timesave' ? `
+          <span style="width:160px;flex-shrink:0;text-align:center;border-left:1px solid var(--border);">h/år</span>
+          <span style="flex:1;min-width:240px;text-align:left;padding-left:12px;border-left:1px solid var(--border);">Beskrivning</span>` : ''}
         </div>
       </div>
       <!-- Scrollable rows -->
