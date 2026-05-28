@@ -766,11 +766,66 @@
     border-bottom: 1px solid var(--border);
   }
   .board-sprint-chips {
-    width: 100%;
+    position: relative;
+    margin-left: auto;
+    width: auto;
+    min-width: 0;
+  }
+  .board-sprint-trigger {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--muted);
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+  }
+  .board-sprint-trigger:hover {
+    border-color: var(--accent2);
+    color: var(--text);
+  }
+  .board-sprint-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 35;
+    min-width: 520px;
+    max-width: min(86vw, 920px);
+    max-height: 52vh;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    padding: 10px;
+    display: none;
+  }
+  .board-sprint-popover.open {
+    display: block;
+  }
+  .board-sprint-popover-head {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
     align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .board-sprint-popover-close {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface2);
+    color: var(--muted);
+    width: 24px;
+    height: 24px;
+    line-height: 1;
+    font-size: 0.9rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .board-sprint-popover-close:hover {
+    border-color: var(--accent2);
+    color: var(--text);
   }
   .board-sprint-chip {
     border: 1px solid var(--border);
@@ -2557,7 +2612,8 @@
     <button class="top-section-btn active" id="section-backlog" onclick="setTopSection('backlog')">Backlog</button>
     <button class="top-section-btn" id="section-portfolio" onclick="setTopSection('portfolio')">Portfolio</button>
   </div>
-  <button id="settingsNavBtn" onclick="showTab('settings')" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Inställningar</button>
+  <button id="globalEditBtn" onclick="toggleEditMode()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="if(!globalEditMode){this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'}" onmouseout="if(!globalEditMode){this.style.borderColor='var(--border)';this.style.color='var(--muted)'}">✎ Editera</button>
+  <button id="settingsNavBtn" onclick="showTab('settings')" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Inställningar</button>
 </header>
 
 <div class="main">
@@ -2707,6 +2763,14 @@
       <div class="descr-popup">
         <h3 id="storageProjectTitle">Välj lagringsprojekt <button onclick="closeStorageProjectPicker()">✕</button></h3>
         <div class="descr-popup-body" id="storageProjectBody"></div>
+      </div>
+    </div>
+
+    <!-- Epic project picker modal -->
+    <div class="descr-popup-overlay" id="epicProjectModal" onclick="if(event.target===this)closeEpicProjectPicker()">
+      <div class="descr-popup">
+        <h3 id="epicProjectTitle">Välj projekt för ny Epic <button onclick="closeEpicProjectPicker()">✕</button></h3>
+        <div class="descr-popup-body" id="epicProjectBody"></div>
       </div>
     </div>
 
@@ -2873,11 +2937,11 @@ async function createEpicFromHierarchyList(projectHint = '') {
 
   let project = projects[0];
   if (projects.length > 1) {
-    const typed = prompt(`Projekt för ny Epic (${projects.join(', ')})`, project);
-    if (typed == null) return;
-    const normalized = String(typed || '').trim();
+    const picked = await chooseEpicProjectFromList(projects, project);
+    if (!picked) return;
+    const normalized = String(picked || '').trim();
     if (!normalized || !projects.includes(normalized)) {
-      showToast('Ogiltigt projektval. Ange exakt projektnamn från listan.');
+      showToast('Ogiltigt projektval. Välj ett projekt från listan.');
       return;
     }
     project = normalized;
@@ -2930,9 +2994,14 @@ async function createEpicFromHierarchyList(projectHint = '') {
 document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
   const childModal = document.getElementById('childModal');
+  const epicProjectModal = document.getElementById('epicProjectModal');
   const workItemModal = document.getElementById('wiOverlay');
   if (childModal?.classList.contains('open')) {
     closeCreateChildModal();
+    return;
+  }
+  if (epicProjectModal?.classList.contains('open')) {
+    closeEpicProjectPicker();
     return;
   }
   if (workItemModal?.classList.contains('open')) closeWorkItemModal();
@@ -3486,6 +3555,7 @@ let selectedStatuses = (() => {
 // Hidden epics — persisted in localStorage (always stored as strings)
 let auditMode   = false;
 let auditData   = [];
+let auditViewMode = 'project'; // 'project' | 'user'
 let dashboardMode = false;
 let roadmapViewMode = false;
 let dashEffortMode = false;
@@ -3560,6 +3630,9 @@ const BOARD_AUTOSAVE_INTERVAL_MS = 60000;
 let boardMode = false;
 let boardTickets = [];
 let boardTicketsLoaded = false;
+let boardTicketsScopeKey = '';
+let boardSprintPanelOpen = false;
+let boardSprintOutsideCloseBound = false;
 let boardStateFieldRef = BOARD_STATE_FIELD_CANDIDATES[0];
 let boardStateStorageMode = 'unknown';
 let activeBoardTicketId = null;
@@ -4672,9 +4745,15 @@ function extractKnownFavoriteKeysFromText(text) {
   const allowed = favoriteSelectionKeys();
   if (!allowed.length) return [];
 
+  const hasBoundedToken = key => {
+    const escaped = String(key || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`(^|[\\s,"'\\[\\]{};])${escaped}($|[\\s,"'\\[\\]{};])`);
+    return re.test(haystack);
+  };
+
   return uniqueStringList(
     allowed
-      .filter(key => key && haystack.includes(key))
+      .filter(key => key && hasBoundedToken(key))
       .sort((a, b) => b.length - a.length)
   );
 }
@@ -4821,6 +4900,7 @@ function isTeamdefUnavailableError(error) {
 }
 
 let storageProjectPickerResolve = null;
+let epicProjectPickerResolve = null;
 
 function closeStorageProjectPicker() {
   const modal = document.getElementById('storageProjectModal');
@@ -4872,6 +4952,53 @@ async function chooseFavoritesStorageProject() {
   modal.classList.add('open');
   return await new Promise(resolve => {
     storageProjectPickerResolve = resolve;
+  });
+}
+
+function closeEpicProjectPicker() {
+  const modal = document.getElementById('epicProjectModal');
+  if (modal) modal.classList.remove('open');
+  if (epicProjectPickerResolve) {
+    const resolve = epicProjectPickerResolve;
+    epicProjectPickerResolve = null;
+    resolve('');
+  }
+}
+
+function pickEpicProject(projectName) {
+  const selected = String(projectName || '').trim();
+  const modal = document.getElementById('epicProjectModal');
+  if (modal) modal.classList.remove('open');
+  if (epicProjectPickerResolve) {
+    const resolve = epicProjectPickerResolve;
+    epicProjectPickerResolve = null;
+    resolve(selected);
+  }
+}
+
+async function chooseEpicProjectFromList(projectNames = [], currentProject = '') {
+  const names = [...new Set((projectNames || []).map(n => String(n || '').trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }));
+  if (!names.length) return '';
+  if (names.length === 1) return names[0];
+
+  const body = document.getElementById('epicProjectBody');
+  const modal = document.getElementById('epicProjectModal');
+  if (!body || !modal) return '';
+
+  const current = names.includes(currentProject) ? currentProject : names[0];
+  body.innerHTML = `
+    <p style="margin-bottom:6px;color:var(--muted)">Välj vilket projekt den nya Epicen ska skapas i.</p>
+    <div class="storage-project-list">
+      ${names.map(name => `<button class="btn btn-outline storage-project-btn ${name === current ? 'active' : ''}" onclick="pickEpicProject('${name.replace(/'/g,"\\'")}')">${escHtml(name)}</button>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+      <button class="btn btn-outline" style="width:auto;padding:6px 10px;font-size:0.78rem;" onclick="closeEpicProjectPicker()">Avbryt</button>
+    </div>`;
+
+  modal.classList.add('open');
+  return await new Promise(resolve => {
+    epicProjectPickerResolve = resolve;
   });
 }
 
@@ -6997,16 +7124,68 @@ async function auditUsers() {
 
 function renderAuditTable(data) {
   const wrap = document.getElementById('tableWrap');
+  const modeButtons = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+      <div class="project-mode-switch" role="group" aria-label="Audit-vy">
+        <button class="project-mode-btn ${auditViewMode === 'project' ? 'active' : ''}" onclick="setAuditViewMode('project')">Per Projekt</button>
+        <button class="project-mode-btn ${auditViewMode === 'user' ? 'active' : ''}" onclick="setAuditViewMode('user')">Per användare</button>
+      </div>
+    </div>`;
+
+  if (auditViewMode === 'user') {
+    const userMap = new Map();
+    data.forEach(({ proj, members }) => {
+      (members || []).forEach(m => {
+        const name = String(m?.name || '').trim();
+        if (!name) return;
+        if (!userMap.has(name)) userMap.set(name, new Map());
+        const projMap = userMap.get(name);
+        if (!projMap.has(proj)) projMap.set(proj, new Set());
+        (m.teams || []).forEach(t => {
+          const teamName = String(t || '').trim();
+          if (teamName) projMap.get(proj).add(teamName);
+        });
+      });
+    });
+
+    const users = [...userMap.entries()]
+      .map(([name, projMap]) => ({
+        name,
+        projects: [...projMap.entries()]
+          .map(([proj, teamsSet]) => ({ proj, teams: [...teamsSet].sort((a, b) => a.localeCompare(b, 'sv-SE')) }))
+          .sort((a, b) => a.proj.localeCompare(b.proj, 'sv-SE')),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'sv-SE'));
+
+    const rowsHtml = users.map(user => {
+      if (!user.projects.length) return '';
+      return user.projects.map((p, i) => `
+        <tr>
+          ${i === 0 ? `<td style="font-size:0.88rem;padding:8px 14px;font-weight:700;vertical-align:top;" rowspan="${user.projects.length}">${escHtml(user.name)}</td>` : ''}
+          <td style="font-size:0.88rem;padding:8px 14px;">${escHtml(p.proj)}</td>
+          <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml(p.teams.join(', '))}</td>
+        </tr>`).join('');
+    }).join('');
+
+    document.getElementById('resultInfo').innerHTML = `<strong>${users.length}</strong> användare`;
+    wrap.innerHTML = modeButtons + `
+      <table>
+        <thead><tr><th>Användare</th><th>Projekt</th><th>Team</th></tr></thead>
+        <tbody>${rowsHtml || '<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted);">Inga användare hittades</td></tr>'}</tbody>
+      </table>`;
+    return;
+  }
+
   const rowsHtml = data.map(({ proj, members }) => {
     if (!members.length) return '';
     const memberRows = members.map(m => `
       <tr>
-        <td style="font-size:0.88rem;padding:8px 14px;">${m.name}</td>
-        <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${m.teams.join(', ')}</td>
+        <td style="font-size:0.88rem;padding:8px 14px;">${escHtml(m.name)}</td>
+        <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml((m.teams || []).join(', '))}</td>
       </tr>`).join('');
     return `
       <tr class="project-row">
-        <td class="title-cell" colspan="2"><a style="color:var(--accent2);text-decoration:none;font-weight:700;">▸ ${proj}</a>
+        <td class="title-cell" colspan="2"><a style="color:var(--accent2);text-decoration:none;font-weight:700;">▸ ${escHtml(proj)}</a>
           <span style="color:var(--muted);font-size:0.84rem;margin-left:8px;">${members.length} användare</span>
         </td>
       </tr>
@@ -7017,7 +7196,7 @@ function renderAuditTable(data) {
   const total = data.reduce((s, d) => s + d.members.length, 0);
   document.getElementById('resultInfo').innerHTML = `<strong>${total}</strong> användare`;
 
-  wrap.innerHTML = `
+  wrap.innerHTML = modeButtons + `
     <table>
       <thead><tr><th>Namn</th><th>Team</th></tr></thead>
       <tbody>${rowsHtml || '<tr><td colspan="2" style="text-align:center;padding:24px;color:var(--muted);">Inga användare hittades</td></tr>'}</tbody>
@@ -7025,13 +7204,26 @@ function renderAuditTable(data) {
 }
 
 function renderAuditSearch() {
-  const q = document.getElementById('searchBox').value.toLowerCase();
+  const q = document.getElementById('searchBox').value.toLowerCase().trim();
   if (!q) { renderAuditTable(auditData); return; }
-  const filtered = auditData.map(({ proj, members }) => ({
-    proj,
-    members: members.filter(m => m.name.toLowerCase().includes(q))
-  })).filter(d => d.members.length > 0);
+  const filtered = auditData.map(({ proj, members }) => {
+    const projMatch = String(proj || '').toLowerCase().includes(q);
+    if (projMatch) return { proj, members };
+    const matchedMembers = (members || []).filter(m => {
+      const name = String(m?.name || '').toLowerCase();
+      const teams = (m?.teams || []).join(' ').toLowerCase();
+      return name.includes(q) || teams.includes(q);
+    });
+    return { proj, members: matchedMembers };
+  }).filter(d => d.members.length > 0);
   renderAuditTable(filtered);
+}
+
+function setAuditViewMode(mode) {
+  const nextMode = mode === 'user' ? 'user' : 'project';
+  if (auditViewMode === nextMode && auditMode) return;
+  auditViewMode = nextMode;
+  if (auditMode) renderAuditSearch();
 }
 
 function downloadAuditCSV() {
@@ -12057,7 +12249,7 @@ function renderPrioritering() {
         ? `<div style="flex:1;min-width:240px;display:flex;align-items:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
             <input class="col-filter" type="text" value="${escHtml(timeSaveText)}"
               style="width:100%;font-size:0.82rem;padding:4px 8px;"
-              placeholder="Beskrivning av tidsbesparing..."
+              placeholder=""
               onblur="prioSaveTimeSaveText(${item.id},this)"
               onclick="event.stopPropagation()" />
           </div>`
@@ -12546,7 +12738,7 @@ function renderTimeline() {
       </select>
     </div>` : ''}
     <div class="tl-body">
-      <!-- Epic labels + Score columns: WSJF | MoSCoW | RICE -->
+      <!-- Epic labels + Score columns: WSJF | MoSCoW | RICE | Tidsbesparing -->
       <div style="flex-shrink:0;width:${TL_LIST_W}px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
         <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;padding:0 12px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">
           <span style="display:flex;align-items:center;gap:6px;padding-right:8px;">${listToggleBtn}${createEpicBtn}${refreshBtn}</span>
@@ -12554,6 +12746,7 @@ function renderTimeline() {
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;">WSJF</span>
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;border-left:1px solid var(--border);">MoSCoW</span>
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;border-left:1px solid var(--border);">RICE</span>
+          <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;border-left:1px solid var(--border);">Tidsbesparing</span>
         </div>
         ${rows.map((r,i) => {
           // Bygg rad: label + score
@@ -12561,14 +12754,14 @@ function renderTimeline() {
             ? `<div style=\"height:${GROUP_H}px;display:flex;align-items:center;background:var(--surface);${groupBorder}box-sizing:border-box;flex:1;\">${hierarchyGroupRowLeadHtml(r.label, { width: `${TL_LIST_W}px`, height: GROUP_H, borderRight: 'none', prefix: '▸ ' })}</div>`
             : hierarchyListCellHtml(r.item, {
                 type: r.type,
-                width: `calc(${TL_LIST_W}px - ${SCORE_W*3}px)`,
+                width: `calc(${TL_LIST_W}px - ${SCORE_W*4}px)`,
                 height: ROW_H,
                 borderRight: 'none',
                 rowExtraStyle: `${borderBtm}overflow:hidden;`,
                 hasChildren: hierarchyRowHasChildren(r.item, r.type, features, stories),
               });
           const rScore = r.type==='group'
-            ? `<div style=\"height:${GROUP_H}px;background:var(--surface);${groupBorder}box-sizing:border-box;display:flex;\"><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span></div>`
+            ? `<div style=\"height:${GROUP_H}px;background:var(--surface);${groupBorder}box-sizing:border-box;display:flex;\"><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span></div>`
             : (() => {
                 const f = r.item.fields;
                 const bv  = f['Microsoft.VSTS.Common.BusinessValue'] ?? null;
@@ -12583,9 +12776,13 @@ function renderTimeline() {
                 const conf  = f['Custom.Confidence'] != null ? Number(f['Custom.Confidence']) : null;
                 const impact = bv != null ? Number(bv) : null;
                 const rice = (reach!=null&&impact!=null&&conf!=null&&eff) ? +((reach*impact*conf)/eff).toFixed(1) : null;
+                const timeSave = f[PRIO_TIME_SAVE_INT_FIELD] != null && f[PRIO_TIME_SAVE_INT_FIELD] !== ''
+                  ? Number(f[PRIO_TIME_SAVE_INT_FIELD])
+                  : null;
                 return `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${wsjf!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;\" title=\"WSJF\">${wsjf!=null?wsjf:'–'}</span>`+
                   `<span style=\"width:${SCORE_W}px;text-align:center;font-size:0.74rem;flex-shrink:0;border-left:1px solid var(--border);\" title=\"MoSCoW\">${moscow?`<span style=\\"color:${moscowColor};font-weight:700;font-size:0.66rem;\\">${moscow}</span>`:'–'}</span>`+
-                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${rice!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"RICE\">${rice!=null?rice:'–'}</span>`;
+                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${rice!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"RICE\">${rice!=null?rice:'–'}</span>`+
+                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${timeSave!=null&&Number.isFinite(timeSave)?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"Tidsbesparing\">${timeSave!=null&&Number.isFinite(timeSave)?Math.round(timeSave):'–'}</span>`;
               })();
           return `<div style=\"display:flex;align-items:center;\">${rLabel}${rScore}</div>`;
         }).join('')}
@@ -13553,6 +13750,13 @@ function boardSelectedProjectNames() {
   return [...new Set([...selectedProjects].map(entry => String(entry || '').split('::')[0]).filter(Boolean))];
 }
 
+function boardSelectedProjectScopeKey() {
+  return boardSelectedProjectNames()
+    .slice()
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }))
+    .join('||');
+}
+
 function boardProjectForTicket(item) {
   return ((item?.fields?.['System.TeamProject'] || item?.fields?.['System.AreaPath'] || '') + '').split('\\')[0] || '';
 }
@@ -13650,6 +13854,21 @@ function boardNodeProject(node) {
     if (fromItem) return fromItem;
   }
   return boardActiveTicketProject();
+}
+
+function boardNodeScopeLabel(node) {
+  if (!node) return '';
+  const scope = String(node.sourceScope || '').trim();
+  if (scope) return scope;
+  return boardNodeProject(node);
+}
+
+function boardShortLabel(value, maxLen = 10) {
+  const text = String(value || '').trim();
+  const max = Number.isFinite(Number(maxLen)) ? Math.max(1, Number(maxLen)) : 10;
+  if (!text) return '';
+  if (text.length <= max) return text;
+  return `${text.slice(0, max)}`;
 }
 
 function boardParentWorkItemUrl(parentWorkItemId) {
@@ -14206,6 +14425,7 @@ function boardGetSprintsByCategory() {
     next: null,
     backlog: { path: '__backlog__', name: 'Backlog', project: '' },
     byProject: {},
+    projectRows: [],
     displayProject: '',
   };
 
@@ -14249,6 +14469,15 @@ function boardGetSprintsByCategory() {
 
   const preferredProject = boardActiveTicketProject();
   const projectKeys = Object.keys(categories.byProject);
+  categories.projectRows = projectKeys
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }))
+    .map(project => ({
+      project,
+      previous: categories.byProject[project]?.previous || null,
+      active: categories.byProject[project]?.active || null,
+      next: categories.byProject[project]?.next || null,
+      backlog: { path: '__backlog__', name: 'Backlog', project },
+    }));
   categories.displayProject = preferredProject && categories.byProject[preferredProject]
     ? preferredProject
     : (projectKeys[0] || '');
@@ -14294,6 +14523,7 @@ function boardResolveTargetSprintPath(node, phaseKey, catalog) {
 }
 
 async function boardAssignSprintToSelected(phaseKey) {
+  const projectFilter = String(arguments[1]?.project || '').trim();
   const phase = String(phaseKey || '').trim();
   if (!phase) return;
   const runtime = boardNativeRuntime;
@@ -14315,6 +14545,8 @@ async function boardAssignSprintToSelected(phaseKey) {
   let skippedNoPath = 0;
 
   selectedNodes.forEach(node => {
+    const nodeProject = boardNodeProject(node);
+    if (projectFilter && nodeProject !== projectFilter) return;
     const targetPath = boardResolveTargetSprintPath(node, phase, catalog);
     if (!targetPath) {
       skippedNoPath++;
@@ -14382,32 +14614,76 @@ function boardNativeRenderSprintChips(runtime) {
   const selected = new Set(runtime.selectedIds || []);
   const hasSelection = selected.size > 0;
 
-  const projectInfo = sprints.displayProject ? ` (${escHtml(sprints.displayProject)})` : '';
-  let html = '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.75rem;">';
-  html += `<span style="font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">Sprint${projectInfo}:</span>`;
-
-  const addPhaseButton = (label, phase, sprintMeta) => {
+  const addPhaseButton = (label, phase, sprintMeta, project) => {
     const title = sprintMeta?.name ? `${label}: ${sprintMeta.name}` : label;
     const text = sprintMeta?.name || label;
     const disabled = !hasSelection || !sprintMeta;
     const disabledAttr = disabled ? 'disabled' : '';
-    return `<button type="button" class="board-sprint-chip phase" data-board-sprint-phase="${phase}" ${disabledAttr} title="${escHtml(title)}">${escHtml(text)}</button>`;
+    const projectAttr = project ? ` data-board-sprint-project="${escHtml(project)}"` : '';
+    return `<button type="button" class="board-sprint-chip phase" data-board-sprint-phase="${phase}"${projectAttr} ${disabledAttr} title="${escHtml(title)}">${escHtml(text)}</button>`;
   };
 
-  html += addPhaseButton('Föregående', 'previous', sprints.previous);
-  html += addPhaseButton('Aktiv', 'active', sprints.active);
-  html += addPhaseButton('Kommande', 'next', sprints.next);
-  html += `<button type="button" class="board-sprint-chip phase" data-board-sprint-phase="backlog" ${hasSelection ? '' : 'disabled'} title="Backlog">Backlog</button>`;
-  html += '</div>';
-  wrap.innerHTML = html;
+  const rows = sprints.projectRows && sprints.projectRows.length
+    ? sprints.projectRows
+    : [{
+        project: sprints.displayProject || '',
+        previous: sprints.previous,
+        active: sprints.active,
+        next: sprints.next,
+        backlog: sprints.backlog,
+      }];
+
+  let rowsHtml = '<div style="display:flex;flex-direction:column;gap:6px;font-size:.75rem;">';
+  rows.forEach(row => {
+    const projectLabel = row.project || 'Okänt projekt';
+    rowsHtml += '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">';
+    rowsHtml += `<span style="font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;min-width:120px;">Sprint (${escHtml(projectLabel)}):</span>`;
+    rowsHtml += addPhaseButton('Föregående', 'previous', row.previous, row.project);
+    rowsHtml += addPhaseButton('Aktiv', 'active', row.active, row.project);
+    rowsHtml += addPhaseButton('Kommande', 'next', row.next, row.project);
+    rowsHtml += `<button type="button" class="board-sprint-chip phase" data-board-sprint-phase="backlog" data-board-sprint-project="${escHtml(row.project)}" ${hasSelection ? '' : 'disabled'} title="Backlog">Backlog</button>`;
+    rowsHtml += '</div>';
+  });
+  rowsHtml += '</div>';
+
+  wrap.innerHTML = `
+    <button type="button" class="board-sprint-trigger" onclick="boardToggleSprintPanel()" title="Visa sprintar per projekt">
+      Sprintar per projekt (${rows.length})
+    </button>
+    <div class="board-sprint-popover ${boardSprintPanelOpen ? 'open' : ''}">
+      <div class="board-sprint-popover-head">
+        <span style="font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">Projekt x Sprintar</span>
+        <button type="button" class="board-sprint-popover-close" onclick="boardToggleSprintPanel(false)" title="Stäng">x</button>
+      </div>
+      ${rowsHtml}
+    </div>`;
 
   wrap.querySelectorAll('[data-board-sprint-phase]').forEach(btn => {
     btn.addEventListener('click', () => {
       const phase = String(btn.getAttribute('data-board-sprint-phase') || '').trim();
+      const project = String(btn.getAttribute('data-board-sprint-project') || '').trim();
       if (!phase) return;
-      boardAssignSprintToSelected(phase);
+      boardAssignSprintToSelected(phase, { project });
     });
   });
+}
+
+function boardEnsureSprintPanelOutsideClose() {
+  if (boardSprintOutsideCloseBound) return;
+  document.addEventListener('pointerdown', (event) => {
+    if (!boardSprintPanelOpen) return;
+    const target = event.target;
+    if (target && typeof target.closest === 'function' && target.closest('#boardSprintChips')) return;
+    boardSprintPanelOpen = false;
+    if (activeTab === 'board' && boardNativeRuntime) boardNativeRenderSprintChips(boardNativeRuntime);
+  }, true);
+  boardSprintOutsideCloseBound = true;
+}
+
+function boardToggleSprintPanel(forceOpen) {
+  if (typeof forceOpen === 'boolean') boardSprintPanelOpen = forceOpen;
+  else boardSprintPanelOpen = !boardSprintPanelOpen;
+  if (activeTab === 'board' && boardNativeRuntime) boardNativeRenderSprintChips(boardNativeRuntime);
 }
 
 function boardNativeDescendants(runtime, rootId) {
@@ -14810,6 +15086,8 @@ function boardNativeRender(runtime) {
       ? `<button class="board-native-save" data-save-node-id="${node.id}"${saveDisabled} title="Spara till DevOps">${saveLabel}</button>`
       : '';
     const displayId = Number(node.sourceWorkItemId || 0) || Number(node.id);
+    const scopeLabel = boardNodeScopeLabel(node);
+    const scopeLabelShort = boardShortLabel(scopeLabel || 'Projekt', 10);
     const timeHandles = runtime.state.showTimeAxis
       ? `<div class="board-native-node-time-handle" data-time-node-id="${node.id}" data-time-side="start" title="Justera startdatum"></div>
          <div class="board-native-node-time-handle" data-time-node-id="${node.id}" data-time-side="end" title="Justera slutdatum"></div>`
@@ -14823,7 +15101,7 @@ function boardNativeRender(runtime) {
       ${collapseBtn}
       <div class="board-native-node-head" data-drag-node-id="${node.id}">
         <span>#${displayId}</span>
-        <span>${escHtml(node.type)}${saveBtn}</span>
+        <span title="${escHtml(scopeLabel || 'Projekt')}">${escHtml(scopeLabelShort)}${saveBtn}</span>
       </div>
       <div class="board-native-node-title" data-title-node-id="${node.id}">${escHtml(node.title)}</div>
       <span class="board-native-node-sprint" title="Sprint">${escHtml(boardNativeNodeSprint(node))}</span>
@@ -15828,9 +16106,14 @@ async function boardLoadTickets(options = {}) {
   const forceFresh = !!options.forceFresh;
   const cacheBuster = forceFresh ? `&_=${Date.now()}` : '';
   const projects = boardSelectedProjectNames();
+  const scopeKey = projects
+    .slice()
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }))
+    .join('||');
   if (!projects.length) {
     boardTickets = [];
     boardTicketsLoaded = true;
+    boardTicketsScopeKey = '';
     if (!preserveActiveTicket) activeBoardTicketId = null;
     boardStatusText = 'Välj minst ett projekt för att ladda Visual board.';
     return;
@@ -15839,7 +16122,10 @@ async function boardLoadTickets(options = {}) {
   const allIds = [];
   for (const project of projects) {
     const wiqlUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/wiql?api-version=7.1${cacheBuster}`;
-    const wiqlBody = { query: "SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = 'Visual board' ORDER BY [System.ChangedDate] DESC" };
+    const escProject = String(project).replace(/'/g, "''");
+    const wiqlBody = {
+      query: `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' AND [System.WorkItemType] = 'Visual board' ORDER BY [System.ChangedDate] DESC`
+    };
     const wiqlRes = await fetch(wiqlUrl, {
       method: 'POST',
       headers: { ...getHeaders(), 'Cache-Control': 'no-cache' },
@@ -15860,6 +16146,7 @@ async function boardLoadTickets(options = {}) {
   if (!ids.length) {
     boardTickets = [];
     boardTicketsLoaded = true;
+    boardTicketsScopeKey = scopeKey;
     if (!preserveActiveTicket) activeBoardTicketId = null;
     boardStatusText = 'Inga Visual board hittades.';
     return;
@@ -15894,6 +16181,7 @@ async function boardLoadTickets(options = {}) {
     return tb - ta;
   });
   boardTicketsLoaded = true;
+  boardTicketsScopeKey = scopeKey;
 
   if (!activeBoardTicketId || !boardTickets.some(t => t.id === activeBoardTicketId)) {
     if (!preserveActiveTicket) {
@@ -16396,9 +16684,11 @@ function boardIssueTreeRowsHtml() {
 }
 
 async function renderBoardTab() {
-  if (!boardTicketsLoaded) {
+  const scopeKey = boardSelectedProjectScopeKey();
+  const scopeChanged = boardTicketsScopeKey !== scopeKey;
+  if (!boardTicketsLoaded || scopeChanged) {
     try {
-      await boardLoadTickets();
+      await boardLoadTickets({ preserveActiveTicket: !scopeChanged, forceFresh: scopeChanged });
     } catch (e) {
       boardSetStatus(e.message);
       showToast(e.message);
