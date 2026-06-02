@@ -32,6 +32,85 @@ Allt kor i en enda HTML-fil: `devops_backlog_gui.html`.
 Minst lasbehorighet till Work Items och Projects kravs for hamtning.
 Om du vill redigera falt i appen behovs aven skrivbehorighet till Work Items.
 
+## Custom falt och custom work item-typer
+
+Denna app anvander flera processanpassade falt och typer i Azure DevOps.
+Nedan listas vad som ar krav respektive kompatibilitets/funktionsfalt.
+
+### Harda krav for full funktion
+
+1. Work item type `Visual board`
+  - Anvands av Board-vyn for att skapa, ladda och lista board-tickets.
+2. Faltet `Custom.BoardState` (Text/long text rekommenderas)
+  - Anvands for att spara boardens JSON-state i DevOps.
+3. Work item type `Teamref` (lagringstyp for Team-lage)
+  - Appen ar last till denna som primar lagringstyp.
+4. Faltet `Custom.teamprojekt`
+  - Anvands pa Teamref-item for att lagra kopplade projekt/team-nycklar.
+
+### Custom work item-typer som anvands
+
+1. `Visual board` (krav for Board-vyn)
+2. `Teamref` (krav for Team-lagring)
+3. `Teamdef` (fallback vid inlasning i vissa processer)
+
+Notera: `Epic`, `Feature`, `User Story`, `Sprint Goal` anvands ocksa i appen men ar inte custom-typer.
+
+### Alla custom-falt som forekommer i koden
+
+1. `Custom.BoardState`
+2. `Custom.Confidence`
+3. `Custom.EndDate`
+4. `Custom.Maconomy`
+5. `Custom.Milestone`
+6. `Custom.PriorityLevel`
+7. `Custom.Prioritylevel`
+8. `Custom.Reach`
+9. `Custom.RiskreductionOpportunityEnablement`
+10. `Custom.Roadmap`
+11. `Custom.StartDate`
+12. `Custom.SuperEpic`
+13. `Custom.Targetapps`
+14. `Custom.Team`
+15. `Custom.Teamprojekt` (lases endast som kompatibilitetsfallback)
+16. `Custom.Tshirt`
+17. `Custom.Typ`
+18. `Custom.bc7657eb-88c5-4322-947f-73e86a65dc14` (Affarsomrade)
+19. `Custom.teamProject` (lases endast som kompatibilitetsfallback)
+20. `Custom.teamProjekt` (lases endast som kompatibilitetsfallback)
+21. `Custom.teamprojekt` (primart falt, anvands vid skrivning)
+22. `Custom.valueTimeSaveInt`
+23. `Custom.valueTimeSaveText`
+24. `Custom.wikipage`
+
+### Praktisk rekommendation
+
+1. Saknas `Custom.BoardState` fungerar Board-visning, men sparning/autospar till DevOps misslyckas.
+2. Saknas `Teamref` och/eller `Custom.teamprojekt` fungerar inte Team-lagring fullt ut.
+3. Ovriga custom-falt ar i huvudsak for metadata, filtrering, scoring eller redigering i modaler.
+
+### Setup-checklista i Azure DevOps
+
+1. Bekrafta work item-typ `Visual board` i processen/projektet.
+2. Bekrafta custom-falt `Custom.BoardState`.
+  - Rekommenderad typ: Plain text (multi-line).
+  - Rekommenderad maxlangd: minst 32000 tecken.
+3. Bekrafta work item-typ `Teamref`.
+4. Bekrafta custom-falt `Custom.teamprojekt` pa `Teamref`.
+  - Rekommenderad typ: Plain text (single-line eller multi-line).
+  - Innehall lagras som serialiserad lista med projekt/team-nycklar.
+  - Appen skriver till `Custom.teamprojekt` och laser aven varianterna `Custom.teamProjekt`, `Custom.teamProject` och `Custom.Teamprojekt` for bakatkompatibilitet.
+5. (Valfritt fallback) Bekrafta att `Teamdef` finns om ni har aldre processvariant.
+6. Bekrafta att `Custom.wikipage` finns om ni vill redigera Wikipage i ticket-modal.
+  - Rekommenderad typ: Plain text (single-line).
+7. Verifiera behorigheter med PAT.
+  - Minst Work Items Read for lasning.
+  - Work Items Read & Write for att skapa/uppdatera Teamref och spara board-state.
+8. Funktionstest efter setup.
+  - Skapa en ny `Visual board` i appen och spara en nodposition.
+  - Ladda om och kontrollera att layouten aterlases.
+  - Skapa ett Team och kontrollera att medlemskap sparas i `Custom.teamprojekt`.
+
 ## Data och sakerhet
 
 - PAT sparas lokalt i webblasaren via `localStorage` (nyckel: `devops_pat`).

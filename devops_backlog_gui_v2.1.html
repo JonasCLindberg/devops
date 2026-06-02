@@ -2149,6 +2149,30 @@
   }
   .wi-modal-save-btn:hover { background: rgba(88,166,255,.2); }
   .wi-modal-save-status { color: var(--muted); font-size: 0.78rem; }
+  .wiki-page-popup {
+    width: min(1200px, 96vw);
+    max-width: 96vw;
+    max-height: 86vh;
+    padding: 14px 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .wiki-page-frame-wrap {
+    flex: 1 1 auto;
+    min-height: 420px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface2);
+  }
+  .wiki-page-frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+  }
   /* ── Sprint cell ── */
   .sprint-label {
     font-family: 'JetBrains Mono', monospace;
@@ -2822,6 +2846,13 @@
       </div>
     </div>
 
+    <div class="descr-popup-overlay" id="wikiPageModal" onclick="if(event.target===this)closeWikiPageModal()">
+      <div class="descr-popup wiki-page-popup">
+        <h3 id="wikiPageTitle">Wikipage <button onclick="closeWikiPageModal()">✕</button></h3>
+        <div class="descr-popup-body" id="wikiPageBody"></div>
+      </div>
+    </div>
+
     <!-- Child creation modal -->
     <div class="descr-popup-overlay" id="childModal" onclick="if(event.target===this)closeCreateChildModal()">
       <div class="descr-popup">
@@ -2994,7 +3025,293 @@ function plainTextToHtml(text) {
 
 function closeWorkItemModal() {
   document.getElementById('wiOverlay').classList.remove('open');
+  closeWikiPageModal();
   workItemModalOriginTab = null;
+}
+
+function closeWikiPageModal() {
+  const modal = document.getElementById('wikiPageModal');
+  const body = document.getElementById('wikiPageBody');
+  if (body) body.innerHTML = '';
+  if (modal) modal.classList.remove('open');
+}
+
+function normalizeWikiPageUrl(rawUrl) {
+  const value = String(rawUrl || '').trim();
+  if (!value) return null;
+  try {
+    const parsed = new URL(value, window.location.href);
+    if (!['http:', 'https:'].includes(parsed.protocol)) return null;
+    return parsed.toString();
+  } catch (_) {
+    return null;
+  }
+}
+
+function parseAzureDevOpsWikiUrl(url) {
+  try {
+    const u = new URL(url);
+    const host = String(u.hostname || '').toLowerCase();
+    const segs = u.pathname.split('/').filter(Boolean);
+
+    let org = '';
+    let project = '';
+    let wikiId = '';
+    let rest = [];
+
+    if (host === 'dev.azure.com') {
+      if (segs.length < 5) return null;
+      org = decodeURIComponent(segs[0] || '');
+      project = decodeURIComponent(segs[1] || '');
+      if (segs[2] !== '_wiki' || segs[3] !== 'wikis') return null;
+      wikiId = decodeURIComponent(segs[4] || '');
+      rest = segs.slice(5).map(s => decodeURIComponent(s));
+    } else if (host.endsWith('.visualstudio.com')) {
+      const orgFromHost = host.replace(/\.visualstudio\.com$/i, '');
+      if (segs.length < 4) return null;
+      org = decodeURIComponent(orgFromHost || '');
+      project = decodeURIComponent(segs[0] || '');
+      if (segs[1] !== '_wiki' || segs[2] !== 'wikis') return null;
+      wikiId = decodeURIComponent(segs[3] || '');
+      rest = segs.slice(4).map(s => decodeURIComponent(s));
+    } else {
+      return null;
+    }
+
+    if (!org || !project || !wikiId) return null;
+
+    const queryPath = u.searchParams.get('pagePath') || u.searchParams.get('path') || '';
+    let pagePath = String(queryPath || '').trim();
+    const pageId = rest.length && /^\d+$/.test(rest[0]) ? Number(rest[0]) : null;
+    if (!pagePath) {
+      let pathSegs = rest;
+      if (pathSegs.length && /^\d+$/.test(pathSegs[0])) pathSegs = pathSegs.slice(1);
+      pagePath = pathSegs.length ? `/${pathSegs.join('/')}` : '/';
+    }
+    if (!pagePath.startsWith('/')) pagePath = `/${pagePath}`;
+
+    return { org, project, wikiId, pagePath, pageId };
+  } catch (_) {
+    return null;
+  }
+}
+
+function isAzureDevOpsHost(url) {
+  try {
+    const host = String(new URL(url).hostname || '').toLowerCase();
+    return host === 'dev.azure.com' || host.endsWith('.visualstudio.com');
+  } catch (_) {
+    return false;
+  }
+}
+
+function wikiMarkdownToHtml(markdownText) {
+  const text = String(markdownText || '').replace(/\r\n/g, '\n');
+  if (!text.trim()) return '<div style="color:var(--muted);">Sidan är tom.</div>';
+
+  const inline = (src) => {
+    let out = escHtml(src || '');
+    out = out.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a class="wi-modal-link" href="$2" target="_blank" rel="noopener noreferrer" style="margin-top:0;">$1 ↗</a>');
+    out = out.replace(/`([^`]+)`/g, '<code style="font-family:\'JetBrains Mono\',monospace;background:var(--surface2);padding:1px 4px;border-radius:4px;">$1</code>');
+    out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    return out;
+  };
+
+  const lines = text.split('\n');
+  const chunks = [];
+  let inCode = false;
+  let inList = false;
+
+  const closeList = () => {
+    if (!inList) return;
+    chunks.push('</ul>');
+    inList = false;
+  };
+
+  for (const rawLine of lines) {
+    const line = String(rawLine || '');
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('```')) {
+      closeList();
+      if (!inCode) {
+        chunks.push('<pre style="margin:8px 0;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);overflow:auto;"><code>');
+        inCode = true;
+      } else {
+        chunks.push('</code></pre>');
+        inCode = false;
+      }
+      continue;
+    }
+
+    if (inCode) {
+      chunks.push(`${escHtml(line)}\n`);
+      continue;
+    }
+
+    if (!trimmed) {
+      closeList();
+      chunks.push('<div style="height:6px;"></div>');
+      continue;
+    }
+
+    const heading = /^(#{1,6})\s+(.+)$/.exec(trimmed);
+    if (heading) {
+      closeList();
+      const level = Math.min(6, heading[1].length);
+      chunks.push(`<h${level} style="margin:8px 0 6px;">${inline(heading[2])}</h${level}>`);
+      continue;
+    }
+
+    const bullet = /^[-*]\s+(.+)$/.exec(trimmed);
+    if (bullet) {
+      if (!inList) {
+        chunks.push('<ul style="margin:6px 0 8px 18px;">');
+        inList = true;
+      }
+      chunks.push(`<li>${inline(bullet[1])}</li>`);
+      continue;
+    }
+
+    closeList();
+    chunks.push(`<p style="margin:0 0 8px;">${inline(trimmed)}</p>`);
+  }
+
+  closeList();
+  if (inCode) chunks.push('</code></pre>');
+  return chunks.join('');
+}
+
+async function fetchAzureDevOpsWikiContent(url) {
+  const parsed = parseAzureDevOpsWikiUrl(url);
+  if (!parsed) return { isAdo: false, ok: false, content: '', parsed: null, status: 0, error: 'not_wiki_url' };
+
+  const { org, project, wikiId, pagePath, pageId } = parsed;
+  const apiBase = `https://dev.azure.com/${encodeURIComponent(org)}/${encodeURIComponent(project)}/_apis/wiki/wikis/${encodeURIComponent(wikiId)}/pages`;
+  const apiVersions = ['7.1-preview.1', '7.1', '7.0'];
+  const attempts = [];
+
+  apiVersions.forEach(v => {
+    if (pageId) {
+      attempts.push(`${apiBase}/${pageId}?includeContent=true&api-version=${v}`);
+    }
+    attempts.push(`${apiBase}?path=${encodeURIComponent(pagePath)}&includeContent=true&api-version=${v}`);
+    if (pagePath !== '/') {
+      attempts.push(`${apiBase}?path=/&includeContent=true&api-version=${v}`);
+    }
+  });
+
+  let lastStatus = 0;
+  let lastError = '';
+  for (const apiUrl of attempts) {
+    const res = await apiGet(apiUrl);
+    if (!res.ok) {
+      lastStatus = res.status;
+      lastError = await res.text().catch(() => '');
+      continue;
+    }
+    const data = await res.json();
+    const content = data?.content == null ? '' : String(data.content);
+    return { isAdo: true, ok: true, content, parsed, status: 200, error: '' };
+  }
+
+  return { isAdo: true, ok: false, content: '', parsed, status: lastStatus, error: lastError || 'empty_content' };
+}
+
+async function openWikiPageModal(rawUrl) {
+  const url = normalizeWikiPageUrl(rawUrl);
+  if (!url) {
+    showToast('Ange en giltig Wikipage-lank (http/https) i fältet Wikipage.');
+    return;
+  }
+
+  const title = document.getElementById('wikiPageTitle');
+  const body = document.getElementById('wikiPageBody');
+  const modal = document.getElementById('wikiPageModal');
+  if (!title || !body || !modal) return;
+
+  title.innerHTML = `Wikipage <button onclick="closeWikiPageModal()">✕</button>`;
+  body.innerHTML =
+    `<div style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.78rem;">Laddar Wikipage...</div>`;
+  modal.classList.add('open');
+
+  try {
+    const wikiResult = await fetchAzureDevOpsWikiContent(url);
+    if (wikiResult?.ok && wikiResult?.content) {
+      const wikiInfo = wikiResult.parsed;
+      const infoLabel = wikiInfo
+        ? `${wikiInfo.project} / ${wikiInfo.wikiId} / ${wikiInfo.pagePath}`
+        : url;
+      body.innerHTML =
+        `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">` +
+          `<span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(infoLabel)}</span>` +
+          `<a class="wi-modal-link" href="${escHtml(url)}" target="_blank" rel="noopener noreferrer" style="margin-top:0;white-space:nowrap;">Öppna i DevOps ↗</a>` +
+        `</div>` +
+        `<div style="max-height:62vh;overflow:auto;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);">${wikiMarkdownToHtml(wikiResult.content)}</div>`;
+      return;
+    }
+
+    if (wikiResult?.isAdo || isAzureDevOpsHost(url)) {
+      const status = Number(wikiResult?.status || 0);
+      const reason = status === 401 || status === 403
+        ? 'PAT saknar troligen behörighet för Wiki (Code Read) eller access till projektet.'
+        : status === 404
+          ? 'Wikisida hittades inte på angiven path.'
+          : 'Kunde inte läsa wiki-innehåll via API.';
+      const errText = String(wikiResult?.error || '').replace(/\s+/g, ' ').trim().slice(0, 260);
+      body.innerHTML =
+        `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">` +
+          `<span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(url)}</span>` +
+          `<a class="wi-modal-link" href="${escHtml(url)}" target="_blank" rel="noopener noreferrer" style="margin-top:0;white-space:nowrap;">Öppna i DevOps ↗</a>` +
+        `</div>` +
+        `<div style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);">` +
+          `<div style="font-weight:700;margin-bottom:6px;">Wikipage kunde inte renderas i modalen</div>` +
+          `<div style="color:var(--muted);font-size:0.78rem;">${escHtml(reason)}${status ? ` (HTTP ${status})` : ''}</div>` +
+          `${errText ? `<div style="margin-top:6px;color:var(--muted);font-size:0.72rem;font-family:'JetBrains Mono',monospace;">API-svar: ${escHtml(errText)}</div>` : ''}` +
+          `<div style="margin-top:8px;color:var(--muted);font-size:0.74rem;font-family:'JetBrains Mono',monospace;">` +
+            `Tips: öppna sidan i ny flik, eller uppdatera PAT med behörighet Code (Read).` +
+          `</div>` +
+        `</div>`;
+      return;
+    }
+  } catch (_) {
+    if (isAzureDevOpsHost(url)) {
+      const fileHint = window.location.protocol === 'file:'
+        ? ' Sidan körs via file:// vilket ofta blockerar API-anrop helt.'
+        : '';
+      body.innerHTML =
+        `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">` +
+          `<span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(url)}</span>` +
+          `<a class="wi-modal-link" href="${escHtml(url)}" target="_blank" rel="noopener noreferrer" style="margin-top:0;white-space:nowrap;">Öppna i DevOps ↗</a>` +
+        `</div>` +
+        `<div style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);">` +
+          `<div style="font-weight:700;margin-bottom:6px;">Wikipage kunde inte renderas i modalen</div>` +
+          `<div style="color:var(--muted);font-size:0.78rem;">Browsern blockerade anropet till Azure DevOps Wiki API (vanligt CORS-beteende för just wiki-endpoints).${escHtml(fileHint)}</div>` +
+          `<div style="margin-top:8px;color:var(--muted);font-size:0.74rem;font-family:'JetBrains Mono',monospace;">` +
+            `Lösning: använd länken "Öppna i DevOps" eller kör via en liten backend-proxy som hämtar wiki-content server-side.` +
+          `</div>` +
+        `</div>`;
+      return;
+    }
+  }
+
+  body.innerHTML =
+    `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">` +
+      `<span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(url)}</span>` +
+      `<a class="wi-modal-link" href="${escHtml(url)}" target="_blank" rel="noopener noreferrer" style="margin-top:0;white-space:nowrap;">Öppna i ny flik ↗</a>` +
+    `</div>` +
+    `<div class="wiki-page-frame-wrap">` +
+      `<iframe class="wiki-page-frame" src="${escHtml(url)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>` +
+    `</div>` +
+    `<div style="margin-top:8px;color:var(--muted);font-size:0.74rem;font-family:'JetBrains Mono',monospace;">` +
+      `Kunde inte läsa wiki-innehåll via API eller iframe. Använd länken "Öppna i ny flik".` +
+    `</div>`;
+}
+
+function openWikiPageFromWorkItemModal() {
+  const input = document.getElementById('wiEditWikiPage');
+  openWikiPageModal(input ? input.value : '');
 }
 
 async function createEpicFromHierarchyList(projectHint = '') {
@@ -3067,10 +3384,15 @@ async function createEpicFromHierarchyList(projectHint = '') {
 document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
   const childModal = document.getElementById('childModal');
+  const wikiPageModal = document.getElementById('wikiPageModal');
   const epicProjectModal = document.getElementById('epicProjectModal');
   const workItemModal = document.getElementById('wiOverlay');
   if (childModal?.classList.contains('open')) {
     closeCreateChildModal();
+    return;
+  }
+  if (wikiPageModal?.classList.contains('open')) {
+    closeWikiPageModal();
     return;
   }
   if (epicProjectModal?.classList.contains('open')) {
@@ -3239,6 +3561,7 @@ async function saveWorkItemModal(itemId) {
     { field: 'Custom.Milestone', value: read('wiEditMilestone') },
     { field: 'Custom.Targetapps', value: read('wiEditTargetApps') },
     { field: 'Custom.Maconomy', value: read('wiEditMaconomy') },
+    { field: 'Custom.wikipage', value: read('wiEditWikiPage') },
   ];
 
   const descText = read('wiEditDescription');
@@ -3429,6 +3752,7 @@ function openWorkItemModal(itemId) {
   const milestone = f['Custom.Milestone'] || '';
   const targetApps = f['Custom.Targetapps'] || '';
   const maconomy = f['Custom.Maconomy'] || '';
+  const wikiPage = f['Custom.wikipage'] || '';
   const description = f['System.Description'] || '';
   const descriptionText = htmlToPlainText(description);
   const devopsUrl = getWorkItemUrl(item);
@@ -3475,6 +3799,7 @@ function openWorkItemModal(itemId) {
       inputRow('Milestone', 'wiEditMilestone', milestone, 'Milestone') +
       inputRow('Target Apps', 'wiEditTargetApps', targetApps, 'Target Apps') +
       inputRow('Maconomy', 'wiEditMaconomy', maconomy, 'Maconomy') +
+      inputRow('Wikipage', 'wiEditWikiPage', wikiPage, 'Wikipage') +
     `</div>` +
     `<div class="wi-modal-desc">` +
       `<div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;">Description</div>` +
@@ -3484,6 +3809,7 @@ function openWorkItemModal(itemId) {
         `<div class="wi-modal-action-buttons">` +
           `<button class="wi-modal-save-btn" id="wiDeleteBtn" style="border-color:var(--danger);color:var(--danger);" onclick="deleteWorkItemModal(${item.id})">Ta bort</button>` +
           `<button class="wi-modal-save-btn" style="border-color:var(--accent);color:var(--accent);" onclick="openCreateChildModal(${item.id})">+ Skapa child</button>` +
+          `<button class="wi-modal-save-btn" style="border-color:var(--accent2);color:var(--accent2);" onclick="openWikiPageFromWorkItemModal()">Visa Wikipage</button>` +
           `<button class="wi-modal-save-btn" id="wiSaveBtn" onclick="saveWorkItemModal(${item.id})">Spara ändringar</button>` +
         `</div>` +
       `</div>` +
@@ -3522,6 +3848,7 @@ const FIELDS = [
   'Custom.Milestone',
   'Custom.SuperEpic',
   'Custom.Maconomy',
+  'Custom.wikipage',
   'Custom.Targetapps',
   'Custom.Tshirt',
   'System.IterationPath', 'System.AreaPath',
