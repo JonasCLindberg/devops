@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Processmallar – Debrief · Scope · Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-dark: #1a3560;
+    --blue-mid: #2e5fa3;
+    --blue-light: #d6e4f5;
+    --blue-xlight: #f0f6ff;
+    --accent: #e8813a;
+    --text: #1a1a2e;
+    --text-muted: #6b7a99;
+    --border: #d0daea;
+    --bg: #f7f9fc;
+    --white: #ffffff;
+    --input-bg: #fafbfd;
+    --shadow: 0 2px 16px rgba(30,60,120,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  .topbar {
+    background: var(--blue-dark);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  }
+
+  .brand {
+    font-family: 'DM Serif Display', serif;
+    color: var(--white);
+    font-size: 18px;
+    padding: 18px 24px 18px 0;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    margin-right: 8px;
+    letter-spacing: 0.01em;
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    padding: 20px 20px;
+    position: relative;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 20px; right: 20px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 3px 3px 0 0;
+    transform: scaleX(0);
+    transition: transform 0.2s;
+  }
+
+  .tab-btn.active {
+    color: var(--white);
+  }
+
+  .tab-btn.active::after {
+    transform: scaleX(1);
+  }
+
+  .tab-btn:hover:not(.active) { color: rgba(255,255,255,0.8); }
+
+  .spacer { flex: 1; }
+
+  .btn-export {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: opacity 0.2s;
+  }
+  .btn-export:hover { opacity: 0.88; }
+
+  /* ── MAIN ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 36px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--blue-light);
+  }
+
+  .step-badge {
+    background: var(--blue-mid);
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(46,95,163,0.3);
+  }
+
+  .page-title h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--blue-dark);
+    line-height: 1.1;
+  }
+
+  .page-title p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ── META GRID ── */
+  .meta-grid {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .meta-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .meta-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .meta-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .meta-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue-mid);
+    margin-bottom: 6px;
+  }
+
+  .meta-field input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .meta-field input:focus {
+    border-color: var(--blue-mid);
+    box-shadow: 0 0 0 3px rgba(46,95,163,0.12);
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-bottom: 28px;
+  }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .section-label h3 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--blue-dark);
+  }
+
+  .section-label .hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--input-bg);
+    resize: vertical;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    min-height: 80px;
+  }
+  textarea:focus {
+    border-color: var(--blue-mid);
+    box-shadow: 0 0 0 3px rgba(46,95,163,0.12);
+    background: var(--white);
+  }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .data-table thead th {
+    background: var(--blue-mid);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    text-align: left;
+  }
+
+  .data-table tbody tr:nth-child(odd) { background: var(--white); }
+  .data-table tbody tr:nth-child(even) { background: var(--blue-xlight); }
+
+  .data-table tbody td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .data-table input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    padding: 4px 4px;
+    outline: none;
+  }
+  .data-table input:focus { background: rgba(46,95,163,0.06); border-radius: 4px; }
+
+  .btn-add-row {
+    margin-top: 8px;
+    background: none;
+    border: 1px dashed var(--blue-mid);
+    color: var(--blue-mid);
+    border-radius: 7px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+  }
+  .btn-add-row:hover { background: var(--blue-xlight); }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    display: grid;
+    gap: 12px;
+    margin-top: 36px;
+    padding: 20px;
+    background: var(--blue-xlight);
+    border-radius: 12px;
+    border: 1px solid var(--blue-light);
+  }
+  .status-bar.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .status-bar.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .status-field label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--blue-dark);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .status-field select, .status-field input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--white);
+    outline: none;
+  }
+  .status-field select:focus, .status-field input:focus {
+    border-color: var(--blue-mid);
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* ── PRINT / EXPORT ── */
+  @media print {
+    .topbar { display: none; }
+    .page { display: block !important; page-break-after: always; }
+    .page:last-child { page-break-after: avoid; }
+    .btn-add-row { display: none; }
+    body { background: white; }
+  }
+
+  /* responsivt */
+  @media (max-width: 700px) {
+    .meta-grid.cols-4 { grid-template-columns: 1fr 1fr; }
+    .meta-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+    .status-bar.cols-3 { grid-template-columns: 1fr; }
+    .step-badge { width: 44px; height: 44px; font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topbar">
+  <div class="brand">Processmallar</div>
+  <button class="tab-btn active" onclick="switchTab(0)">① Debrief</button>
+  <button class="tab-btn" onclick="switchTab(1)">② Scope</button>
+  <button class="tab-btn" onclick="switchTab(2)">③ Plan</button>
+  <div class="spacer"></div>
+  <button class="btn-export" onclick="window.print()">Skriv ut / Spara PDF</button>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     STEG 1 – DEBRIEF
+═══════════════════════════════════════════ -->
+<div class="page active" id="page-0">
+<div class="container">
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Debrief</h1>
+      <p>Direkt efter möten – fånga vad vi hörde innan minnet bleknar</p>
+    </div>
+  </div>
+
+  <div class="meta-grid cols-4">
+    <div class="meta-field"><label>Möte / ämne</label><input type="text" placeholder="Beskriv mötets syfte"></div>
+    <div class="meta-field"><label>Datum</label><input type="date"></div>
+    <div class="meta-field"><label>Deltagare</label><input type="text" placeholder="Namn"></div>
+    <div class="meta-field"><label>Sammanställd av</label><input type="text" placeholder="Namn"></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Vad hörde vi?</h3>
+      <span class="hint">Fri sammanfattning – utan tolkning ännu</span>
+    </div>
+    <textarea rows="4" placeholder="Beskriv vad som diskuterades under mötet..."></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Behov vi uppfattade</h3>
+      <span class="hint">Vad verkar stakeholdern vilja uppnå eller lösa?</span>
+    </div>
+    <textarea rows="4" placeholder="Vilka underliggande behov signalerades?"></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Föreslagna lösningar eller riktningar</h3>
+      <span class="hint">Vad nämndes som möjliga vägar framåt?</span>
+    </div>
+    <textarea rows="3" placeholder="Idéer, förslag eller riktningsval som kom upp..."></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Scope-signaler</h3>
+      <span class="hint">Vad antyddes om omfattning, avgränsningar eller prioritet?</span>
+    </div>
+    <textarea rows="3" placeholder="Signaler om vad som ingår, vad som är viktigt, vad som ska vänta..."></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Förväntningar och tidshorisonter</h3>
+      <span class="hint">Uttalade eller outtalade förväntningar på leverans eller tempo</span>
+    </div>
+    <textarea rows="3" placeholder="Deadlines, önskemål om tempo, kvalitetsnivå..."></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Våra frågetecken</h3>
+      <span class="hint">Vad är vi osäkra på eller behöver följa upp?</span>
+    </div>
+    <textarea rows="3" placeholder="Otydligheter, saker att verifiera, uppföljningsfrågor..."></textarea>
+  </div>
+
+  <div class="status-bar cols-3">
+    <div class="status-field">
+      <label>Skickad för verifiering</label>
+      <select><option value="">– välj –</option><option>Ja</option><option>Nej</option></select>
+    </div>
+    <div class="status-field">
+      <label>Bekräftad av stakeholder</label>
+      <select><option value="">– välj –</option><option>Ja</option><option>Nej – avvikelser noterade</option></select>
+    </div>
+    <div class="status-field">
+      <label>Datum för bekräftelse</label>
+      <input type="date">
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STEG 2 – SCOPE
+═══════════════════════════════════════════ -->
+<div class="page" id="page-1">
+<div class="container">
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Definiera scope</h1>
+      <p>Iterativt – konkretisera målbilden och ram in leveransen</p>
+    </div>
+  </div>
+
+  <div class="meta-grid cols-4">
+    <div class="meta-field"><label>Initiative / leverans</label><input type="text" placeholder="Namn"></div>
+    <div class="meta-field"><label>Datum</label><input type="date"></div>
+    <div class="meta-field"><label>Version</label><input type="text" placeholder="t.ex. v1"></div>
+    <div class="meta-field"><label>Ansvarig</label><input type="text" placeholder="Namn"></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Målbild</h3>
+      <span class="hint">Vad ska vara uppnått när vi är klara?</span>
+    </div>
+    <textarea rows="3" placeholder="Beskriv slutläget i ett eller två meningar..."></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Detta ingår</h3>
+      <span class="hint">Konkreta leverabler, funktioner eller resultat</span>
+    </div>
+    <textarea rows="4" placeholder="Lista vad som uttryckligen ingår i leveransen..."></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Detta ingår inte</h3>
+      <span class="hint">Tydliga avgränsningar – vad vi explicit lämnar utanför</span>
+    </div>
+    <textarea rows="3" placeholder="Lista vad som faller utanför – även uppenbara saker kan vara värda att nämna..."></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Delmål / milstolpar</h3>
+    </div>
+    <table class="data-table" id="scope-milestones">
+      <thead>
+        <tr>
+          <th style="width:35%">Delmål</th>
+          <th style="width:45%">Beskrivning</th>
+          <th style="width:20%">Datum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><input type="text" placeholder="Namn"></td><td><input type="text" placeholder="Vad levereras?"></td><td><input type="date"></td></tr>
+        <tr><td><input type="text" placeholder="Namn"></td><td><input type="text" placeholder="Vad levereras?"></td><td><input type="date"></td></tr>
+        <tr><td><input type="text" placeholder="Namn"></td><td><input type="text" placeholder="Vad levereras?"></td><td><input type="date"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-add-row" onclick="addRow('scope-milestones', 3)">+ Lägg till rad</button>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Beroenden</h3>
+      <span class="hint">Vad behöver vara på plats för att vi ska kunna leverera?</span>
+    </div>
+    <textarea rows="3" placeholder="Team, beslut, system, information eller resurser vi är beroende av..."></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-label">
+      <h3>Öppna frågor</h3>
+      <span class="hint">Vad är fortfarande oklart och behöver beslutas?</span>
+    </div>
+    <textarea rows="3" placeholder="Frågor utan svar ännu – ta med till nästa avstämning..."></textarea>
+  </div>
+
+  <div class="status-bar cols-3">
+    <div class="status-field">
+      <label>Kopplad debrief</label>
+      <input type="text" placeholder="Referens / länk">
+    </div>
+    <div class="status-field">
+      <label>Avstämd med stakeholder</label>
+      <select><option value="">– välj –</option><option>Ja</option><option>Nej</option><option>Delvis</option></select>
+    </div>
+    <div class="status-field">
+      <label>Avstämd med management</label>
+      <select><option value="">– välj –</option><option>Ja</option><option>Nej</option><option>Ej aktuellt</option></select>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STEG 3 – PLAN
+═══════════════════════════════════════════ -->
+<div class="page" id="page-2">
+<div class="container">
+
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Planera</h1>
+      <p>Iterativt och synkroniserat – en gemensam plan minskar friktion</p>
+    </div>
+  </div>
+
+  <div class="meta-grid cols-4">
+    <div class="meta-field"><label>Initiative / leverans</label><input type="text" placeholder="Namn"></div>
+    <div class="meta-field"><label>Datum</label><input type="date"></div>
+    <div class="meta-field"><label>Version</label><input type="text" placeholder="t.ex. v1"></div>
+    <div class="meta-field"><label>Ansvarig</label><input type="text" placeholder="Namn"></div>
+  </div>
+  <div class="meta-grid cols-2" style="margin-top:0">
+    <div class="meta-field"><label>Kopplad scope-definition</label><input type="text" placeholder="Referens / länk"></div>
+    <div class="meta-field"><label>Senast uppdaterad</label><input type="date"></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label"><h3>Övergripande tidslinje</h3></div>
+    <table class="data-table" id="plan-timeline">
+      <thead>
+        <tr>
+          <th style="width:22%">Delmål / Milstolpe</th>
+          <th style="width:28%">Beskrivning</th>
+          <th style="width:18%">Ansvarig</th>
+          <th style="width:12%">Start</th>
+          <th style="width:12%">Slut</th>
+          <th style="width:8%">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td><td><input type="date"></td><td><input type="text" placeholder="–"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td><td><input type="date"></td><td><input type="text" placeholder="–"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td><td><input type="date"></td><td><input type="text" placeholder="–"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td><td><input type="date"></td><td><input type="text" placeholder="–"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-add-row" onclick="addRow('plan-timeline', 6)">+ Lägg till rad</button>
+  </div>
+
+  <div class="section">
+    <div class="section-label"><h3>Aktiviteter per delmål</h3></div>
+    <table class="data-table" id="plan-activities">
+      <thead>
+        <tr>
+          <th style="width:28%">Aktivitet</th>
+          <th style="width:22%">Kopplad till delmål</th>
+          <th style="width:18%">Ansvarig</th>
+          <th style="width:20%">Beroende av</th>
+          <th style="width:12%">Klar när?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-add-row" onclick="addRow('plan-activities', 5)">+ Lägg till rad</button>
+  </div>
+
+  <div class="section">
+    <div class="section-label"><h3>Beroenden och risker</h3></div>
+    <table class="data-table" id="plan-risks">
+      <thead>
+        <tr>
+          <th style="width:22%">Beroende / Risk</th>
+          <th style="width:30%">Beskrivning</th>
+          <th style="width:13%">Sannolikhet</th>
+          <th style="width:13%">Påverkan</th>
+          <th style="width:22%">Hantering</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" placeholder="Hög/Med/Låg"></td><td><input type="text" placeholder="Hög/Med/Låg"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" placeholder="Hög/Med/Låg"></td><td><input type="text" placeholder="Hög/Med/Låg"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text" placeholder="Hög/Med/Låg"></td><td><input type="text" placeholder="Hög/Med/Låg"></td><td><input type="text"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-add-row" onclick="addRow('plan-risks', 5)">+ Lägg till rad</button>
+  </div>
+
+  <div class="section">
+    <div class="section-label"><h3>Kommunikationsplan</h3></div>
+    <table class="data-table" id="plan-comms">
+      <thead>
+        <tr>
+          <th style="width:25%">Målgrupp</th>
+          <th style="width:25%">Kanal</th>
+          <th style="width:25%">Frekvens</th>
+          <th style="width:25%">Ansvarig</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><input type="text" placeholder="t.ex. Team"></td><td><input type="text" placeholder="t.ex. Standup"></td><td><input type="text" placeholder="t.ex. Dagligen"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text" placeholder="t.ex. Management"></td><td><input type="text" placeholder="t.ex. Statusrapport"></td><td><input type="text" placeholder="t.ex. Varannan vecka"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text" placeholder="t.ex. Stakeholder"></td><td><input type="text" placeholder="t.ex. Möte"></td><td><input type="text" placeholder="t.ex. Veckovis"></td><td><input type="text"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-add-row" onclick="addRow('plan-comms', 4)">+ Lägg till rad</button>
+  </div>
+
+  <div class="section">
+    <div class="section-label"><h3>Ändringslogg</h3></div>
+    <table class="data-table" id="plan-changelog">
+      <thead>
+        <tr>
+          <th style="width:15%">Datum</th>
+          <th style="width:10%">Version</th>
+          <th style="width:40%">Vad ändrades</th>
+          <th style="width:35%">Anledning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><input type="date"></td><td><input type="text" placeholder="v1"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        <tr><td><input type="date"></td><td><input type="text" placeholder="v2"></td><td><input type="text"></td><td><input type="text"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-add-row" onclick="addRow('plan-changelog', 4)">+ Lägg till rad</button>
+  </div>
+
+  <div class="status-bar cols-3">
+    <div class="status-field">
+      <label>Delad med team</label>
+      <select><option value="">– välj –</option><option>Ja</option><option>Nej</option></select>
+    </div>
+    <div class="status-field">
+      <label>Delad med management</label>
+      <select><option value="">– välj –</option><option>Ja</option><option>Nej</option></select>
+    </div>
+    <div class="status-field">
+      <label>Delad med stakeholder</label>
+      <select><option value="">– välj –</option><option>Ja</option><option>Nej</option></select>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+  function switchTab(idx) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+    document.querySelectorAll('.page').forEach((p, i) => p.classList.toggle('active', i === idx));
+  }
+
+  function addRow(tableId, cols) {
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    const tr = document.createElement('tr');
+    for (let i = 0; i < cols; i++) {
+      const td = document.createElement('td');
+      const input = document.createElement('input');
+      input.type = 'text';
+      td.appendChild(input);
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+</script>
+</body>
+</html>
