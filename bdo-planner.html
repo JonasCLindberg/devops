@@ -766,11 +766,66 @@
     border-bottom: 1px solid var(--border);
   }
   .board-sprint-chips {
-    width: 100%;
+    position: relative;
+    margin-left: auto;
+    width: auto;
+    min-width: 0;
+  }
+  .board-sprint-trigger {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--muted);
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+  }
+  .board-sprint-trigger:hover {
+    border-color: var(--accent2);
+    color: var(--text);
+  }
+  .board-sprint-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 35;
+    min-width: 520px;
+    max-width: min(86vw, 920px);
+    max-height: 52vh;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    padding: 10px;
+    display: none;
+  }
+  .board-sprint-popover.open {
+    display: block;
+  }
+  .board-sprint-popover-head {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
     align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .board-sprint-popover-close {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface2);
+    color: var(--muted);
+    width: 24px;
+    height: 24px;
+    line-height: 1;
+    font-size: 0.9rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .board-sprint-popover-close:hover {
+    border-color: var(--accent2);
+    color: var(--text);
   }
   .board-sprint-chip {
     border: 1px solid var(--border);
@@ -928,6 +983,27 @@
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
   }
+  .board-native-node-id {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .board-native-status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    display: inline-block;
+    flex-shrink: 0;
+    border: 1px solid color-mix(in oklab, var(--border) 65%, transparent 35%);
+    background: color-mix(in oklab, var(--muted) 60%, transparent 40%);
+    box-shadow: 0 0 0 1px rgba(0,0,0,.18);
+  }
+  .board-native-status-dot.status-new { background: #f2c94c; }
+  .board-native-status-dot.status-active { background: #2f80ed; }
+  .board-native-status-dot.status-pending { background: #bb6bd9; }
+  .board-native-status-dot.status-resolved { background: #27ae60; }
+  .board-native-status-dot.status-blocked { background: #eb5757; }
   .board-native-node.epic .board-native-node-head { background: rgba(251,146,60,.28); color: var(--epic-color); }
   .board-native-node.feature .board-native-node-head { background: rgba(192,132,252,.28); color: var(--feature-color); }
   .board-native-node.story .board-native-node-head { background: rgba(96,165,250,.28); color: var(--story-color); }
@@ -1130,6 +1206,7 @@
     color: var(--muted);
     font-family: 'JetBrains Mono', monospace;
     font-size: .66rem;
+    overflow: hidden;
   }
   .board-native-time-axis::before {
     content: '';
@@ -1174,6 +1251,41 @@
     background: color-mix(in oklab, var(--accent2) 35%, transparent 65%);
     pointer-events: none;
     z-index: 2;
+  }
+  .board-native-time-scale {
+    position: absolute;
+    inset: 2px 0 0 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .board-native-time-week-tick {
+    position: absolute;
+    bottom: 7px;
+    width: 1px;
+    height: 9px;
+    background: color-mix(in oklab, var(--accent2) 64%, var(--border));
+    opacity: .9;
+    transform: translateX(-50%);
+  }
+  .board-native-time-week-tick.major {
+    width: 2px;
+    height: 13px;
+    opacity: 1;
+  }
+  .board-native-time-week-label {
+    position: absolute;
+    top: 1px;
+    transform: translateX(-50%);
+    font-size: 9px;
+    line-height: 1;
+    color: color-mix(in oklab, var(--text) 92%, white 8%);
+    background: color-mix(in oklab, var(--surface2) 85%, black 15%);
+    border: 1px solid color-mix(in oklab, var(--accent2) 26%, var(--border));
+    border-radius: 4px;
+    padding: 1px 4px;
+    white-space: nowrap;
+    opacity: 1;
+    text-shadow: 0 1px 0 rgba(0,0,0,.25);
   }
   .board-native-time-node-handle {
     position: absolute;
@@ -1488,6 +1600,21 @@
     padding: 1px 6px;
     letter-spacing: 0;
     text-transform: none;
+  }
+  .sprint-col-phase-pill.prev {
+    color: #f0c040;
+    border-color: rgba(240, 192, 64, 0.75);
+    background: rgba(240, 192, 64, 0.14);
+  }
+  .sprint-col-phase-pill.nu {
+    color: #6bdb78;
+    border-color: rgba(107, 219, 120, 0.75);
+    background: rgba(107, 219, 120, 0.14);
+  }
+  .sprint-col-phase-pill.nasta {
+    color: #79c0ff;
+    border-color: rgba(121, 192, 255, 0.75);
+    background: rgba(121, 192, 255, 0.14);
   }
   .sprint-col-actions {
     display: flex;
@@ -2557,7 +2684,8 @@
     <button class="top-section-btn active" id="section-backlog" onclick="setTopSection('backlog')">Backlog</button>
     <button class="top-section-btn" id="section-portfolio" onclick="setTopSection('portfolio')">Portfolio</button>
   </div>
-  <button id="settingsNavBtn" onclick="showTab('settings')" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Inställningar</button>
+  <button id="globalEditBtn" onclick="toggleEditMode()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="if(!globalEditMode){this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'}" onmouseout="if(!globalEditMode){this.style.borderColor='var(--border)';this.style.color='var(--muted)'}">✎ Editera</button>
+  <button id="settingsNavBtn" onclick="showTab('settings')" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Inställningar</button>
 </header>
 
 <div class="main">
@@ -2626,7 +2754,7 @@
       <div class="section-label">Övrigt</div>
       <div class="cb-item" id="completedEpicsWrap" onclick="toggleCompletedEpics()">
         <input type="checkbox" id="completedEpicsToggle" onchange="toggleCompletedEpics()" />
-        <span style="font-size:0.84rem">Completed Epics &lt;180d</span>
+        <span style="font-size:0.84rem">Visa completed</span>
       </div>
       <div class="cb-item" id="orphanWrap" onclick="toggleOrphans()">
         <input type="checkbox" id="orphanToggle" onchange="toggleOrphans()" />
@@ -2710,6 +2838,14 @@
       </div>
     </div>
 
+    <!-- Epic project picker modal -->
+    <div class="descr-popup-overlay" id="epicProjectModal" onclick="if(event.target===this)closeEpicProjectPicker()">
+      <div class="descr-popup">
+        <h3 id="epicProjectTitle">Välj projekt för ny Epic <button onclick="closeEpicProjectPicker()">✕</button></h3>
+        <div class="descr-popup-body" id="epicProjectBody"></div>
+      </div>
+    </div>
+
     <!-- Debug fields popup -->
 
     <div class="table-wrap" id="tableWrap">
@@ -2762,6 +2898,7 @@ const LS_COL_NORMAL  = 'devops_cols_normal';
 const LS_COL_FOCUS   = 'devops_cols_focus';
 const LS_STATUS_KEY  = 'devops_status_settings';
 const LS_SIDEBAR_COLLAPSED = 'devops_sidebar_collapsed';
+const LS_SHOW_COMPLETED_GLOBAL = 'devops_show_completed_global';
 
 function explainFetchError(error) {
   const message = error?.message ? String(error.message) : String(error || 'Okänt fel');
@@ -2860,6 +2997,36 @@ function closeWorkItemModal() {
   workItemModalOriginTab = null;
 }
 
+function normalizeWikiPageUrl(rawUrl) {
+  const value = String(rawUrl || '').trim();
+  if (!value) return null;
+  try {
+    const parsed = new URL(value, window.location.href);
+    if (!['http:', 'https:'].includes(parsed.protocol)) return null;
+    return parsed.toString();
+  } catch (_) {
+    return null;
+  }
+}
+
+function toggleWikiOpenButton(inputId, buttonId) {
+  const input = document.getElementById(inputId);
+  const button = document.getElementById(buttonId);
+  if (!button) return;
+  const hasValue = !!String(input?.value || '').trim();
+  button.style.display = hasValue ? 'inline-flex' : 'none';
+}
+
+function openWikiPageFromInput(inputId) {
+  const input = document.getElementById(inputId);
+  const url = normalizeWikiPageUrl(input ? input.value : '');
+  if (!url) {
+    showToast('Ange en giltig Wikipage-lank (http/https) i fältet Wikipage.');
+    return;
+  }
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 async function createEpicFromHierarchyList(projectHint = '') {
   const hint = String(projectHint || '').trim();
   const selected = [...selectedProjects].map(p => String(p || '').trim()).filter(Boolean);
@@ -2873,11 +3040,11 @@ async function createEpicFromHierarchyList(projectHint = '') {
 
   let project = projects[0];
   if (projects.length > 1) {
-    const typed = prompt(`Projekt för ny Epic (${projects.join(', ')})`, project);
-    if (typed == null) return;
-    const normalized = String(typed || '').trim();
+    const picked = await chooseEpicProjectFromList(projects, project);
+    if (!picked) return;
+    const normalized = String(picked || '').trim();
     if (!normalized || !projects.includes(normalized)) {
-      showToast('Ogiltigt projektval. Ange exakt projektnamn från listan.');
+      showToast('Ogiltigt projektval. Välj ett projekt från listan.');
       return;
     }
     project = normalized;
@@ -2930,9 +3097,14 @@ async function createEpicFromHierarchyList(projectHint = '') {
 document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
   const childModal = document.getElementById('childModal');
+  const epicProjectModal = document.getElementById('epicProjectModal');
   const workItemModal = document.getElementById('wiOverlay');
   if (childModal?.classList.contains('open')) {
     closeCreateChildModal();
+    return;
+  }
+  if (epicProjectModal?.classList.contains('open')) {
+    closeEpicProjectPicker();
     return;
   }
   if (workItemModal?.classList.contains('open')) closeWorkItemModal();
@@ -3097,6 +3269,7 @@ async function saveWorkItemModal(itemId) {
     { field: 'Custom.Milestone', value: read('wiEditMilestone') },
     { field: 'Custom.Targetapps', value: read('wiEditTargetApps') },
     { field: 'Custom.Maconomy', value: read('wiEditMaconomy') },
+    { field: 'Custom.wikipage', value: read('wiEditWikiPage') },
   ];
 
   const descText = read('wiEditDescription');
@@ -3287,6 +3460,7 @@ function openWorkItemModal(itemId) {
   const milestone = f['Custom.Milestone'] || '';
   const targetApps = f['Custom.Targetapps'] || '';
   const maconomy = f['Custom.Maconomy'] || '';
+  const wikiPage = f['Custom.wikipage'] || '';
   const description = f['System.Description'] || '';
   const descriptionText = htmlToPlainText(description);
   const devopsUrl = getWorkItemUrl(item);
@@ -3305,6 +3479,14 @@ function openWorkItemModal(itemId) {
     `<div class="wi-modal-row" style="display:block;">
       <div class="wi-modal-label" style="margin-bottom:4px;">${label}</div>
       <input class="wi-modal-input" id="${id}" value="${escHtml(value || '')}" placeholder="${escHtml(placeholder)}" />
+    </div>`;
+  const wikiInputRow = (label, id, value, placeholder='') =>
+    `<div class="wi-modal-row" style="display:block;">
+      <div class="wi-modal-label" style="margin-bottom:4px;">${label}</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input class="wi-modal-input" id="${id}" value="${escHtml(value || '')}" placeholder="${escHtml(placeholder)}" oninput="toggleWikiOpenButton('${id}','wiOpenWikiBtn')" />
+        <button class="wi-modal-save-btn" id="wiOpenWikiBtn" type="button" onclick="openWikiPageFromInput('${id}')" title="Öppna Wikipage i ny flik" style="padding:5px 8px;${String(value || '').trim() ? '' : 'display:none;'}">↗</button>
+      </div>
     </div>`;
   const sprintOptions = [...new Set([
     ...sprintIterationsCatalog.map(s => String(s.path || '').trim()),
@@ -3333,6 +3515,7 @@ function openWorkItemModal(itemId) {
       inputRow('Milestone', 'wiEditMilestone', milestone, 'Milestone') +
       inputRow('Target Apps', 'wiEditTargetApps', targetApps, 'Target Apps') +
       inputRow('Maconomy', 'wiEditMaconomy', maconomy, 'Maconomy') +
+      wikiInputRow('Wikipage', 'wiEditWikiPage', wikiPage, 'Wikipage') +
     `</div>` +
     `<div class="wi-modal-desc">` +
       `<div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;">Description</div>` +
@@ -3380,6 +3563,7 @@ const FIELDS = [
   'Custom.Milestone',
   'Custom.SuperEpic',
   'Custom.Maconomy',
+  'Custom.wikipage',
   'Custom.Targetapps',
   'Custom.Tshirt',
   'System.IterationPath', 'System.AreaPath',
@@ -3473,8 +3657,14 @@ const STATUS_FILTERS = [
   { key: 'todo',       label: 'To Do',       match: ['to do', 'todo', 'waiting', 'assigned', 'ready to start', 'ready for start'] },
   { key: 'inprogress', label: 'In Progress', match: ['active', 'in progress', 'in development', 'in review', 'committed', 'open', 'pending', 'doing'] },
 ];
-// Completed epics filter is separate (time-limited)
-let showCompletedEpics = false;
+// Global completed visibility toggle used across list views.
+let showCompletedEpics = (() => {
+  try {
+    return localStorage.getItem(LS_SHOW_COMPLETED_GLOBAL) === '1';
+  } catch (_) {
+    return false;
+  }
+})();
 let selectedStatuses = (() => {
   try {
     const saved = JSON.parse(localStorage.getItem(LS_STATUS_KEY));
@@ -3486,6 +3676,7 @@ let selectedStatuses = (() => {
 // Hidden epics — persisted in localStorage (always stored as strings)
 let auditMode   = false;
 let auditData   = [];
+let auditViewMode = 'project'; // 'project' | 'user'
 let dashboardMode = false;
 let roadmapViewMode = false;
 let dashEffortMode = false;
@@ -3560,6 +3751,8 @@ const BOARD_AUTOSAVE_INTERVAL_MS = 60000;
 let boardMode = false;
 let boardTickets = [];
 let boardTicketsLoaded = false;
+let boardTicketsScopeKey = '';
+let boardSprintPanelOpen = false;
 let boardStateFieldRef = BOARD_STATE_FIELD_CANDIDATES[0];
 let boardStateStorageMode = 'unknown';
 let activeBoardTicketId = null;
@@ -4169,6 +4362,10 @@ async function saveEffort(itemId, inputEl) {
 // ──────────────────────────────────────────
 function initCheckboxes() {
   // Status filter is now configured in Settings (⚙ Kolumner button).
+  const completedToggle = document.getElementById('completedEpicsToggle');
+  if (completedToggle) completedToggle.checked = !!showCompletedEpics;
+  const completedWrap = document.getElementById('completedEpicsWrap');
+  if (completedWrap) completedWrap.className = `cb-item ${showCompletedEpics ? 'checked' : ''}`;
 }
 
 function toggleTimelineRoadmap(key) {
@@ -4529,6 +4726,9 @@ function toggleCompletedEpics() {
   showCompletedEpics = document.getElementById('completedEpicsToggle').checked;
   const wrap = document.getElementById('completedEpicsWrap');
   if (wrap) wrap.className = `cb-item ${showCompletedEpics ? 'checked' : ''}`;
+  try {
+    localStorage.setItem(LS_SHOW_COMPLETED_GLOBAL, showCompletedEpics ? '1' : '0');
+  } catch (_) {}
   renderActiveView();
 }
 
@@ -4672,9 +4872,15 @@ function extractKnownFavoriteKeysFromText(text) {
   const allowed = favoriteSelectionKeys();
   if (!allowed.length) return [];
 
+  const hasBoundedToken = key => {
+    const escaped = String(key || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`(^|[\\s,"'\\[\\]{};])${escaped}($|[\\s,"'\\[\\]{};])`);
+    return re.test(haystack);
+  };
+
   return uniqueStringList(
     allowed
-      .filter(key => key && haystack.includes(key))
+      .filter(key => key && hasBoundedToken(key))
       .sort((a, b) => b.length - a.length)
   );
 }
@@ -4821,6 +5027,7 @@ function isTeamdefUnavailableError(error) {
 }
 
 let storageProjectPickerResolve = null;
+let epicProjectPickerResolve = null;
 
 function closeStorageProjectPicker() {
   const modal = document.getElementById('storageProjectModal');
@@ -4872,6 +5079,53 @@ async function chooseFavoritesStorageProject() {
   modal.classList.add('open');
   return await new Promise(resolve => {
     storageProjectPickerResolve = resolve;
+  });
+}
+
+function closeEpicProjectPicker() {
+  const modal = document.getElementById('epicProjectModal');
+  if (modal) modal.classList.remove('open');
+  if (epicProjectPickerResolve) {
+    const resolve = epicProjectPickerResolve;
+    epicProjectPickerResolve = null;
+    resolve('');
+  }
+}
+
+function pickEpicProject(projectName) {
+  const selected = String(projectName || '').trim();
+  const modal = document.getElementById('epicProjectModal');
+  if (modal) modal.classList.remove('open');
+  if (epicProjectPickerResolve) {
+    const resolve = epicProjectPickerResolve;
+    epicProjectPickerResolve = null;
+    resolve(selected);
+  }
+}
+
+async function chooseEpicProjectFromList(projectNames = [], currentProject = '') {
+  const names = [...new Set((projectNames || []).map(n => String(n || '').trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }));
+  if (!names.length) return '';
+  if (names.length === 1) return names[0];
+
+  const body = document.getElementById('epicProjectBody');
+  const modal = document.getElementById('epicProjectModal');
+  if (!body || !modal) return '';
+
+  const current = names.includes(currentProject) ? currentProject : names[0];
+  body.innerHTML = `
+    <p style="margin-bottom:6px;color:var(--muted)">Välj vilket projekt den nya Epicen ska skapas i.</p>
+    <div class="storage-project-list">
+      ${names.map(name => `<button class="btn btn-outline storage-project-btn ${name === current ? 'active' : ''}" onclick="pickEpicProject('${name.replace(/'/g,"\\'")}')">${escHtml(name)}</button>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+      <button class="btn btn-outline" style="width:auto;padding:6px 10px;font-size:0.78rem;" onclick="closeEpicProjectPicker()">Avbryt</button>
+    </div>`;
+
+  modal.classList.add('open');
+  return await new Promise(resolve => {
+    epicProjectPickerResolve = resolve;
   });
 }
 
@@ -5228,7 +5482,7 @@ function updateProjectModeUI() {
   }
 }
 
-function setProjectPanelMode(mode) {
+async function setProjectPanelMode(mode) {
   projectPanelMode = mode === 'favorites' ? 'favorites' : 'all';
   if (projectPanelMode === 'favorites') {
     manageProjectsMode = false;
@@ -5245,6 +5499,12 @@ function setProjectPanelMode(mode) {
   } catch (_) {}
   updateProjectModeUI();
   renderProjectCheckboxes(window._allProjects || []);
+
+  // Lazy-load Teams metadata only when Team mode is opened.
+  const pat = (document.getElementById('patInput')?.value || '').trim();
+  if (projectPanelMode === 'favorites' && pat && !window._projectTeamsLoaded) {
+    await loadProjects({ loadTeams: true });
+  }
 }
 
 async function setActiveFavorite(favoriteId, autoLoad = false) {
@@ -5736,7 +5996,8 @@ async function fetchProjectNames() {
   return [...new Set(projects)].sort((a, b) => a.localeCompare(b));
 }
 
-async function loadProjects() {
+async function loadProjects(options = {}) {
+  const loadTeams = options.loadTeams !== false;
   let btn = null;
   const writeConn = (msg, isError = false) => {
     const el = document.getElementById('connectionMsg');
@@ -5768,26 +6029,32 @@ async function loadProjects() {
 
     const projectNames = await fetchProjectNames();
 
-    // Fetch teams for each project in parallel
-    const teamResults = await Promise.all(projectNames.map(async proj => {
-      try {
-        const rawTeams = await fetchProjectTeams(proj);
-        const teamIdByName = {};
-        rawTeams.forEach(t => {
-          if (t?.name && t?.id) teamIdByName[t.name] = t.id;
-        });
-        const teams = [...new Set(rawTeams.map(t => t.name).filter(Boolean))]
-          .filter(name => name !== proj)
-          .sort((a,b) => a.localeCompare(b));
-        return { proj, teams, teamIdByName };
-      } catch(e) { return { proj, teams: [], teamIdByName: {} }; }
-    }));
+    let teamResults = projectNames.map(proj => ({ proj, teams: [], teamIdByName: {} }));
+    if (loadTeams) {
+      // Fetch teams for each project in parallel.
+      teamResults = await Promise.all(projectNames.map(async proj => {
+        try {
+          const rawTeams = await fetchProjectTeams(proj);
+          const teamIdByName = {};
+          rawTeams.forEach(t => {
+            if (t?.name && t?.id) teamIdByName[t.name] = t.id;
+          });
+          const teams = [...new Set(rawTeams.map(t => t.name).filter(Boolean))]
+            .filter(name => name !== proj)
+            .sort((a,b) => a.localeCompare(b));
+          return { proj, teams, teamIdByName };
+        } catch(e) { return { proj, teams: [], teamIdByName: {} }; }
+      }));
+    }
 
     // Build structured list: [{proj, teams:[]}]
     window._projectTeams = teamResults;
+    window._projectTeamsLoaded = !!loadTeams;
     window._allProjects = projectNames; // keep for compat
 
-    await loadProjectFavoritesFromDevOps(projectNames);
+    if (loadTeams) {
+      await loadProjectFavoritesFromDevOps(projectNames);
+    }
 
     if (projectPanelMode === 'favorites') {
       applyActiveFavoriteSelection();
@@ -6000,13 +6267,13 @@ async function fetchItems(options = {}) {
     // Re-sort items into WIQL rank order (batch fetch returns arbitrary order)
     items.sort((a, b) => (idOrder.get(a.id) ?? 9999) - (idOrder.get(b.id) ?? 9999));
 
-    // Filter excluded states — always keep completed Epics and Sprint goals (UI filter controls display)
+    // Filter excluded states — keep hierarchy types for Board/Sprint contexts.
     allItems = items.filter(item => {
       const state = workItemStateLower(item);
       const isExcluded = EXCLUDED_STATES.some(ex => state.includes(ex));
       if (!isExcluded) return true;
       const type = (item.fields['System.WorkItemType'] || '').toLowerCase().trim();
-      return type === 'epic' || type === 'sprint goal';
+      return type === 'epic' || type === 'feature' || type === 'user story' || type === 'sprint goal';
     });
     normalizeRoadmapValuesOnItems(allItems);
 
@@ -6997,16 +7264,68 @@ async function auditUsers() {
 
 function renderAuditTable(data) {
   const wrap = document.getElementById('tableWrap');
+  const modeButtons = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+      <div class="project-mode-switch" role="group" aria-label="Audit-vy">
+        <button class="project-mode-btn ${auditViewMode === 'project' ? 'active' : ''}" onclick="setAuditViewMode('project')">Per Projekt</button>
+        <button class="project-mode-btn ${auditViewMode === 'user' ? 'active' : ''}" onclick="setAuditViewMode('user')">Per användare</button>
+      </div>
+    </div>`;
+
+  if (auditViewMode === 'user') {
+    const userMap = new Map();
+    data.forEach(({ proj, members }) => {
+      (members || []).forEach(m => {
+        const name = String(m?.name || '').trim();
+        if (!name) return;
+        if (!userMap.has(name)) userMap.set(name, new Map());
+        const projMap = userMap.get(name);
+        if (!projMap.has(proj)) projMap.set(proj, new Set());
+        (m.teams || []).forEach(t => {
+          const teamName = String(t || '').trim();
+          if (teamName) projMap.get(proj).add(teamName);
+        });
+      });
+    });
+
+    const users = [...userMap.entries()]
+      .map(([name, projMap]) => ({
+        name,
+        projects: [...projMap.entries()]
+          .map(([proj, teamsSet]) => ({ proj, teams: [...teamsSet].sort((a, b) => a.localeCompare(b, 'sv-SE')) }))
+          .sort((a, b) => a.proj.localeCompare(b.proj, 'sv-SE')),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'sv-SE'));
+
+    const rowsHtml = users.map(user => {
+      if (!user.projects.length) return '';
+      return user.projects.map((p, i) => `
+        <tr>
+          ${i === 0 ? `<td style="font-size:0.88rem;padding:8px 14px;font-weight:700;vertical-align:top;" rowspan="${user.projects.length}">${escHtml(user.name)}</td>` : ''}
+          <td style="font-size:0.88rem;padding:8px 14px;">${escHtml(p.proj)}</td>
+          <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml(p.teams.join(', '))}</td>
+        </tr>`).join('');
+    }).join('');
+
+    document.getElementById('resultInfo').innerHTML = `<strong>${users.length}</strong> användare`;
+    wrap.innerHTML = modeButtons + `
+      <table>
+        <thead><tr><th>Användare</th><th>Projekt</th><th>Team</th></tr></thead>
+        <tbody>${rowsHtml || '<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted);">Inga användare hittades</td></tr>'}</tbody>
+      </table>`;
+    return;
+  }
+
   const rowsHtml = data.map(({ proj, members }) => {
     if (!members.length) return '';
     const memberRows = members.map(m => `
       <tr>
-        <td style="font-size:0.88rem;padding:8px 14px;">${m.name}</td>
-        <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${m.teams.join(', ')}</td>
+        <td style="font-size:0.88rem;padding:8px 14px;">${escHtml(m.name)}</td>
+        <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml((m.teams || []).join(', '))}</td>
       </tr>`).join('');
     return `
       <tr class="project-row">
-        <td class="title-cell" colspan="2"><a style="color:var(--accent2);text-decoration:none;font-weight:700;">▸ ${proj}</a>
+        <td class="title-cell" colspan="2"><a style="color:var(--accent2);text-decoration:none;font-weight:700;">▸ ${escHtml(proj)}</a>
           <span style="color:var(--muted);font-size:0.84rem;margin-left:8px;">${members.length} användare</span>
         </td>
       </tr>
@@ -7017,7 +7336,7 @@ function renderAuditTable(data) {
   const total = data.reduce((s, d) => s + d.members.length, 0);
   document.getElementById('resultInfo').innerHTML = `<strong>${total}</strong> användare`;
 
-  wrap.innerHTML = `
+  wrap.innerHTML = modeButtons + `
     <table>
       <thead><tr><th>Namn</th><th>Team</th></tr></thead>
       <tbody>${rowsHtml || '<tr><td colspan="2" style="text-align:center;padding:24px;color:var(--muted);">Inga användare hittades</td></tr>'}</tbody>
@@ -7025,13 +7344,26 @@ function renderAuditTable(data) {
 }
 
 function renderAuditSearch() {
-  const q = document.getElementById('searchBox').value.toLowerCase();
+  const q = document.getElementById('searchBox').value.toLowerCase().trim();
   if (!q) { renderAuditTable(auditData); return; }
-  const filtered = auditData.map(({ proj, members }) => ({
-    proj,
-    members: members.filter(m => m.name.toLowerCase().includes(q))
-  })).filter(d => d.members.length > 0);
+  const filtered = auditData.map(({ proj, members }) => {
+    const projMatch = String(proj || '').toLowerCase().includes(q);
+    if (projMatch) return { proj, members };
+    const matchedMembers = (members || []).filter(m => {
+      const name = String(m?.name || '').toLowerCase();
+      const teams = (m?.teams || []).join(' ').toLowerCase();
+      return name.includes(q) || teams.includes(q);
+    });
+    return { proj, members: matchedMembers };
+  }).filter(d => d.members.length > 0);
   renderAuditTable(filtered);
+}
+
+function setAuditViewMode(mode) {
+  const nextMode = mode === 'user' ? 'user' : 'project';
+  if (auditViewMode === nextMode && auditMode) return;
+  auditViewMode = nextMode;
+  if (auditMode) renderAuditSearch();
 }
 
 function downloadAuditCSV() {
@@ -9893,7 +10225,7 @@ function renderSprintGoals() {
         <div class="sprint-col-title-row">
           <span class="sprint-col-title-wrap">
             <span>${meta.name}</span>
-            ${phaseText ? `<span class="sprint-col-phase-pill">${phaseText}</span>` : ''}
+            ${phaseText ? `<span class="sprint-col-phase-pill ${phaseText==='Prev' ? 'prev' : (phaseText==='Nu' ? 'nu' : (phaseText==='Nästa' ? 'nasta' : ''))}">${phaseText}</span>` : ''}
           </span>
           <div class="sprint-col-actions">
             ${(hasFocusMode && isFocused) ? `<button class="btn btn-outline sprint-goal-group-inline-btn btn-sm-icon${sprintShowGoalTicketGroups ? ' active' : ''}${sprintShowGoalTicketGroups ? ' text-accent2-sm' : ''}" title="Visa eller dölj länkade issues i sprintmål">Visa issues</button>` : ''}
@@ -12057,7 +12389,7 @@ function renderPrioritering() {
         ? `<div style="flex:1;min-width:240px;display:flex;align-items:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
             <input class="col-filter" type="text" value="${escHtml(timeSaveText)}"
               style="width:100%;font-size:0.82rem;padding:4px 8px;"
-              placeholder="Beskrivning av tidsbesparing..."
+              placeholder=""
               onblur="prioSaveTimeSaveText(${item.id},this)"
               onclick="event.stopPropagation()" />
           </div>`
@@ -12546,7 +12878,7 @@ function renderTimeline() {
       </select>
     </div>` : ''}
     <div class="tl-body">
-      <!-- Epic labels + Score columns: WSJF | MoSCoW | RICE -->
+      <!-- Epic labels + Score columns: WSJF | MoSCoW | RICE | Tidsbesparing -->
       <div style="flex-shrink:0;width:${TL_LIST_W}px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
         <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;padding:0 12px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">
           <span style="display:flex;align-items:center;gap:6px;padding-right:8px;">${listToggleBtn}${createEpicBtn}${refreshBtn}</span>
@@ -12554,6 +12886,7 @@ function renderTimeline() {
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;">WSJF</span>
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;border-left:1px solid var(--border);">MoSCoW</span>
           <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;border-left:1px solid var(--border);">RICE</span>
+          <span style="width:${SCORE_W}px;text-align:center;flex-shrink:0;border-left:1px solid var(--border);">Tidsbesparing</span>
         </div>
         ${rows.map((r,i) => {
           // Bygg rad: label + score
@@ -12561,14 +12894,14 @@ function renderTimeline() {
             ? `<div style=\"height:${GROUP_H}px;display:flex;align-items:center;background:var(--surface);${groupBorder}box-sizing:border-box;flex:1;\">${hierarchyGroupRowLeadHtml(r.label, { width: `${TL_LIST_W}px`, height: GROUP_H, borderRight: 'none', prefix: '▸ ' })}</div>`
             : hierarchyListCellHtml(r.item, {
                 type: r.type,
-                width: `calc(${TL_LIST_W}px - ${SCORE_W*3}px)`,
+                width: `calc(${TL_LIST_W}px - ${SCORE_W*4}px)`,
                 height: ROW_H,
                 borderRight: 'none',
                 rowExtraStyle: `${borderBtm}overflow:hidden;`,
                 hasChildren: hierarchyRowHasChildren(r.item, r.type, features, stories),
               });
           const rScore = r.type==='group'
-            ? `<div style=\"height:${GROUP_H}px;background:var(--surface);${groupBorder}box-sizing:border-box;display:flex;\"><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span></div>`
+            ? `<div style=\"height:${GROUP_H}px;background:var(--surface);${groupBorder}box-sizing:border-box;display:flex;\"><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span><span style=\"width:${SCORE_W}px;\"></span></div>`
             : (() => {
                 const f = r.item.fields;
                 const bv  = f['Microsoft.VSTS.Common.BusinessValue'] ?? null;
@@ -12583,9 +12916,13 @@ function renderTimeline() {
                 const conf  = f['Custom.Confidence'] != null ? Number(f['Custom.Confidence']) : null;
                 const impact = bv != null ? Number(bv) : null;
                 const rice = (reach!=null&&impact!=null&&conf!=null&&eff) ? +((reach*impact*conf)/eff).toFixed(1) : null;
+                const timeSave = f[PRIO_TIME_SAVE_INT_FIELD] != null && f[PRIO_TIME_SAVE_INT_FIELD] !== ''
+                  ? Number(f[PRIO_TIME_SAVE_INT_FIELD])
+                  : null;
                 return `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${wsjf!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;\" title=\"WSJF\">${wsjf!=null?wsjf:'–'}</span>`+
                   `<span style=\"width:${SCORE_W}px;text-align:center;font-size:0.74rem;flex-shrink:0;border-left:1px solid var(--border);\" title=\"MoSCoW\">${moscow?`<span style=\\"color:${moscowColor};font-weight:700;font-size:0.66rem;\\">${moscow}</span>`:'–'}</span>`+
-                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${rice!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"RICE\">${rice!=null?rice:'–'}</span>`;
+                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${rice!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"RICE\">${rice!=null?rice:'–'}</span>`+
+                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${timeSave!=null&&Number.isFinite(timeSave)?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"Tidsbesparing\">${timeSave!=null&&Number.isFinite(timeSave)?Math.round(timeSave):'–'}</span>`;
               })();
           return `<div style=\"display:flex;align-items:center;\">${rLabel}${rScore}</div>`;
         }).join('')}
@@ -13553,6 +13890,13 @@ function boardSelectedProjectNames() {
   return [...new Set([...selectedProjects].map(entry => String(entry || '').split('::')[0]).filter(Boolean))];
 }
 
+function boardSelectedProjectScopeKey() {
+  return boardSelectedProjectNames()
+    .slice()
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }))
+    .join('||');
+}
+
 function boardProjectForTicket(item) {
   return ((item?.fields?.['System.TeamProject'] || item?.fields?.['System.AreaPath'] || '') + '').split('\\')[0] || '';
 }
@@ -13650,6 +13994,51 @@ function boardNodeProject(node) {
     if (fromItem) return fromItem;
   }
   return boardActiveTicketProject();
+}
+
+function boardNodeScopeLabel(node) {
+  if (!node) return '';
+  const scope = String(node.sourceScope || '').trim();
+  if (scope) return scope;
+  return boardNodeProject(node);
+}
+
+function boardStatusDotTone(state) {
+  const s = String(state || '').toLowerCase();
+  if (['new', 'to do', 'todo', 'proposed'].some(k => s.includes(k))) return 'new';
+  if (['active', 'in progress', 'in development', 'in review', 'committed', 'open', 'doing'].some(k => s.includes(k))) return 'active';
+  if (s.includes('pending')) return 'pending';
+  if (['resolved', 'done', 'completed', 'closed', 'ready for prod', 'released', 'deployed', 'archived'].some(k => s.includes(k))) return 'resolved';
+  if (['blocked', 'on hold'].some(k => s.includes(k))) return 'blocked';
+  return '';
+}
+
+function boardNodeStatusMeta(node) {
+  if (!node || !node.sourceWorkItemId) {
+    return { state: 'Ej satt', tone: '' };
+  }
+  const item = allItems.find(i => Number(i.id) === Number(node.sourceWorkItemId));
+  if (!item) {
+    return { state: 'Ej satt', tone: '' };
+  }
+  const state = workItemState(item) || 'Ej satt';
+  return { state, tone: boardStatusDotTone(state) };
+}
+
+function boardNodeIsCompleted(node) {
+  if (!node || !node.sourceWorkItemId) return false;
+  const item = allItems.find(i => Number(i.id) === Number(node.sourceWorkItemId));
+  if (!item) return false;
+  const state = workItemStateLower(item);
+  return EXCLUDED_STATES.some(ex => state.includes(ex));
+}
+
+function boardShortLabel(value, maxLen = 10) {
+  const text = String(value || '').trim();
+  const max = Number.isFinite(Number(maxLen)) ? Math.max(1, Number(maxLen)) : 10;
+  if (!text) return '';
+  if (text.length <= max) return text;
+  return `${text.slice(0, max)}`;
 }
 
 function boardParentWorkItemUrl(parentWorkItemId) {
@@ -13812,6 +14201,7 @@ function boardNativeDefaultState() {
     showTimeAxis: false,
     timeStartDate: '',
     timeEndDate: '',
+    timeWeekPx: 56,
     timeMilestones: [],
     treeLayout: false,
     freeLayoutPositions: {},
@@ -13865,6 +14255,7 @@ function boardNativeNormalizeState(model) {
     showTimeAxis: Boolean(src.showTimeAxis),
     timeStartDate: String(src.timeStartDate || src.timelineStartDate || '').trim(),
     timeEndDate: String(src.timeEndDate || src.timelineEndDate || '').trim(),
+    timeWeekPx: boardNativeClampTimeWeekPx(src.timeWeekPx),
     timeMilestones: Array.isArray(src.timeMilestones) ? src.timeMilestones.map((m, i) => ({
       id: Number.isFinite(Number(m.id)) ? Number(m.id) : (i + 2000),
       date: String(m.date || m.time || '').trim(),
@@ -13965,6 +14356,7 @@ function boardNativeSnapshot(runtime) {
     showTimeAxis: !!runtime.state.showTimeAxis,
     timeStartDate: String(runtime.state.timeStartDate || ''),
     timeEndDate: String(runtime.state.timeEndDate || ''),
+    timeWeekPx: boardNativeClampTimeWeekPx(runtime.state.timeWeekPx),
     timeMilestones: (runtime.state.timeMilestones || []).map(m => ({ ...m })),
     treeLayout: !!runtime.state.treeLayout,
     freeLayoutPositions: { ...(runtime.state.freeLayoutPositions || {}) },
@@ -13989,6 +14381,21 @@ function boardNativeParseIsoDate(value) {
   return Number.isFinite(ms) ? ms : NaN;
 }
 
+function boardNativeClampTimeWeekPx(value) {
+  const px = Number(value);
+  if (!Number.isFinite(px)) return 56;
+  return Math.max(20, Math.min(300, px));
+}
+
+function boardNativeStartOfWeekMs(ms) {
+  const d = new Date(ms);
+  if (!Number.isFinite(d.getTime())) return NaN;
+  const day = d.getUTCDay();
+  const diff = (day + 6) % 7;
+  const startMs = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  return startMs - (diff * 24 * 60 * 60 * 1000);
+}
+
 function boardNativeTimeRange(runtime) {
   const today = new Date();
   const fallbackStart = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
@@ -14001,36 +14408,36 @@ function boardNativeTimeRange(runtime) {
   return { startMs: s, endMs: e };
 }
 
-function boardNativeTimeBoardBounds() {
-  return { left: 40, right: 1240 };
+function boardNativeTimeBoardBounds(runtime) {
+  const { startMs, endMs } = boardNativeTimeRange(runtime);
+  const left = 40;
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  const weeks = Math.max(1, (endMs - startMs) / msPerWeek);
+  const weekPx = boardNativeClampTimeWeekPx(runtime?.state?.timeWeekPx);
+  const right = left + Math.max(240, Math.round(weeks * weekPx));
+  return { left, right };
 }
 
 function boardNativeDateToBoardX(runtime, dateMs) {
   const { startMs, endMs } = boardNativeTimeRange(runtime);
-  const { left, right } = boardNativeTimeBoardBounds();
+  const { left, right } = boardNativeTimeBoardBounds(runtime);
   const span = Math.max(1, endMs - startMs);
-  const ratio = Math.max(0, Math.min(1, (dateMs - startMs) / span));
+  const ratio = (dateMs - startMs) / span;
   return left + (right - left) * ratio;
 }
 
 function boardNativeBoardXToDate(runtime, boardX) {
   const { startMs, endMs } = boardNativeTimeRange(runtime);
-  const { left, right } = boardNativeTimeBoardBounds();
+  const { left, right } = boardNativeTimeBoardBounds(runtime);
   const spanX = Math.max(1, right - left);
-  const ratio = Math.max(0, Math.min(1, (boardX - left) / spanX));
+  const ratio = (boardX - left) / spanX;
   return startMs + (endMs - startMs) * ratio;
 }
 
 function boardNativeNodeWidth(runtime, node) {
   const base = Number.isFinite(Number(node.boardWidth)) ? Math.max(80, Number(node.boardWidth)) : 220;
-  if (!runtime.state.showTimeAxis) return base;
-  const s = boardNativeParseIsoDate(node.timeStartDate);
-  const e = boardNativeParseIsoDate(node.timeEndDate);
-  if (!Number.isFinite(s) || !Number.isFinite(e) || e <= s) return base;
-  const x1 = boardNativeDateToBoardX(runtime, s);
-  const x2 = boardNativeDateToBoardX(runtime, e);
-  // Keep current layout width as floor to avoid tiny visual shrink from date rounding.
-  return Math.max(80, base, x2 - x1);
+  // Width is stored on the node so scale +/- only changes the axis, not object size.
+  return base;
 }
 
 function boardNativeSyncNodeFromDates(runtime, node) {
@@ -14206,6 +14613,7 @@ function boardGetSprintsByCategory() {
     next: null,
     backlog: { path: '__backlog__', name: 'Backlog', project: '' },
     byProject: {},
+    projectRows: [],
     displayProject: '',
   };
 
@@ -14249,6 +14657,15 @@ function boardGetSprintsByCategory() {
 
   const preferredProject = boardActiveTicketProject();
   const projectKeys = Object.keys(categories.byProject);
+  categories.projectRows = projectKeys
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }))
+    .map(project => ({
+      project,
+      previous: categories.byProject[project]?.previous || null,
+      active: categories.byProject[project]?.active || null,
+      next: categories.byProject[project]?.next || null,
+      backlog: { path: '__backlog__', name: 'Backlog', project },
+    }));
   categories.displayProject = preferredProject && categories.byProject[preferredProject]
     ? preferredProject
     : (projectKeys[0] || '');
@@ -14294,6 +14711,7 @@ function boardResolveTargetSprintPath(node, phaseKey, catalog) {
 }
 
 async function boardAssignSprintToSelected(phaseKey) {
+  const projectFilter = String(arguments[1]?.project || '').trim();
   const phase = String(phaseKey || '').trim();
   if (!phase) return;
   const runtime = boardNativeRuntime;
@@ -14315,6 +14733,8 @@ async function boardAssignSprintToSelected(phaseKey) {
   let skippedNoPath = 0;
 
   selectedNodes.forEach(node => {
+    const nodeProject = boardNodeProject(node);
+    if (projectFilter && nodeProject !== projectFilter) return;
     const targetPath = boardResolveTargetSprintPath(node, phase, catalog);
     if (!targetPath) {
       skippedNoPath++;
@@ -14382,32 +14802,64 @@ function boardNativeRenderSprintChips(runtime) {
   const selected = new Set(runtime.selectedIds || []);
   const hasSelection = selected.size > 0;
 
-  const projectInfo = sprints.displayProject ? ` (${escHtml(sprints.displayProject)})` : '';
-  let html = '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.75rem;">';
-  html += `<span style="font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">Sprint${projectInfo}:</span>`;
-
-  const addPhaseButton = (label, phase, sprintMeta) => {
+  const addPhaseButton = (label, phase, sprintMeta, project) => {
     const title = sprintMeta?.name ? `${label}: ${sprintMeta.name}` : label;
     const text = sprintMeta?.name || label;
     const disabled = !hasSelection || !sprintMeta;
     const disabledAttr = disabled ? 'disabled' : '';
-    return `<button type="button" class="board-sprint-chip phase" data-board-sprint-phase="${phase}" ${disabledAttr} title="${escHtml(title)}">${escHtml(text)}</button>`;
+    const projectAttr = project ? ` data-board-sprint-project="${escHtml(project)}"` : '';
+    return `<button type="button" class="board-sprint-chip phase" data-board-sprint-phase="${phase}"${projectAttr} ${disabledAttr} title="${escHtml(title)}">${escHtml(text)}</button>`;
   };
 
-  html += addPhaseButton('Föregående', 'previous', sprints.previous);
-  html += addPhaseButton('Aktiv', 'active', sprints.active);
-  html += addPhaseButton('Kommande', 'next', sprints.next);
-  html += `<button type="button" class="board-sprint-chip phase" data-board-sprint-phase="backlog" ${hasSelection ? '' : 'disabled'} title="Backlog">Backlog</button>`;
-  html += '</div>';
-  wrap.innerHTML = html;
+  const rows = sprints.projectRows && sprints.projectRows.length
+    ? sprints.projectRows
+    : [{
+        project: sprints.displayProject || '',
+        previous: sprints.previous,
+        active: sprints.active,
+        next: sprints.next,
+        backlog: sprints.backlog,
+      }];
+
+  let rowsHtml = '<div style="display:flex;flex-direction:column;gap:6px;font-size:.75rem;">';
+  rows.forEach(row => {
+    const projectLabel = row.project || 'Okänt projekt';
+    rowsHtml += '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">';
+    rowsHtml += `<span style="font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;min-width:120px;">Sprint (${escHtml(projectLabel)}):</span>`;
+    rowsHtml += addPhaseButton('Föregående', 'previous', row.previous, row.project);
+    rowsHtml += addPhaseButton('Aktiv', 'active', row.active, row.project);
+    rowsHtml += addPhaseButton('Kommande', 'next', row.next, row.project);
+    rowsHtml += `<button type="button" class="board-sprint-chip phase" data-board-sprint-phase="backlog" data-board-sprint-project="${escHtml(row.project)}" ${hasSelection ? '' : 'disabled'} title="Backlog">Backlog</button>`;
+    rowsHtml += '</div>';
+  });
+  rowsHtml += '</div>';
+
+  wrap.innerHTML = `
+    <button type="button" class="board-sprint-trigger" onclick="boardToggleSprintPanel()" title="Visa sprintar per projekt">
+      Sprintar per projekt (${rows.length})
+    </button>
+    <div class="board-sprint-popover ${boardSprintPanelOpen ? 'open' : ''}">
+      <div class="board-sprint-popover-head">
+        <span style="font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">Projekt x Sprintar</span>
+        <button type="button" class="board-sprint-popover-close" onclick="boardToggleSprintPanel(false)" title="Stäng">x</button>
+      </div>
+      ${rowsHtml}
+    </div>`;
 
   wrap.querySelectorAll('[data-board-sprint-phase]').forEach(btn => {
     btn.addEventListener('click', () => {
       const phase = String(btn.getAttribute('data-board-sprint-phase') || '').trim();
+      const project = String(btn.getAttribute('data-board-sprint-project') || '').trim();
       if (!phase) return;
-      boardAssignSprintToSelected(phase);
+      boardAssignSprintToSelected(phase, { project });
     });
   });
+}
+
+function boardToggleSprintPanel(forceOpen) {
+  if (typeof forceOpen === 'boolean') boardSprintPanelOpen = forceOpen;
+  else boardSprintPanelOpen = !boardSprintPanelOpen;
+  if (activeTab === 'board' && boardNativeRuntime) boardNativeRenderSprintChips(boardNativeRuntime);
 }
 
 function boardNativeDescendants(runtime, rootId) {
@@ -14445,7 +14897,12 @@ function boardNativeDeleteSelected(runtime) {
 
 function boardNativeVisibleNodeIds(runtime) {
   const selectedSprints = new Set((runtime.state.selectedSprints || []).map(s => String(s || '').trim()).filter(Boolean));
-  const sprintFiltered = runtime.state.nodes.filter(n => {
+  const completedFiltered = runtime.state.nodes.filter(n => {
+    if (showCompletedEpics) return true;
+    return !boardNodeIsCompleted(n);
+  });
+
+  const sprintFiltered = completedFiltered.filter(n => {
     if (!selectedSprints.size) return true;
     return selectedSprints.has(boardNativeNodeSprint(n));
   });
@@ -14471,8 +14928,8 @@ function boardNativeRenderAxes(runtime) {
   const timeAxis = document.getElementById('boardNativeTimeAxis');
   const xWrap = document.getElementById('boardNativeXMarkers');
   const yWrap = document.getElementById('boardNativeYMarkers');
-  const timeStartLabel = document.getElementById('boardNativeTimeStartDate');
-  const timeEndLabel = document.getElementById('boardNativeTimeEndDate');
+  const timeScale = document.getElementById('boardNativeTimeScale');
+  const timeScaleValue = document.getElementById('boardTimeScaleValue');
   const timeStartHandle = document.getElementById('boardNativeTimeStartHandle');
   const timeEndHandle = document.getElementById('boardNativeTimeEndHandle');
   const timeMilestonesWrap = document.getElementById('boardNativeTimeMilestones');
@@ -14583,12 +15040,12 @@ function boardNativeRenderAxes(runtime) {
     boardNativeRenderAxes(runtime);
   };
 
-  if (timeAxis && timeStartLabel && timeEndLabel && timeStartHandle && timeEndHandle && timeNodeRanges && timeMilestonesWrap) {
+  if (timeAxis && timeStartHandle && timeEndHandle && timeNodeRanges && timeMilestonesWrap) {
     const { startMs, endMs } = boardNativeTimeRange(runtime);
     runtime.state.timeStartDate = boardNativeIsoDate(startMs);
     runtime.state.timeEndDate = boardNativeIsoDate(endMs);
-    timeStartLabel.textContent = `Start: ${runtime.state.timeStartDate}`;
-    timeEndLabel.textContent = `Slut: ${runtime.state.timeEndDate}`;
+    runtime.state.timeWeekPx = boardNativeClampTimeWeekPx(runtime.state.timeWeekPx);
+    if (timeScaleValue) timeScaleValue.textContent = `${Math.round(runtime.state.timeWeekPx)} px/v`;
 
     const axisRect = timeAxis.getBoundingClientRect();
     const trackLeft = 12;
@@ -14599,13 +15056,36 @@ function boardNativeRenderAxes(runtime) {
       const ratio = Math.max(0, Math.min(1, (dateMs - startMs) / Math.max(1, endMs - startMs)));
       return trackLeft + (ratio * trackWidth);
     };
-    const fromAxisLeft = (left) => {
-      const ratio = Math.max(0, Math.min(1, (left - trackLeft) / trackWidth));
-      return startMs + ((endMs - startMs) * ratio);
-    };
 
     timeStartHandle.style.left = `${trackLeft}px`;
     timeEndHandle.style.left = `${trackRight}px`;
+
+    if (timeScale) {
+      const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+      const viewportRect = runtime.viewport.getBoundingClientRect();
+      const firstTick = boardNativeStartOfWeekMs(startMs);
+      const ticks = [];
+      let idx = 0;
+      let labelIdx = 0;
+      for (let ms = firstTick; ms <= (endMs + (msPerWeek * 2)); ms += msPerWeek) {
+        const boardX = boardNativeDateToBoardX(runtime, ms);
+        const screenX = boardX * runtime.state.zoom + runtime.state.panX + viewportRect.left;
+        const left = screenX - axisRect.left;
+        if (left < -24 || left > axisRect.width + 24) {
+          idx++;
+          continue;
+        }
+        const isMajor = idx % 4 === 0;
+        ticks.push(`<div class="board-native-time-week-tick${isMajor ? ' major' : ''}" style="left:${left}px;"></div>`);
+        labelIdx += 1;
+        const labelText = String(labelIdx);
+        const approxLabelHalf = Math.max(8, ((labelText.length * 6) + 8) / 2);
+        const safeLeft = Math.max(approxLabelHalf + 1, Math.min(axisRect.width - approxLabelHalf - 1, left));
+        ticks.push(`<div class="board-native-time-week-label" style="left:${safeLeft}px;">${labelText}</div>`);
+        idx++;
+      }
+      timeScale.innerHTML = ticks.join('');
+    }
 
     const timeMsHtml = (runtime.state.timeMilestones || []).map(m => {
       const ms = boardNativeParseIsoDate(m.date);
@@ -14726,6 +15206,7 @@ function boardNativeRenderAxes(runtime) {
         runtime.nodeTimeDrag = {
           nodeId,
           side,
+          source: 'axis',
           startX: ev.clientX,
           didMove: false,
         };
@@ -14810,6 +15291,9 @@ function boardNativeRender(runtime) {
       ? `<button class="board-native-save" data-save-node-id="${node.id}"${saveDisabled} title="Spara till DevOps">${saveLabel}</button>`
       : '';
     const displayId = Number(node.sourceWorkItemId || 0) || Number(node.id);
+    const scopeLabel = boardNodeScopeLabel(node);
+    const scopeLabelShort = boardShortLabel(scopeLabel || 'Projekt', 10);
+     const statusMeta = boardNodeStatusMeta(node);
     const timeHandles = runtime.state.showTimeAxis
       ? `<div class="board-native-node-time-handle" data-time-node-id="${node.id}" data-time-side="start" title="Justera startdatum"></div>
          <div class="board-native-node-time-handle" data-time-node-id="${node.id}" data-time-side="end" title="Justera slutdatum"></div>`
@@ -14822,8 +15306,8 @@ function boardNativeRender(runtime) {
       ${childPlus}
       ${collapseBtn}
       <div class="board-native-node-head" data-drag-node-id="${node.id}">
-        <span>#${displayId}</span>
-        <span>${escHtml(node.type)}${saveBtn}</span>
+        <span class="board-native-node-id" title="Status: ${escHtml(statusMeta.state)}"><span class="board-native-status-dot${statusMeta.tone ? ` status-${statusMeta.tone}` : ''}"></span>#${displayId}</span>
+        <span title="${escHtml(scopeLabel || 'Projekt')}">${escHtml(scopeLabelShort)}${saveBtn}</span>
       </div>
       <div class="board-native-node-title" data-title-node-id="${node.id}">${escHtml(node.title)}</div>
       <span class="board-native-node-sprint" title="Sprint">${escHtml(boardNativeNodeSprint(node))}</span>
@@ -15076,6 +15560,7 @@ function boardNativeRender(runtime) {
       runtime.nodeTimeDrag = {
         nodeId,
         side,
+        source: 'node',
         startX: e.clientX,
         startY: e.clientY,
         didMove: false,
@@ -15235,21 +15720,25 @@ function boardNativeMount() {
       }
       if (rt.timeAxisDrag || rt.nodeTimeDrag) {
         const axisEl = document.getElementById('boardNativeTimeAxis');
-        if (!axisEl) return;
-        const rect = axisEl.getBoundingClientRect();
-        const trackLeft = rect.left + 12;
-        const trackRight = Math.max(trackLeft + 1, rect.right - 12);
-        const trackWidth = Math.max(1, trackRight - trackLeft);
-        const ratio = Math.max(0, Math.min(1, (e.clientX - trackLeft) / trackWidth));
         const { startMs, endMs } = boardNativeTimeRange(rt);
+        let axisMs = startMs;
+        if (axisEl) {
+          const rect = axisEl.getBoundingClientRect();
+          const trackLeft = rect.left + 12;
+          const trackRight = Math.max(trackLeft + 1, rect.right - 12);
+          const trackWidth = Math.max(1, trackRight - trackLeft);
+          const ratio = (e.clientX - trackLeft) / trackWidth;
+          axisMs = startMs + (endMs - startMs) * ratio;
+        }
         if (rt.timeAxisDrag) {
+          if (!axisEl) return;
           const dx = e.clientX - rt.timeAxisDrag.startX;
           if (!rt.timeAxisDrag.didMove) {
             if (Math.abs(dx) <= 10) return;
             boardNativePushUndo(rt);
             rt.timeAxisDrag.didMove = true;
           }
-          const ms = startMs + (endMs - startMs) * ratio;
+          const ms = axisMs;
           if (rt.timeAxisDrag.side === 'start') {
             const maxStart = endMs - (1000 * 60 * 60 * 24);
             rt.state.timeStartDate = boardNativeIsoDate(Math.min(ms, maxStart));
@@ -15276,7 +15765,12 @@ function boardNativeMount() {
           if (!node.timeStartDate || !node.timeEndDate) boardNativeSyncNodeDatesFromLayout(rt, node);
           const s = boardNativeParseIsoDate(node.timeStartDate);
           const eMs = boardNativeParseIsoDate(node.timeEndDate);
-          const ms = startMs + (endMs - startMs) * ratio;
+          let ms = axisMs;
+          if (rt.nodeTimeDrag.source === 'node') {
+            const vRect = rt.viewport.getBoundingClientRect();
+            const boardX = (e.clientX - vRect.left - rt.state.panX) / rt.state.zoom;
+            ms = boardNativeBoardXToDate(rt, boardX);
+          }
           if (rt.nodeTimeDrag.side === 'start') {
             const next = Number.isFinite(eMs) ? Math.min(ms, eMs - (1000 * 60 * 60 * 24)) : ms;
             node.timeStartDate = boardNativeIsoDate(next);
@@ -15581,6 +16075,35 @@ function boardToggleTimeAxis(checked) {
   boardNativeRender(boardNativeRuntime);
 }
 
+function boardAdjustTimeScale(delta) {
+  if (!boardNativeRuntime) return;
+  const rt = boardNativeRuntime;
+  const step = Number(delta);
+  if (!Number.isFinite(step) || !step) return;
+
+  const prev = boardNativeClampTimeWeekPx(rt.state.timeWeekPx);
+  const next = boardNativeClampTimeWeekPx(prev + step);
+  if (next === prev) return;
+
+  boardNativePushUndo(rt);
+  if (rt.state.showTimeAxis) {
+    // Preserve node screen layout while changing scale by re-basing dates to current geometry.
+    rt.state.nodes.forEach(n => {
+      if (!n.timeStartDate || !n.timeEndDate) {
+        boardNativeSyncNodeDatesFromLayout(rt, n);
+      } else {
+        const s = boardNativeParseIsoDate(n.timeStartDate);
+        const e = boardNativeParseIsoDate(n.timeEndDate);
+        if (!Number.isFinite(s) || !Number.isFinite(e) || e <= s) {
+          boardNativeSyncNodeDatesFromLayout(rt, n);
+        }
+      }
+    });
+  }
+  rt.state.timeWeekPx = next;
+  boardNativeRenderAxes(rt);
+}
+
 function boardToggleTreeLayout(checked) {
   if (!boardNativeRuntime) return;
   const on = !!checked;
@@ -15828,9 +16351,14 @@ async function boardLoadTickets(options = {}) {
   const forceFresh = !!options.forceFresh;
   const cacheBuster = forceFresh ? `&_=${Date.now()}` : '';
   const projects = boardSelectedProjectNames();
+  const scopeKey = projects
+    .slice()
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }))
+    .join('||');
   if (!projects.length) {
     boardTickets = [];
     boardTicketsLoaded = true;
+    boardTicketsScopeKey = '';
     if (!preserveActiveTicket) activeBoardTicketId = null;
     boardStatusText = 'Välj minst ett projekt för att ladda Visual board.';
     return;
@@ -15839,7 +16367,10 @@ async function boardLoadTickets(options = {}) {
   const allIds = [];
   for (const project of projects) {
     const wiqlUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/wiql?api-version=7.1${cacheBuster}`;
-    const wiqlBody = { query: "SELECT [System.Id] FROM WorkItems WHERE [System.WorkItemType] = 'Visual board' ORDER BY [System.ChangedDate] DESC" };
+    const escProject = String(project).replace(/'/g, "''");
+    const wiqlBody = {
+      query: `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' AND [System.WorkItemType] = 'Visual board' ORDER BY [System.ChangedDate] DESC`
+    };
     const wiqlRes = await fetch(wiqlUrl, {
       method: 'POST',
       headers: { ...getHeaders(), 'Cache-Control': 'no-cache' },
@@ -15860,6 +16391,7 @@ async function boardLoadTickets(options = {}) {
   if (!ids.length) {
     boardTickets = [];
     boardTicketsLoaded = true;
+    boardTicketsScopeKey = scopeKey;
     if (!preserveActiveTicket) activeBoardTicketId = null;
     boardStatusText = 'Inga Visual board hittades.';
     return;
@@ -15894,6 +16426,7 @@ async function boardLoadTickets(options = {}) {
     return tb - ta;
   });
   boardTicketsLoaded = true;
+  boardTicketsScopeKey = scopeKey;
 
   if (!activeBoardTicketId || !boardTickets.some(t => t.id === activeBoardTicketId)) {
     if (!preserveActiveTicket) {
@@ -16358,18 +16891,10 @@ function boardRefreshIssueTree() {
 boardEnsureAutoSaveTimer();
 
 function boardIssueTreeRowsHtml() {
-  const features = getFeatureItems(allItems);
-  const stories = getStoryItems(allItems);
-  const epics = allItems.filter(i => {
-    if (!isWorkItemType(i, WI_TYPE_EPIC)) return false;
-    const s = workItemStateLower(i);
-    const isCompleted = EXCLUDED_STATES.some(ex => s.includes(ex));
-    if (!isCompleted) return true;
-    if (!showCompletedEpics) return false;
-    const changed = i.fields['System.ChangedDate'];
-    if (!changed) return false;
-    return (Date.now() - new Date(changed).getTime()) / 86400000 <= 180;
-  });
+  const isCompletedItem = (item) => EXCLUDED_STATES.some(ex => workItemStateLower(item).includes(ex));
+  const features = getFeatureItems(allItems).filter(i => showCompletedEpics || !isCompletedItem(i));
+  const stories = getStoryItems(allItems).filter(i => showCompletedEpics || !isCompletedItem(i));
+  const epics = getEpicItems(allItems).filter(i => showCompletedEpics || !isCompletedItem(i));
 
   const groupKey = ep => workItemProject(ep, '–') || '–';
   const groups = [...new Set(epics.map(groupKey))].sort((a, b) => a === '–' ? 1 : b === '–' ? -1 : a.localeCompare(b));
@@ -16396,9 +16921,11 @@ function boardIssueTreeRowsHtml() {
 }
 
 async function renderBoardTab() {
-  if (!boardTicketsLoaded) {
+  const scopeKey = boardSelectedProjectScopeKey();
+  const scopeChanged = boardTicketsScopeKey !== scopeKey;
+  if (!boardTicketsLoaded || scopeChanged) {
     try {
-      await boardLoadTickets();
+      await boardLoadTickets({ preserveActiveTicket: !scopeChanged, forceFresh: scopeChanged });
     } catch (e) {
       boardSetStatus(e.message);
       showToast(e.message);
@@ -16462,6 +16989,11 @@ async function renderBoardTab() {
               <input type="checkbox" id="boardShowTimeAxisToggle" onchange="boardToggleTimeAxis(this.checked)">
               <span>Tid-axel</span>
             </label>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <button class="btn btn-outline btn-xs-icon" style="width:auto;padding:2px 7px;font-size:.75rem;line-height:1;" onclick="boardAdjustTimeScale(-8)" title="Minska avstånd mellan veckstreck">−</button>
+              <span id="boardTimeScaleValue" style="min-width:58px;text-align:center;color:var(--muted);font-size:.68rem;font-family:'JetBrains Mono',monospace;">56 px/v</span>
+              <button class="btn btn-outline btn-xs-icon" style="width:auto;padding:2px 7px;font-size:.75rem;line-height:1;" onclick="boardAdjustTimeScale(8)" title="Öka avstånd mellan veckstreck">+</button>
+            </div>
             <label style="display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted);">
               <input type="checkbox" id="boardTreeLayoutToggle" onchange="boardToggleTreeLayout(this.checked)">
               <span>Trädlayout</span>
@@ -16488,8 +17020,7 @@ async function renderBoardTab() {
                 <div id="boardNativeYMarkers"></div>
               </div>
               <div id="boardNativeTimeAxis" class="board-native-time-axis" style="display:none;">
-                <span id="boardNativeTimeStartDate" class="board-native-time-date board-native-time-date-start"></span>
-                <span id="boardNativeTimeEndDate" class="board-native-time-date board-native-time-date-end"></span>
+                <div id="boardNativeTimeScale" class="board-native-time-scale"></div>
                 <button id="boardNativeTimeStartHandle" class="board-native-time-handle" title="Sätt tidsaxel start"></button>
                 <button id="boardNativeTimeEndHandle" class="board-native-time-handle" title="Sätt tidsaxel slut"></button>
                 <div id="boardNativeTimeMilestones"></div>
@@ -16561,7 +17092,8 @@ setTopSection('backlog');
   const saved = localStorage.getItem(LS_PAT);
   if (saved) {
     patEl.value = saved;
-    loadProjects();
+    // On reload: only load Teams metadata immediately if Team mode is active.
+    loadProjects({ loadTeams: projectPanelMode === 'favorites' });
   }
   patEl.addEventListener('change', () => {
     localStorage.setItem(LS_PAT, patEl.value);
