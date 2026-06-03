@@ -6244,7 +6244,12 @@ async function loadProjects(options = {}) {
             if (t?.name && t?.id) teamIdByName[t.name] = t.id;
           });
           const teams = [...new Set(rawTeams.map(t => t.name).filter(Boolean))]
-            .filter(name => name !== proj)
+            .filter(name => {
+              const trimmed = String(name || '').trim();
+              if (!trimmed) return false;
+              if (trimmed === proj) return false;
+              return true;
+            })
             .sort((a,b) => a.localeCompare(b));
           return { proj, teams, teamIdByName };
         } catch(e) { return { proj, teams: [], teamIdByName: {} }; }
@@ -6363,6 +6368,12 @@ async function fetchItems(options = {}) {
         } catch(e) { 
           // Fall back to no area filter on error
         }
+
+        // Strict team scope: never broaden to whole project when team filter is unresolved.
+        if (!areaFilter) {
+          fetchWarnings.push(`${project} / ${team}: kunde inte läsa teamets områden, hoppar över för att undvika projektomfång.`);
+          continue;
+        }
       }
 
       const wiqlBase = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/wiql?api-version=7.1`;
@@ -6381,18 +6392,8 @@ async function fetchItems(options = {}) {
       const wiqlData = await wiqlRes.json();
       let ids = (wiqlData.workItems || []).map(i => i.id);
 
-      // Some teams can have area mappings that yield 0 rows; retry without team area filter.
-      let usedFallback = false;
-      if (team && areaFilter && ids.length === 0) {
-        const wiqlRetryRes = await apiPost(wiqlBase, buildWiqlBody(''));
-        if (wiqlRetryRes.ok) {
-          const wiqlRetryData = await wiqlRetryRes.json();
-          const retryIds = (wiqlRetryData.workItems || []).map(i => i.id);
-          if (retryIds.length > 0) {
-            ids = retryIds;
-            usedFallback = true;
-          }
-        }
+      if (team && ids.length === 0) {
+        fetchWarnings.push(`${project} / ${team}: inga work items hittades inom teamets område.`);
       }
 
       // Record rank order before batch fetch scrambles it
@@ -6430,39 +6431,7 @@ async function fetchItems(options = {}) {
         items = items.concat(batchData.value || []);
       }
 
-      // Debug & Smart fallback filtering: if team-filtered and got results, analyze area paths
-      if (team && batchItems.length > 0) {
-        // If we used fallback, try to find matching area paths based on team name
-        if (usedFallback && team) {
-          const uniquePaths = [...new Set(batchItems.map(i => i.fields['System.AreaPath']).filter(p => p))];
-          
-          // Try to find areas matching the team name (handle both "Project" and Swedish "Projekt")
-          const teamKeywords = [
-            team,  // "Project Lift_Shift_IP"
-            team.replace(/\s+/g, ''),  // "ProjectLift_Shift_IP"
-            team.split(/\s+/)[0],  // "Project"
-            'Projekt',  // Swedish for Project
-          ];
-          
-          const matchingAreas = uniquePaths.filter(areaPath => {
-            const areaLower = areaPath.toLowerCase();
-            return teamKeywords.some(kw => areaLower.includes(kw.toLowerCase()));
-          });
-          
-          if (matchingAreas.length > 0) {
-            // Filter this team's items (from itemsStartPos onwards) to only matching areas
-            const teamItems = items.slice(itemsStartPos);
-            const filtered = teamItems.filter(item => matchingAreas.includes(item.fields['System.AreaPath']));
-            if (filtered.length > 0) {
-              // Replace this team's items in the main items array
-              items.splice(itemsStartPos, teamItems.length, ...filtered);
-              fetchWarnings.push(`${project} / ${team}: filtrerat till ${filtered.length} items baserat på området "${matchingAreas[0]}"`);
-            }
-          } else {
-            fetchWarnings.push(`${project} / ${team}: teamfilter gav 0 träffar, visade projektdata istället`);
-          }
-        }
-      }
+      // Team scope is now strict; no keyword-based broad fallback filtering.
     }
 
     // Re-sort items into WIQL rank order (batch fetch returns arbitrary order)
