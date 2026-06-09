@@ -161,6 +161,7 @@
   .meta-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
   .meta-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
   .meta-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .meta-grid.cols-1 { grid-template-columns: 1fr; }
 
   .meta-field label {
     display: block;
@@ -236,6 +237,103 @@
     border-color: var(--blue-mid);
     box-shadow: 0 0 0 3px rgba(46,95,163,0.12);
     background: var(--white);
+  }
+
+  .rte-source {
+    display: none !important;
+  }
+
+  .rte-editor {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--input-bg);
+    outline: none;
+    line-height: 1.6;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    min-height: 80px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .rte-editor:focus {
+    border-color: var(--blue-mid);
+    box-shadow: 0 0 0 3px rgba(46,95,163,0.12);
+    background: var(--white);
+  }
+
+  .rte-editor:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .rte-editor p {
+    margin: 0 0 8px 0;
+  }
+
+  .rte-editor p:last-child {
+    margin-bottom: 0;
+  }
+
+  .rte-editor ul,
+  .rte-editor ol {
+    margin: 6px 0 8px 22px;
+    padding: 0;
+  }
+
+  .rte-editor ul {
+    list-style: disc;
+  }
+
+  .rte-editor ol {
+    list-style: decimal;
+  }
+
+  .rte-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .rte-tool-btn {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    line-height: 1;
+    padding: 6px 8px;
+    cursor: pointer;
+  }
+
+  .rte-tool-btn:hover {
+    background: var(--blue-xlight);
+    border-color: var(--blue-mid);
+  }
+
+  .rte-font-size {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    line-height: 1;
+    padding: 5px 6px;
+    cursor: pointer;
+  }
+
+  .rte-font-size:hover,
+  .rte-font-size:focus {
+    border-color: var(--blue-mid);
+    outline: none;
   }
 
   /* ── TABLE ── */
@@ -381,11 +479,14 @@
     </div>
   </div>
 
-  <div class="meta-grid cols-4">
+  <div class="meta-grid cols-3">
     <div class="meta-field"><label>Möte / ämne</label><input type="text" placeholder="Beskriv mötets syfte"></div>
     <div class="meta-field"><label>Datum</label><input type="date"></div>
-    <div class="meta-field"><label>Deltagare</label><input type="text" placeholder="Namn"></div>
     <div class="meta-field"><label>Sammanställd av</label><input type="text" placeholder="Namn"></div>
+  </div>
+
+  <div class="meta-grid cols-1" style="margin-top:0;">
+    <div class="meta-field"><label>Deltagare</label><textarea rows="3" placeholder="Namn, och ev roll etc"></textarea></div>
   </div>
 
   <hr class="divider">
@@ -707,6 +808,236 @@
 </div>
 
 <script>
+  function normalizeToEditableHtml(rawText) {
+    const text = String(rawText || '').trim();
+    if (!text) return '';
+
+    const looksLikeHtml = /<\/?[a-z][\s\S]*>/i.test(text);
+    if (looksLikeHtml) return text;
+
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
+  }
+
+  function normalizeEditorHtml(html) {
+    const raw = String(html || '').trim();
+    if (!raw || raw === '<br>' || raw === '<div><br></div>' || raw === '<p><br></p>') return '';
+    return raw;
+  }
+
+  function initRichTextEditors() {
+    const textareas = Array.from(document.querySelectorAll('textarea'));
+    textareas.forEach((ta, idx) => {
+      if (ta.dataset.rteBound === '1') return;
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'rte-toolbar';
+
+      const editor = document.createElement('div');
+      editor.className = 'rte-editor';
+      editor.contentEditable = 'true';
+      editor.setAttribute('role', 'textbox');
+      editor.setAttribute('aria-multiline', 'true');
+      editor.dataset.placeholder = ta.getAttribute('placeholder') || '';
+
+      const rows = Number(ta.getAttribute('rows') || 4);
+      const computedMinHeight = Math.max(80, rows * 26);
+      editor.style.minHeight = `${computedMinHeight}px`;
+
+      const syncToTextarea = () => {
+        const normalized = normalizeEditorHtml(editor.innerHTML);
+        ta.value = normalized;
+        ta.dataset.rteShadowValue = normalized;
+      };
+
+      let savedRange = null;
+      const saveSelection = () => {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+        const range = sel.getRangeAt(0);
+        if (!editor.contains(range.commonAncestorContainer)) return;
+        savedRange = range.cloneRange();
+      };
+
+      const restoreSelection = () => {
+        if (!savedRange) return false;
+        const sel = window.getSelection();
+        if (!sel) return false;
+        sel.removeAllRanges();
+        sel.addRange(savedRange);
+        return true;
+      };
+
+      const createToolButton = (label, command) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'rte-tool-btn';
+        btn.textContent = label;
+        btn.addEventListener('mousedown', (ev) => {
+          ev.preventDefault();
+          editor.focus();
+          try {
+            document.execCommand(command, false, null);
+          } catch (_) {}
+          syncToTextarea();
+        });
+        return btn;
+      };
+
+      const applyFontSize = (sizePx) => {
+        editor.focus();
+        restoreSelection();
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+
+        const range = sel.getRangeAt(0);
+        if (!editor.contains(range.commonAncestorContainer)) return;
+
+        const getClosestLi = (node) => {
+          let cur = node;
+          while (cur && cur !== editor) {
+            if (cur.nodeType === Node.ELEMENT_NODE && cur.tagName === 'LI') return cur;
+            cur = cur.parentNode;
+          }
+          return null;
+        };
+
+        const listItems = [];
+        const seen = new Set();
+        const startLi = getClosestLi(range.startContainer);
+        if (startLi) {
+          listItems.push(startLi);
+          seen.add(startLi);
+        }
+        const walker = document.createTreeWalker(editor, NodeFilter.SHOW_ELEMENT, {
+          acceptNode(node) {
+            if (node.tagName !== 'LI') return NodeFilter.FILTER_SKIP;
+            try {
+              return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+            } catch (_) {
+              return NodeFilter.FILTER_SKIP;
+            }
+          }
+        });
+        let nextLi = walker.nextNode();
+        while (nextLi) {
+          if (!seen.has(nextLi)) {
+            listItems.push(nextLi);
+            seen.add(nextLi);
+          }
+          nextLi = walker.nextNode();
+        }
+
+        if (listItems.length) {
+          listItems.forEach((li) => {
+            li.style.fontSize = `${sizePx}px`;
+          });
+          saveSelection();
+          syncToTextarea();
+          return;
+        }
+
+        if (range.collapsed) {
+          const span = document.createElement('span');
+          span.style.fontSize = `${sizePx}px`;
+          span.appendChild(document.createTextNode('\u200b'));
+          range.insertNode(span);
+          const nextRange = document.createRange();
+          nextRange.setStart(span.firstChild, 1);
+          nextRange.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(nextRange);
+          savedRange = nextRange.cloneRange();
+        } else {
+          const fragment = range.extractContents();
+          const span = document.createElement('span');
+          span.style.fontSize = `${sizePx}px`;
+          span.appendChild(fragment);
+          range.insertNode(span);
+          const nextRange = document.createRange();
+          nextRange.selectNodeContents(span);
+          sel.removeAllRanges();
+          sel.addRange(nextRange);
+          savedRange = nextRange.cloneRange();
+        }
+
+        syncToTextarea();
+      };
+
+      toolbar.appendChild(createToolButton('B', 'bold'));
+      toolbar.appendChild(createToolButton('I', 'italic'));
+      toolbar.appendChild(createToolButton('• Lista', 'insertUnorderedList'));
+      toolbar.appendChild(createToolButton('1. Lista', 'insertOrderedList'));
+
+      const fontSizeLabel = document.createElement('span');
+      fontSizeLabel.className = 'rte-tool-btn';
+      fontSizeLabel.textContent = 'Storlek:';
+      fontSizeLabel.style.cursor = 'default';
+      toolbar.appendChild(fontSizeLabel);
+
+      [12, 14, 16, 18, 20].forEach((size) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'rte-tool-btn';
+        btn.textContent = String(size);
+        btn.title = `${size} px`;
+        btn.addEventListener('mousedown', (ev) => {
+          ev.preventDefault();
+          applyFontSize(size);
+        });
+        toolbar.appendChild(btn);
+      });
+
+      const syncFromTextarea = () => {
+        const source = normalizeToEditableHtml(ta.value || ta.textContent || '');
+        if (source !== editor.innerHTML) editor.innerHTML = source;
+        ta.dataset.rteShadowValue = normalizeEditorHtml(editor.innerHTML);
+      };
+
+      editor.addEventListener('input', syncToTextarea);
+      editor.addEventListener('blur', syncToTextarea);
+      editor.addEventListener('mouseup', saveSelection);
+      editor.addEventListener('keyup', saveSelection);
+      editor.addEventListener('focus', saveSelection);
+      editor.addEventListener('keydown', (ev) => {
+        if (ev.key !== 'Tab') return;
+        ev.preventDefault();
+        editor.focus();
+        restoreSelection();
+        try {
+          if (ev.shiftKey) document.execCommand('outdent', false, null);
+          else document.execCommand('indent', false, null);
+        } catch (_) {}
+        syncToTextarea();
+        saveSelection();
+      });
+
+      ta.classList.add('rte-source');
+      ta.dataset.rteBound = '1';
+      ta.dataset.rteId = `rte-${idx}`;
+      editor.dataset.rteId = ta.dataset.rteId;
+      toolbar.dataset.rteId = ta.dataset.rteId;
+
+      ta.insertAdjacentElement('afterend', toolbar);
+      ta.insertAdjacentElement('afterend', editor);
+      syncFromTextarea();
+
+      // Support external updates to textarea values (e.g. parent iframe population logic).
+      setInterval(() => {
+        const current = normalizeEditorHtml(editor.innerHTML);
+        const source = normalizeEditorHtml(ta.value);
+        if (document.activeElement === editor) return;
+        if (source !== current) {
+          editor.innerHTML = normalizeToEditableHtml(source);
+          ta.dataset.rteShadowValue = normalizeEditorHtml(editor.innerHTML);
+        }
+      }, 300);
+    });
+  }
+
   function switchTab(idx) {
     document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
     document.querySelectorAll('.page').forEach((p, i) => p.classList.toggle('active', i === idx));
@@ -724,6 +1055,8 @@
     }
     tbody.appendChild(tr);
   }
+
+  initRichTextEditors();
 </script>
 </body>
 </html>

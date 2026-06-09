@@ -7388,6 +7388,16 @@ async function auditUsers() {
   wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><div>Hämtar användare...</div></div>`;
 
   try {
+    const auditRoleFromMember = (member) => {
+      const roleText = String(member?.role || member?.accessLevel || member?.identity?.accessLevel || '').toLowerCase();
+      const isAdmin = Boolean(
+        member?.isTeamAdmin ||
+        member?.identity?.isTeamAdmin ||
+        roleText.includes('admin')
+      );
+      return isAdmin ? 'Admin' : 'User';
+    };
+
     // Collect unique projects from selectedProjects (strip team suffix)
     const projectSet = new Set();
     [...selectedProjects].forEach(key => {
@@ -7415,11 +7425,13 @@ async function auditUsers() {
         const membersData = await membersRes.json();
         (membersData.value || []).forEach(m => {
           const name = m.identity?.displayName || m.displayName || '–';
+          const role = auditRoleFromMember(m);
           const existing = projMembers.find(r => r.name === name);
           if (existing) {
             if (!existing.teams.includes(team.name)) existing.teams.push(team.name);
+            if (role === 'Admin') existing.role = 'Admin';
           } else {
-            projMembers.push({ name, teams: [team.name] });
+            projMembers.push({ name, teams: [team.name], role });
           }
         });
       }
@@ -7449,7 +7461,11 @@ async function auditUsers() {
 function renderAuditTable(data) {
   const wrap = document.getElementById('tableWrap');
   const modeButtons = `
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;">
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-outline" style="width:auto;padding:5px 10px;font-size:0.76rem;" onclick="downloadAuditCSV()" title="Exportera Audit till CSV">CSV</button>
+        <button class="btn btn-outline" style="width:auto;padding:5px 10px;font-size:0.76rem;" onclick="downloadAuditExcel()" title="Exportera Audit till Excel">Excel</button>
+      </div>
       <div class="project-mode-switch" role="group" aria-label="Audit-vy">
         <button class="project-mode-btn ${auditViewMode === 'project' ? 'active' : ''}" onclick="setAuditViewMode('project')">Per Projekt</button>
         <button class="project-mode-btn ${auditViewMode === 'user' ? 'active' : ''}" onclick="setAuditViewMode('user')">Per användare</button>
@@ -7464,10 +7480,12 @@ function renderAuditTable(data) {
         if (!name) return;
         if (!userMap.has(name)) userMap.set(name, new Map());
         const projMap = userMap.get(name);
-        if (!projMap.has(proj)) projMap.set(proj, new Set());
+        if (!projMap.has(proj)) projMap.set(proj, { teams: new Set(), role: 'User' });
+        const projEntry = projMap.get(proj);
+        if (String(m?.role || '').toLowerCase() === 'admin') projEntry.role = 'Admin';
         (m.teams || []).forEach(t => {
           const teamName = String(t || '').trim();
-          if (teamName) projMap.get(proj).add(teamName);
+          if (teamName) projEntry.teams.add(teamName);
         });
       });
     });
@@ -7476,7 +7494,7 @@ function renderAuditTable(data) {
       .map(([name, projMap]) => ({
         name,
         projects: [...projMap.entries()]
-          .map(([proj, teamsSet]) => ({ proj, teams: [...teamsSet].sort((a, b) => a.localeCompare(b, 'sv-SE')) }))
+          .map(([proj, info]) => ({ proj, role: info.role || 'User', teams: [...(info.teams || new Set())].sort((a, b) => a.localeCompare(b, 'sv-SE')) }))
           .sort((a, b) => a.proj.localeCompare(b.proj, 'sv-SE')),
       }))
       .sort((a, b) => a.name.localeCompare(b.name, 'sv-SE'));
@@ -7487,6 +7505,7 @@ function renderAuditTable(data) {
         <tr>
           ${i === 0 ? `<td style="font-size:0.88rem;padding:8px 14px;font-weight:700;vertical-align:top;" rowspan="${user.projects.length}">${escHtml(user.name)}</td>` : ''}
           <td style="font-size:0.88rem;padding:8px 14px;">${escHtml(p.proj)}</td>
+          <td style="font-size:0.84rem;padding:8px 14px;font-family:'JetBrains Mono',monospace;color:${p.role === 'Admin' ? 'var(--accent2)' : 'var(--text)'};">${escHtml(p.role || 'User')}</td>
           <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml(p.teams.join(', '))}</td>
         </tr>`).join('');
     }).join('');
@@ -7494,8 +7513,8 @@ function renderAuditTable(data) {
     document.getElementById('resultInfo').innerHTML = `<strong>${users.length}</strong> användare`;
     wrap.innerHTML = modeButtons + `
       <table>
-        <thead><tr><th>Användare</th><th>Projekt</th><th>Team</th></tr></thead>
-        <tbody>${rowsHtml || '<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted);">Inga användare hittades</td></tr>'}</tbody>
+        <thead><tr><th>Användare</th><th>Projekt</th><th>Behörighet</th><th>Team</th></tr></thead>
+        <tbody>${rowsHtml || '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted);">Inga användare hittades</td></tr>'}</tbody>
       </table>`;
     return;
   }
@@ -7505,16 +7524,17 @@ function renderAuditTable(data) {
     const memberRows = members.map(m => `
       <tr>
         <td style="font-size:0.88rem;padding:8px 14px;">${escHtml(m.name)}</td>
+        <td style="font-size:0.84rem;padding:8px 14px;font-family:'JetBrains Mono',monospace;color:${m.role === 'Admin' ? 'var(--accent2)' : 'var(--text)'};">${escHtml(m.role || 'User')}</td>
         <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml((m.teams || []).join(', '))}</td>
       </tr>`).join('');
     return `
       <tr class="project-row">
-        <td class="title-cell" colspan="2"><a style="color:var(--accent2);text-decoration:none;font-weight:700;">▸ ${escHtml(proj)}</a>
+        <td class="title-cell" colspan="3"><a style="color:var(--accent2);text-decoration:none;font-weight:700;">▸ ${escHtml(proj)}</a>
           <span style="color:var(--muted);font-size:0.84rem;margin-left:8px;">${members.length} användare</span>
         </td>
       </tr>
       ${memberRows}
-      <tr class="separator-row"><td colspan="2"></td></tr>`;
+      <tr class="separator-row"><td colspan="3"></td></tr>`;
   }).join('');
 
   const total = data.reduce((s, d) => s + d.members.length, 0);
@@ -7522,25 +7542,30 @@ function renderAuditTable(data) {
 
   wrap.innerHTML = modeButtons + `
     <table>
-      <thead><tr><th>Namn</th><th>Team</th></tr></thead>
-      <tbody>${rowsHtml || '<tr><td colspan="2" style="text-align:center;padding:24px;color:var(--muted);">Inga användare hittades</td></tr>'}</tbody>
+      <thead><tr><th>Namn</th><th>Behörighet</th><th>Team</th></tr></thead>
+      <tbody>${rowsHtml || '<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted);">Inga användare hittades</td></tr>'}</tbody>
     </table>`;
 }
 
 function renderAuditSearch() {
+  const filtered = getAuditFilteredDataFromSearch();
+  renderAuditTable(filtered);
+}
+
+function getAuditFilteredDataFromSearch() {
   const q = document.getElementById('searchBox').value.toLowerCase().trim();
-  if (!q) { renderAuditTable(auditData); return; }
-  const filtered = auditData.map(({ proj, members }) => {
+  if (!q) return auditData;
+  return auditData.map(({ proj, members }) => {
     const projMatch = String(proj || '').toLowerCase().includes(q);
     if (projMatch) return { proj, members };
     const matchedMembers = (members || []).filter(m => {
       const name = String(m?.name || '').toLowerCase();
       const teams = (m?.teams || []).join(' ').toLowerCase();
-      return name.includes(q) || teams.includes(q);
+      const role = String(m?.role || '').toLowerCase();
+      return name.includes(q) || teams.includes(q) || role.includes(q);
     });
     return { proj, members: matchedMembers };
   }).filter(d => d.members.length > 0);
-  renderAuditTable(filtered);
 }
 
 function setAuditViewMode(mode) {
@@ -7551,13 +7576,10 @@ function setAuditViewMode(mode) {
 }
 
 function downloadAuditCSV() {
-  const q = document.getElementById('searchBox').value.toLowerCase();
-  const data = q
-    ? auditData.map(({ proj, members }) => ({ proj, members: members.filter(m => m.name.toLowerCase().includes(q)) })).filter(d => d.members.length)
-    : auditData;
-  const rows = [['Projekt', 'Namn', 'Team']];
+  const data = getAuditFilteredDataFromSearch();
+  const rows = [['Projekt', 'Namn', 'Behörighet', 'Team']];
   data.forEach(({ proj, members }) => {
-    members.forEach(m => rows.push([proj, m.name, m.teams.join('; ')]));
+    members.forEach(m => rows.push([proj, m.name, m.role || 'User', m.teams.join('; ')]));
   });
   const csv = '\uFEFF' + rows.map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
@@ -7566,6 +7588,59 @@ function downloadAuditCSV() {
   a.download = 'audit_users.csv';
   a.click();
   URL.revokeObjectURL(objectUrl);
+}
+
+function downloadAuditExcel() {
+  const data = getAuditFilteredDataFromSearch();
+  const rows = [];
+  data.forEach(({ proj, members }) => {
+    (members || []).forEach(m => {
+      rows.push([
+        String(proj || ''),
+        String(m?.name || ''),
+        String(m?.role || 'User'),
+        String((m?.teams || []).join('; ')),
+      ]);
+    });
+  });
+
+  const esc = (v) => String(v || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+  const tableRows = rows.length
+    ? rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')
+    : '<tr><td></td><td></td><td></td><td></td></tr>';
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+table { border-collapse: collapse; font-family: Calibri, Arial, sans-serif; font-size: 12px; }
+th, td { border: 1px solid #c7c7c7; padding: 6px 8px; text-align: left; }
+th { background: #f2f2f2; font-weight: 700; }
+</style>
+</head>
+<body>
+<table>
+  <thead>
+    <tr><th>Projekt</th><th>Namn</th><th>Behörighet</th><th>Team</th></tr>
+  </thead>
+  <tbody>${tableRows}</tbody>
+</table>
+</body>
+</html>`;
+
+  const blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'audit_users.xls';
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 // ──────────────────────────────────────────
