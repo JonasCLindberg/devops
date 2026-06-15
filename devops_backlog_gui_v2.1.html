@@ -2632,10 +2632,10 @@
 
   .rm-grid-body { flex:1; overflow:auto; }
   .rm-grid-lane {
-    border-top:1px dashed rgba(125,133,144,.35);
+    border-top:2px dashed rgba(125,133,144,.35);
     padding:6px 0 10px;
   }
-  .rm-grid-lane:last-child { border-bottom:1px dashed rgba(125,133,144,.35); }
+  .rm-grid-lane:last-child { border-bottom:2px dashed rgba(125,133,144,.35); }
   .rm-grid-lane-title {
     font-size:0.88rem;
     font-family:'JetBrains Mono',monospace;
@@ -6281,32 +6281,29 @@ async function loadProjects(options = {}) {
 
     const projectNames = await fetchProjectNames();
 
-    let teamResults = projectNames.map(proj => ({ proj, teams: [], teamIdByName: {} }));
-    if (loadTeams) {
-      // Fetch teams for each project in parallel.
-      teamResults = await Promise.all(projectNames.map(async proj => {
-        try {
-          const rawTeams = await fetchProjectTeams(proj);
-          const teamIdByName = {};
-          rawTeams.forEach(t => {
-            if (t?.name && t?.id) teamIdByName[t.name] = t.id;
-          });
-          const teams = [...new Set(rawTeams.map(t => t.name).filter(Boolean))]
-            .filter(name => {
-              const trimmed = String(name || '').trim();
-              if (!trimmed) return false;
-              if (trimmed === proj) return false;
-              return true;
-            })
-            .sort((a,b) => a.localeCompare(b));
-          return { proj, teams, teamIdByName };
-        } catch(e) { return { proj, teams: [], teamIdByName: {} }; }
-      }));
-    }
+    // Project mode needs team metadata immediately; favorites loading stays optional below.
+    const teamResults = await Promise.all(projectNames.map(async proj => {
+      try {
+        const rawTeams = await fetchProjectTeams(proj);
+        const teamIdByName = {};
+        rawTeams.forEach(t => {
+          if (t?.name && t?.id) teamIdByName[t.name] = t.id;
+        });
+        const teams = [...new Set(rawTeams.map(t => t.name).filter(Boolean))]
+          .filter(name => {
+            const trimmed = String(name || '').trim();
+            if (!trimmed) return false;
+            if (trimmed === proj) return false;
+            return true;
+          })
+          .sort((a,b) => a.localeCompare(b));
+        return { proj, teams, teamIdByName };
+      } catch(e) { return { proj, teams: [], teamIdByName: {} }; }
+    }));
 
     // Build structured list: [{proj, teams:[]}]
     window._projectTeams = teamResults;
-    window._projectTeamsLoaded = !!loadTeams;
+    window._projectTeamsLoaded = true;
     window._allProjects = projectNames; // keep for compat
 
     if (loadTeams) {
@@ -12137,8 +12134,8 @@ function renderEstimering() {
   });
 
   const epics   = getEpicItems(items);
-  const features = getFeatureItems(allItems);
-  const stories = getStoryItems(allItems);
+  const features = getFeatureItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
+  const stories = getStoryItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
 
   let filtered = epics;
   if (estTargetappsFilter && selectedProjects.has('Roadmap')) {
@@ -12374,8 +12371,8 @@ function renderPrioritering() {
   const wrap = document.getElementById('tableWrap');
   // ── 1. Data preparation: source lists, filters, model inputs ──
   const PRIO_LIST_W = HIERARCHY_LIST_WIDTH;
-  const features = getFeatureItems(allItems);
-  const stories = getStoryItems(allItems);
+  const features = getFeatureItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
+  const stories = getStoryItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
   const epics = allItems.filter(i => {
     if (!isWorkItemType(i, WI_TYPE_EPIC)) return false;
     const s = workItemStateLower(i);
@@ -12890,8 +12887,8 @@ function renderTimeline() {
     }
     return false;
   });
-  const features = getFeatureItems(allItems);
-  const stories = getStoryItems(allItems);
+  const features = getFeatureItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
+  const stories = getStoryItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
   const appKey = ep => standardHierarchyGroupLabel(ep, timelineGroupMode);
 
   // Build rows early (needed for label/date/chart rendering below)
@@ -18098,7 +18095,7 @@ setTopSection('backlog');
   const saved = localStorage.getItem(LS_PAT);
   if (saved) {
     patEl.value = saved;
-    // On reload: only load Teams metadata immediately if Team mode is active.
+    // On reload: team metadata is needed for Project mode; favorites data is loaded on demand.
     loadProjects({ loadTeams: projectPanelMode === 'favorites' });
   }
   patEl.addEventListener('change', () => {

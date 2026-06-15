@@ -59,12 +59,12 @@
   body.light-mode .tshirt-xxl { background:rgba(106,27,154,.12);  color:#6a1b9a; }
   body.light-mode .tshirt-xxxl { background:rgba(74,20,140,.12);  color:#4a148c; }
 
-  body.light-mode .roadmap-now      { background:rgba(27,94,32,.12);   color:#1b5e20; }
-  body.light-mode .roadmap-next     { background:rgba(13,71,161,.12);  color:#0d47a1; }
-  body.light-mode .roadmap-later    { background:rgba(183,28,28,.12);  color:#b71c1c; }
-  body.light-mode .roadmap-finishing { background:rgba(130,87,0,.12);  color:#825500; }
-  body.light-mode .roadmap-continous { background:rgba(106,27,154,.12);color:#6a1b9a; }
-  body.light-mode .roadmap-completed { background:rgba(80,70,60,.12);   color:#4a3f3a; }
+  body.light-mode .roadmap-now      { background:rgba(27,94,32,.18);   color:#0b3d13; }
+  body.light-mode .roadmap-next     { background:rgba(13,71,161,.18);  color:#062f70; }
+  body.light-mode .roadmap-later    { background:rgba(183,28,28,.18);  color:#7f1414; }
+  body.light-mode .roadmap-finishing { background:rgba(130,87,0,.18);  color:#563900; }
+  body.light-mode .roadmap-continous { background:rgba(106,27,154,.18);color:#44156b; }
+  body.light-mode .roadmap-completed { background:rgba(80,70,60,.18);   color:#231d1a; }
 
   body.light-mode .prio-must   { background:rgba(183,28,28,.1);  color:#b71c1c; border-color:rgba(183,28,28,.3); }
   body.light-mode .prio-should { background:rgba(130,87,0,.1);   color:#825500; border-color:rgba(130,87,0,.3); }
@@ -130,12 +130,12 @@
   body.bdo-mode .epic-link          { color: #c40020; }
   body.bdo-mode .tshirt-xxl         { background: rgba(0,96,184,.10);  color: #004a90; }
   body.bdo-mode .tshirt-xxxl        { background: rgba(0,60,140,.10);  color: #003080; }
-  body.bdo-mode .roadmap-now        { background: rgba(27,122,58,.12);  color: #1b5e20; }
-  body.bdo-mode .roadmap-next       { background: rgba(0,96,184,.12);   color: #004a90; }
-  body.bdo-mode .roadmap-later      { background: rgba(196,0,32,.12);   color: #c40020; }
-  body.bdo-mode .roadmap-finishing  { background: rgba(176,96,0,.12);   color: #8a5000; }
-  body.bdo-mode .roadmap-continous  { background: rgba(0,60,140,.12);   color: #003080; }
-  body.bdo-mode .roadmap-completed  { background: rgba(100,124,144,.12);color: #4a6070; }
+  body.bdo-mode .roadmap-now        { background: rgba(27,122,58,.18);  color: #0f4726; }
+  body.bdo-mode .roadmap-next       { background: rgba(0,96,184,.18);   color: #002f5b; }
+  body.bdo-mode .roadmap-later      { background: rgba(196,0,32,.18);   color: #840015; }
+  body.bdo-mode .roadmap-finishing  { background: rgba(176,96,0,.18);   color: #5b3200; }
+  body.bdo-mode .roadmap-continous  { background: rgba(0,60,140,.18);   color: #001d49; }
+  body.bdo-mode .roadmap-completed  { background: rgba(100,124,144,.18);color: #243442; }
   body.bdo-mode .badge-state,
   body.bdo-mode .badge-state-new     { background: rgba(100,124,144,.10); color: #4a6070; }
   body.bdo-mode .badge-state-active  { background: rgba(0,96,184,.12);   color: #004a90; font-weight:600; }
@@ -1914,12 +1914,12 @@
   .tshirt-xxxl { background:rgba(132,90,223,.20); color:#e2ccff; }
 
   /* Roadmap badges */
-  .roadmap-now      { background:rgba(63,185,80,.20);   color:#6bdb78; }
-  .roadmap-next     { background:rgba(88,166,255,.20);  color:#79c0ff; }
-  .roadmap-later    { background:rgba(248,81,73,.18);   color:#ff8a80; }
-  .roadmap-finishing { background:rgba(210,153,34,.20);  color:#f0c040; }
-  .roadmap-continous { background:rgba(167,105,218,.20); color:#d2a8ff; }
-  .roadmap-completed { background:rgba(125,133,144,.20); color:#b0bcc8; }
+  .roadmap-now      { background:rgba(63,185,80,.28);   color:#8df0a0; }
+  .roadmap-next     { background:rgba(88,166,255,.28);  color:#9ecdff; }
+  .roadmap-later    { background:rgba(248,81,73,.26);   color:#ffb0a9; }
+  .roadmap-finishing { background:rgba(210,153,34,.28);  color:#ffd36a; }
+  .roadmap-continous { background:rgba(167,105,218,.28); color:#e2bbff; }
+  .roadmap-completed { background:rgba(125,133,144,.28); color:#d0d7e2; }
 
   /* Desc icon next to ID */
   .descr-icon {
@@ -2568,21 +2568,36 @@
   .rm-col { flex:1; display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
   .rm-col:last-child { border-right:none; }
   .rm-col-header { padding:12px 16px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; border-bottom:2px solid; flex-shrink:0; }
-  .rm-col-now    .rm-col-header { color:#6bdb78; border-color:#6bdb78; background:rgba(63,185,80,.06); }
-  .rm-col-next   .rm-col-header { color:#79c0ff; border-color:#79c0ff; background:rgba(88,166,255,.06); }
-  .rm-col-later  .rm-col-header { color:#ff8a80; border-color:#ff8a80; background:rgba(248,81,73,.06); }
-  .rm-col-finishing .rm-col-header { color:#f0c040; border-color:#f0c040; background:rgba(210,153,34,.06); }
-  .rm-col-continous .rm-col-header { color:#d2a8ff; border-color:#d2a8ff; background:rgba(167,105,218,.06); }
-  .rm-col-completed .rm-col-header { color:#b0bcc8; border-color:#b0bcc8; background:rgba(125,133,144,.06); }
-  .rm-simple-group { padding:4px 0 2px; }
+  .rm-col-now    .rm-col-header { color:#8df0a0; border-color:#8df0a0; background:rgba(63,185,80,.13); }
+  .rm-col-next   .rm-col-header { color:#9ecdff; border-color:#9ecdff; background:rgba(88,166,255,.13); }
+  .rm-col-later  .rm-col-header { color:#ffb0a9; border-color:#ffb0a9; background:rgba(248,81,73,.13); }
+  .rm-col-finishing .rm-col-header { color:#ffd36a; border-color:#ffd36a; background:rgba(210,153,34,.13); }
+  .rm-col-continous .rm-col-header { color:#e2bbff; border-color:#e2bbff; background:rgba(167,105,218,.13); }
+  .rm-col-completed .rm-col-header { color:#d0d7e2; border-color:#d0d7e2; background:rgba(125,133,144,.13); }
+  .rm-simple-group { padding:0; }
   .rm-simple-group-label { font-size:0.86rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.06em; color:var(--accent2); padding:6px 12px 3px; font-weight:700; }
   .rm-simple-row { display:flex; align-items:center; gap:6px; padding:3px 12px 3px 20px; cursor:pointer; border-radius:3px; transition:background .1s; }
   .rm-simple-row:hover { background:rgba(88,166,255,.07); }
   .rm-simple-row::before { content:'◆'; font-size:0.45rem; color:var(--muted); flex-shrink:0; }
   .rm-simple-title { font-size:0.84rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .rm-col-body { flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:8px; }
+  .rm-col-body { flex:1; overflow-y:auto; padding:8px 10px 12px; display:flex; flex-direction:column; gap:0; }
+  .rm-lane-row {
+    border-top: 1px dashed rgba(125,133,144,.35);
+    padding: 8px 0 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rm-lane-row:last-child { border-bottom: 1px dashed rgba(125,133,144,.35); }
+  .rm-lane-empty {
+    font-size: 0.76rem;
+    color: var(--muted);
+    opacity: 0.55;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 10px 0;
+  }
   .rm-swimlane { margin-bottom:4px; }
-  .rm--label { font-size:0.88rem; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--accent2); padding:6px 2px 8px; border-bottom:1px solid var(--border); margin-bottom:8px; letter-spacing:.02em; }
+  .rm--label { font-size:0.88rem; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--accent2); padding:4px 2px 6px; border-bottom:1px solid var(--border); margin-bottom:6px; letter-spacing:.02em; }
   .rm-draggable { cursor: grab; }
   .rm-draggable:active { cursor: grabbing; opacity: 0.7; }
   .rm-col-drag-over { outline: 2px dashed var(--accent2); outline-offset: -4px; background: rgba(88,166,255,.06); }
@@ -2592,13 +2607,85 @@
   .kost-mac-block-over .kost-mac-drop-hint { display: block !important; }
   .rm-col-ejsatt .rm-col-header { color: var(--muted); }
 
+  .rm-grid { display:flex; flex-direction:column; flex:1; overflow:hidden; }
+  .rm-grid-head {
+    display:grid;
+    border-bottom:1px solid var(--border);
+    background:var(--surface2);
+    flex-shrink:0;
+  }
+  .rm-grid-head-cell {
+    border-right:1px solid var(--border);
+    min-width:0;
+  }
+  .rm-grid-head-cell:last-child { border-right:none; }
+  .rm-grid-head-cell .rm-col-header { margin:0; border-bottom:none; }
+
+  /* Header color variants when state class sits on the header element itself */
+  .rm-col-header.rm-col-now { color:#8df0a0; border-color:#8df0a0; background:rgba(63,185,80,.13); }
+  .rm-col-header.rm-col-next { color:#9ecdff; border-color:#9ecdff; background:rgba(88,166,255,.13); }
+  .rm-col-header.rm-col-later { color:#ffb0a9; border-color:#ffb0a9; background:rgba(248,81,73,.13); }
+  .rm-col-header.rm-col-finishing { color:#ffd36a; border-color:#ffd36a; background:rgba(210,153,34,.13); }
+  .rm-col-header.rm-col-continous { color:#e2bbff; border-color:#e2bbff; background:rgba(167,105,218,.13); }
+  .rm-col-header.rm-col-completed { color:#d0d7e2; border-color:#d0d7e2; background:rgba(125,133,144,.13); }
+  .rm-col-header.rm-col-ejsatt { color:var(--muted); border-color:var(--muted); background:rgba(125,133,144,.06); }
+
+  .rm-grid-body { flex:1; overflow:auto; }
+  .rm-grid-lane {
+    border-top:2px dashed rgba(125,133,144,.35);
+    padding:6px 0 10px;
+  }
+  .rm-grid-lane:last-child { border-bottom:2px dashed rgba(125,133,144,.35); }
+  .rm-grid-lane-title {
+    font-size:0.88rem;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    color:var(--accent2);
+    letter-spacing:.02em;
+    padding:4px 12px 7px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:8px;
+  }
+  .rm-grid-lane-cells {
+    display:grid;
+  }
+  .rm-grid-cell {
+    padding:2px 10px 4px;
+    border-right:1px solid var(--border);
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .rm-grid-cell:last-child { border-right:none; }
+
+  body.light-mode .rm-col-header.rm-col-now { color:#0b3d13; border-color:#0b3d13; background:rgba(27,94,32,.14); }
+  body.light-mode .rm-col-header.rm-col-next { color:#062f70; border-color:#062f70; background:rgba(13,71,161,.14); }
+  body.light-mode .rm-col-header.rm-col-later { color:#7f1414; border-color:#7f1414; background:rgba(183,28,28,.14); }
+  body.light-mode .rm-col-header.rm-col-finishing { color:#563900; border-color:#563900; background:rgba(130,87,0,.14); }
+  body.light-mode .rm-col-header.rm-col-continous { color:#44156b; border-color:#44156b; background:rgba(106,27,154,.14); }
+  body.light-mode .rm-col-header.rm-col-completed { color:#231d1a; border-color:#231d1a; background:rgba(80,70,60,.14); }
+  body.bdo-mode .rm-col-header.rm-col-now { color:#0f4726; border-color:#0f4726; background:rgba(27,122,58,.14); }
+  body.bdo-mode .rm-col-header.rm-col-next { color:#002f5b; border-color:#002f5b; background:rgba(0,96,184,.14); }
+  body.bdo-mode .rm-col-header.rm-col-later { color:#840015; border-color:#840015; background:rgba(196,0,32,.14); }
+  body.bdo-mode .rm-col-header.rm-col-finishing { color:#5b3200; border-color:#5b3200; background:rgba(176,96,0,.14); }
+  body.bdo-mode .rm-col-header.rm-col-continous { color:#001d49; border-color:#001d49; background:rgba(0,60,140,.14); }
+  body.bdo-mode .rm-col-header.rm-col-completed { color:#243442; border-color:#243442; background:rgba(100,124,144,.14); }
+  body.light-mode .rm-col-header.rm-col-ejsatt { color:#4a3f3a; border-color:#4a3f3a; background:rgba(80,70,60,.07); }
+
   /* Light mode: roadmap column headers */
-  body.light-mode .rm-col-now      .rm-col-header { color:#1b5e20; border-color:#1b5e20; background:rgba(27,94,32,.07); }
-  body.light-mode .rm-col-next     .rm-col-header { color:#0d47a1; border-color:#0d47a1; background:rgba(13,71,161,.07); }
-  body.light-mode .rm-col-later    .rm-col-header { color:#b71c1c; border-color:#b71c1c; background:rgba(183,28,28,.07); }
-  body.light-mode .rm-col-finishing .rm-col-header { color:#825500; border-color:#825500; background:rgba(130,87,0,.07); }
-  body.light-mode .rm-col-continous .rm-col-header { color:#6a1b9a; border-color:#6a1b9a; background:rgba(106,27,154,.07); }
-  body.light-mode .rm-col-completed .rm-col-header { color:#4a3f3a; border-color:#4a3f3a; background:rgba(80,70,60,.07); }
+  body.light-mode .rm-col-now      .rm-col-header { color:#0b3d13; border-color:#0b3d13; background:rgba(27,94,32,.14); }
+  body.light-mode .rm-col-next     .rm-col-header { color:#062f70; border-color:#062f70; background:rgba(13,71,161,.14); }
+  body.light-mode .rm-col-later    .rm-col-header { color:#7f1414; border-color:#7f1414; background:rgba(183,28,28,.14); }
+  body.light-mode .rm-col-finishing .rm-col-header { color:#563900; border-color:#563900; background:rgba(130,87,0,.14); }
+  body.light-mode .rm-col-continous .rm-col-header { color:#44156b; border-color:#44156b; background:rgba(106,27,154,.14); }
+  body.light-mode .rm-col-completed .rm-col-header { color:#231d1a; border-color:#231d1a; background:rgba(80,70,60,.14); }
+  body.bdo-mode .rm-col-now      .rm-col-header { color:#0f4726; border-color:#0f4726; background:rgba(27,122,58,.14); }
+  body.bdo-mode .rm-col-next     .rm-col-header { color:#002f5b; border-color:#002f5b; background:rgba(0,96,184,.14); }
+  body.bdo-mode .rm-col-later    .rm-col-header { color:#840015; border-color:#840015; background:rgba(196,0,32,.14); }
+  body.bdo-mode .rm-col-finishing .rm-col-header { color:#5b3200; border-color:#5b3200; background:rgba(176,96,0,.14); }
+  body.bdo-mode .rm-col-continous .rm-col-header { color:#001d49; border-color:#001d49; background:rgba(0,60,140,.14); }
+  body.bdo-mode .rm-col-completed .rm-col-header { color:#243442; border-color:#243442; background:rgba(100,124,144,.14); }
 
   .rm-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; cursor:pointer; transition:border-color .15s, box-shadow .15s; }
   .rm-card:hover { border-color:var(--accent2); box-shadow:0 2px 12px rgba(0,0,0,.3); }
@@ -2836,7 +2923,7 @@
       <div class="checkbox-group" id="projectCheckboxes">
         <div class="project-placeholder">Hämtar team...</div>
       </div>
-      <button class="btn btn-outline create-favorite-main-btn" id="createFavoriteMainBtn" onclick="createFavorite()" title="Skapa team" aria-label="Skapa team">+</button>
+      <button class="btn btn-outline create-favorite-main-btn" id="createFavoriteMainBtn" onclick="createFavorite()" title="Skapa team" aria-label="Skapa team">Skapa team</button>
     </div>
 
     <hr class="divider"/>
@@ -2845,9 +2932,6 @@
     <div class="sidebar-actions">
       <button class="btn btn-primary" id="fetchBtn" onclick="fetchData()" disabled>
         <span>🔍</span> Hämta data
-      </button>
-      <button class="btn btn-outline" id="createTeamFromProjectsBtn" onclick="createTeamFromCurrentProjects()" disabled>
-        <span>👥</span> Skapa team
       </button>
 
     </div>
@@ -3750,6 +3834,12 @@ function expandAllEpicsAndFeatures(items = allItems) {
   getFeatureItems(items).forEach(i => expandedFeatureIds.add(i.id));
 }
 
+function expandEpicsOneStep(items = allItems) {
+  getEpicItems(items).forEach(i => expandedEpicIds.add(i.id));
+  // One-step expand keeps the next level collapsed until user expands it explicitly.
+  expandedFeatureIds.clear();
+}
+
 // ──────────────────────────────────────────
 // State
 // ──────────────────────────────────────────
@@ -3793,7 +3883,7 @@ let dashEffortMode = false;
 let tshirtCalcMode = false;
 let kalkylMode = false;
 let kalkylSwimBy = 'ao';
-let roadmapSwimBy = 'ao';
+let roadmapSwimBy = 'app';
 let activeTab = 'backlog';
 let activeSection = 'backlog';
 let workItemModalOriginTab = null;
@@ -4056,12 +4146,7 @@ const LS_FAVORITES_STORAGE_PROJECT = 'devops_favorites_storage_project_v1';
 const FAVORITES_WI_TYPE_DEFAULT = 'Teamref';
 const LS_FAVORITES_WI_TYPE = 'devops_favorites_wi_type_v1';
 const FAVORITES_FIELD_REF = 'Custom.teamprojekt';
-const FAVORITES_FIELD_REFS = [
-  FAVORITES_FIELD_REF,
-  'Custom.Teamprojekt',
-  'Custom.teamProjekt',
-  'Custom.teamProject',
-];
+const FAVORITES_FIELD_REFS = [FAVORITES_FIELD_REF];
 let hiddenProjects = new Set();
 try {
   hiddenProjects = new Set(JSON.parse(localStorage.getItem(LS_PROJ_KEY) || '[]'));
@@ -5372,31 +5457,11 @@ function parseApiErrorText(text, fallback = '') {
 }
 
 async function fetchFavoriteWorkItemsForProject(project) {
-  const wiTypes = [...new Set([
-    activeFavoritesWiType(),
-    FAVORITES_WI_TYPE_DEFAULT,
-    'Teamdef',
-  ].map(t => String(t || '').trim()).filter(Boolean))];
-
-  // Expand with any process-specific team-like types in this project.
-  try {
-    const typeDefs = await fetchWorkItemTypesForProject(project);
-    typeDefs.forEach(t => {
-      const n = String(t?.name || '').trim();
-      const r = String(t?.referenceName || '').trim();
-      if (/team/i.test(n) || /team/i.test(r)) wiTypes.push(n || r);
-    });
-  } catch (_) {
-    // Ignore type lookup errors and continue with default type candidates.
-  }
-
   const escProject = String(project || '').replace(/'/g, "''");
   const wiqlUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/wiql?api-version=7.1`;
-  const wiTypeClause = [...new Set(wiTypes.map(t => String(t || '').trim()).filter(Boolean))]
-    .map(t => `'${t.replace(/'/g, "''")}'`).join(', ');
+  const wiTypeClause = `'${FAVORITES_WI_TYPE_DEFAULT.replace(/'/g, "''")}'`;
   const queryByType = `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' AND [System.WorkItemType] IN (${wiTypeClause}) ORDER BY [System.ChangedDate] DESC`;
   let ids = [];
-  let broadFallbackUsed = false;
 
   const wiqlRes = await apiPost(wiqlUrl, { query: queryByType });
   if (wiqlRes.ok) {
@@ -5405,22 +5470,6 @@ async function fetchFavoriteWorkItemsForProject(project) {
   } else {
     const txt = await wiqlRes.text().catch(() => '');
     throw new Error(parseApiErrorText(txt, `WIQL ${project} ${wiqlRes.status}`));
-  }
-
-  // Fallback: team work item type can differ between processes.
-  // Query recent work items and keep only those that look like team definitions by field/title.
-  if (!ids.length) {
-    try {
-      const fallbackQuery = `SELECT TOP 2000 [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' ORDER BY [System.ChangedDate] DESC`;
-      const fallbackRes = await apiPost(wiqlUrl, { query: fallbackQuery });
-      if (fallbackRes.ok) {
-        const fallbackData = await fallbackRes.json();
-        ids = (fallbackData.workItems || []).map(w => Number(w.id)).filter(Number.isFinite);
-        broadFallbackUsed = true;
-      }
-    } catch (_) {
-      // Ignore fallback parsing/query errors and continue with empty result.
-    }
   }
 
   if (!ids.length) return [];
@@ -5463,7 +5512,6 @@ async function fetchFavoriteWorkItemsForProject(project) {
       .map(ref => item?.fields?.[ref])
       .find(v => v != null && String(v).trim() !== '');
     const keys = favoriteFieldToKeys(fieldValue);
-    if (broadFallbackUsed && keys.length === 0 && !/team/i.test(title)) return null;
     return {
       id: `wi_${wiId}`,
       name: title || `Team ${wiId}`,
@@ -6233,32 +6281,29 @@ async function loadProjects(options = {}) {
 
     const projectNames = await fetchProjectNames();
 
-    let teamResults = projectNames.map(proj => ({ proj, teams: [], teamIdByName: {} }));
-    if (loadTeams) {
-      // Fetch teams for each project in parallel.
-      teamResults = await Promise.all(projectNames.map(async proj => {
-        try {
-          const rawTeams = await fetchProjectTeams(proj);
-          const teamIdByName = {};
-          rawTeams.forEach(t => {
-            if (t?.name && t?.id) teamIdByName[t.name] = t.id;
-          });
-          const teams = [...new Set(rawTeams.map(t => t.name).filter(Boolean))]
-            .filter(name => {
-              const trimmed = String(name || '').trim();
-              if (!trimmed) return false;
-              if (trimmed === proj) return false;
-              return true;
-            })
-            .sort((a,b) => a.localeCompare(b));
-          return { proj, teams, teamIdByName };
-        } catch(e) { return { proj, teams: [], teamIdByName: {} }; }
-      }));
-    }
+    // Project mode needs team metadata immediately; favorites loading stays optional below.
+    const teamResults = await Promise.all(projectNames.map(async proj => {
+      try {
+        const rawTeams = await fetchProjectTeams(proj);
+        const teamIdByName = {};
+        rawTeams.forEach(t => {
+          if (t?.name && t?.id) teamIdByName[t.name] = t.id;
+        });
+        const teams = [...new Set(rawTeams.map(t => t.name).filter(Boolean))]
+          .filter(name => {
+            const trimmed = String(name || '').trim();
+            if (!trimmed) return false;
+            if (trimmed === proj) return false;
+            return true;
+          })
+          .sort((a,b) => a.localeCompare(b));
+        return { proj, teams, teamIdByName };
+      } catch(e) { return { proj, teams: [], teamIdByName: {} }; }
+    }));
 
     // Build structured list: [{proj, teams:[]}]
     window._projectTeams = teamResults;
-    window._projectTeamsLoaded = !!loadTeams;
+    window._projectTeamsLoaded = true;
     window._allProjects = projectNames; // keep for compat
 
     if (loadTeams) {
@@ -9917,7 +9962,6 @@ function sprintBindFocusControls(wrap) {
   wrap.querySelectorAll('.sprint-focus-list-filter-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      expandAllEpicsAndFeatures(allItems);
       sprintFocusListOnlyCurrent = !sprintFocusListOnlyCurrent;
       scheduleSprintRender();
     });
@@ -9931,7 +9975,7 @@ function sprintBindFocusControls(wrap) {
         expandedEpicIds.clear();
         expandedFeatureIds.clear();
       } else {
-        expandAllEpicsAndFeatures(allItems);
+        expandEpicsOneStep(allItems);
       }
       scheduleSprintRender();
     });
@@ -9949,9 +9993,6 @@ function sprintBindFocusControls(wrap) {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       sprintFocusGroupByGoal = !sprintFocusGroupByGoal;
-      if (sprintFocusGroupByGoal) {
-        expandAllEpicsAndFeatures(allItems);
-      }
       scheduleSprintRender();
     });
   });
@@ -10644,11 +10685,7 @@ function renderSprintGoals() {
       return p ? sprintPathIdentity(p) : '';
     };
 
-    // Group mode should always work on a fully visible hierarchy.
-    if (sprintFocusGroupByGoal) {
-      epics.forEach(ep => expandedEpicIds.add(ep.id));
-      features.forEach(ft => expandedFeatureIds.add(ft.id));
-    }
+    // Keep user-controlled expansion state in focus mode; do not auto-expand on re-render.
 
     // Build groupKey function based on sprintFocusListGroupMode
     const AFFARSOM_FIELD_SF = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
@@ -11746,14 +11783,15 @@ const RM_COLS_BASE = [
 ];
 const RM_COLS_ALL = [
   { key: 'Completed', cls: 'rm-col-completed' },
-  { key: 'Finishing', cls: 'rm-col-finishing' },
   { key: 'Continous', cls: 'rm-col-continous' },
+  { key: 'Finishing', cls: 'rm-col-finishing' },
   { key: 'Now',       cls: 'rm-col-now' },
   { key: 'Next',      cls: 'rm-col-next' },
   { key: 'Later',     cls: 'rm-col-later' },
 ];
 let rmShowAll = false;
-let rmSimpleMode = false;
+let rmSimpleMode = true;
+let rmSwimBySuperEpic = false;
 let rmEditMode = false;  // Kept for Roadmap dragging — uses globalEditMode for edit state
 const AFFARSOM_FIELD_RM = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
 
@@ -11782,9 +11820,10 @@ async function rmDropEpic(event, newRoadmapVal) {
 
 function renderRoadmapView() {
   const wrap = document.getElementById('tableWrap');
-  const swimCheckedRM = roadmapSwimBy === 'app' ? 'checked' : '';
+  const swimCheckedRM = roadmapSwimBy === 'ao' ? 'checked' : '';
   const toggleCheckedAll = rmShowAll ? 'checked' : '';
-  const toggleSimple = rmSimpleMode ? 'checked' : '';
+  const toggleDetailed = rmSimpleMode ? '' : 'checked';
+  const toggleSwimBySuperEpic = rmSwimBySuperEpic ? 'checked' : '';
 
   // Build effort/feature/story counts per epic
   // First pass: map features to their epic parent
@@ -11816,12 +11855,16 @@ function renderRoadmapView() {
   const rmColKeys = RM_COLS.map(c => c.key);
   const epics = getEpicItems(allItems).filter(i => {
     const rm = roadmapValue(i, '');
-    return rmColKeys.includes(rm) || (rmShowAll && !rm);
+    if (!(rmColKeys.includes(rm) || (rmShowAll && !rm))) return false;
+    const superEpic = String(i?.fields?.['Custom.SuperEpic'] || '').trim();
+    if (rmSwimBySuperEpic && !superEpic) return false;
+    return true;
   }
   );
 
   // Swimlane grouping key
   const getSwimKey = epic => {
+    if (rmSwimBySuperEpic) return String(epic.fields['Custom.SuperEpic'] || '').trim() || '–';
     if (roadmapSwimBy === 'ao') return epic.fields[AFFARSOM_FIELD_RM] || '–';
     return workItemProject(epic, 'Okänt');
   };
@@ -11970,72 +12013,71 @@ function renderRoadmapView() {
 
   const toggleBar = `<div class="rm--toggle" style="border-top:2px solid var(--border);">
       <span>Sortering:</span>
-      <span style="${roadmapSwimBy === 'ao' ? 'color:var(--accent2);font-weight:600;' : ''}">Affärsområde</span>
+      <span style="${roadmapSwimBy === 'app' ? 'color:var(--accent2);font-weight:600;' : ''}">Projekt</span>
       <label class="toggle-wrap" style="margin:0">
-        <input type="checkbox" ${swimCheckedRM} onchange="roadmapSwimBy=this.checked?'app':'ao';renderRoadmapView()">
+        <input type="checkbox" ${swimCheckedRM} onchange="roadmapSwimBy=this.checked?'ao':'app';renderRoadmapView()">
         <span class="toggle-track"></span>
         <span></span>
       </label>
-      <span style="${roadmapSwimBy === 'app' ? 'color:var(--accent2);font-weight:600;' : ''}">App</span>
+      <span style="${roadmapSwimBy === 'ao' ? 'color:var(--accent2);font-weight:600;' : ''}">Affärsområde</span>
       <span style="width:1px;background:var(--border);height:16px;margin:0 4px;"></span>
       <label class="toggle-wrap" style="margin:0">
         <input type="checkbox" ${toggleCheckedAll} onchange="rmShowAll=this.checked;renderRoadmapView()">
         <span class="toggle-track"></span>
-        <span>Visa alla</span>
+        <span>Visa alla states</span>
       </label>
       <span style="width:1px;background:var(--border);height:16px;margin:0 4px;"></span>
       <label class="toggle-wrap" style="margin:0">
-        <input type="checkbox" ${toggleSimple} onchange="rmSimpleMode=this.checked;renderRoadmapView()">
+        <input type="checkbox" ${toggleDetailed} onchange="rmSimpleMode=!this.checked;renderRoadmapView()">
         <span class="toggle-track"></span>
-        <span>Förenklad</span>
+        <span>Detaljerad</span>
+      </label>
+      <span style="width:1px;background:var(--border);height:16px;margin:0 4px;"></span>
+      <label class="toggle-wrap" style="margin:0">
+        <input type="checkbox" ${toggleSwimBySuperEpic} onchange="rmSwimBySuperEpic=this.checked;renderRoadmapView()">
+        <span class="toggle-track"></span>
+        <span>Visa bara Super epics</span>
       </label>
       <label class="toggle-wrap" style="margin:0;margin-left:auto;">
       </label>
     </div>`;
 
-  // Build columns (including "Ej satt" when showAll)
-  const buildCol = (colKey, colCls, colEpicsList) => {
-    const bodyHtml = swimKeys.map(sk => {
-      const cards = colEpicsList.filter(e => getSwimKey(e) === sk);
-      if (!cards.length) return '';
-      if (rmSimpleMode) {
-        return `<div class="rm-simple-group">
-          <div class="rm-simple-group-label">▸ ${sk}</div>
-          ${cards.map(makeSimpleRow).join('')}
-        </div>`;
-      }
-      return `<div class="rm-r">
-        <div class="rm--label">${sk}</div>
-        ${cards.map(makeCard).join('')}
-      </div>`;
+  const stateColumns = [
+    ...RM_COLS.map(col => ({ key: col.key, cls: col.cls, epics: epics.filter(e => roadmapValue(e, '') === col.key) })),
+    ...(rmShowAll ? [{ key: 'Ej satt', cls: 'rm-col-ejsatt', epics: epics.filter(e => !roadmapValue(e, '')) }] : [])
+  ];
+
+  const gridTemplate = `repeat(${Math.max(1, stateColumns.length)}, minmax(0, 1fr))`;
+  const headHtml = stateColumns.map(col =>
+    `<div class="rm-grid-head-cell ${col.cls}"><div class="rm-col-header ${col.cls}">${col.key} <span style="opacity:.5;font-weight:400">(${col.epics.length})</span></div></div>`
+  ).join('');
+
+  const lanesHtml = swimKeys.map(sk => {
+    const cellsHtml = stateColumns.map(col => {
+      const cards = col.epics.filter(e => getSwimKey(e) === sk);
+      const content = cards.length
+        ? cards.map(rmSimpleMode ? makeSimpleRow : makeCard).join('')
+        : '<div class="rm-lane-empty">-</div>';
+      const dropHandlers = globalEditMode
+        ? `ondragover="event.preventDefault();this.classList.add('rm-col-drag-over')"
+           ondragleave="this.classList.remove('rm-col-drag-over')"
+           ondrop="this.classList.remove('rm-col-drag-over');rmDropEpic(event,'${col.key}')"`
+        : '';
+      return `<div class="rm-grid-cell ${col.cls}" ${dropHandlers}>${content}</div>`;
     }).join('');
 
-    // Also show ungrouped epics not matching any swim key (edge case)
-    const unswimmed = colEpicsList.filter(e => !swimKeys.includes(getSwimKey(e)));
-    const unswimHtml = unswimmed.length ? unswimmed.map(rmSimpleMode ? makeSimpleRow : makeCard).join('') : '';
-
-    const dropHandlers = globalEditMode
-      ? `ondragover="event.preventDefault();this.classList.add('rm-col-drag-over')"
-         ondragleave="this.classList.remove('rm-col-drag-over')"
-         ondrop="this.classList.remove('rm-col-drag-over');rmDropEpic(event,'${colKey}')"`
-      : '';
-
-    return `<div class="rm-col ${colCls}" ${dropHandlers}>
-      <div class="rm-col-header">${colKey} <span style="opacity:.5;font-weight:400">(${colEpicsList.length})</span></div>
-      <div class="rm-col-body">${bodyHtml}${unswimHtml || (!bodyHtml && !unswimHtml ? '<span style="color:var(--muted);font-size:0.88rem">Inga epics</span>' : '')}</div>
+    return `<div class="rm-grid-lane">
+      <div class="rm-grid-lane-title">${sk}</div>
+      <div class="rm-grid-lane-cells" style="grid-template-columns:${gridTemplate};">${cellsHtml}</div>
     </div>`;
-  };
-
-  const ejSattEpics = rmShowAll ? epics.filter(e => !roadmapValue(e, '')) : [];
-  const colsHtml = [
-    ...RM_COLS.map(col => buildCol(col.key, col.cls, epics.filter(e => roadmapValue(e, '') === col.key))),
-    ...(rmShowAll ? [buildCol('Ej satt', 'rm-col-ejsatt', ejSattEpics)] : [])
-  ].join('');
+  }).join('');
 
   wrap.innerHTML = `<div class="rm-wrap">
-    ${seSummaryHtml}
     ${toggleBar}
-    <div class="rm-cols" style="flex:1;overflow:hidden;">${colsHtml}</div>
+    <div class="rm-grid">
+      <div class="rm-grid-head" style="grid-template-columns:${gridTemplate};">${headHtml}</div>
+      <div class="rm-grid-body">${lanesHtml || '<div style="padding:14px;color:var(--muted);font-size:0.88rem;">Inga swimlanes</div>'}</div>
+    </div>
   </div>`;
 }
 
@@ -12092,8 +12134,8 @@ function renderEstimering() {
   });
 
   const epics   = getEpicItems(items);
-  const features = getFeatureItems(allItems);
-  const stories = getStoryItems(allItems);
+  const features = getFeatureItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
+  const stories = getStoryItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
 
   let filtered = epics;
   if (estTargetappsFilter && selectedProjects.has('Roadmap')) {
@@ -12329,8 +12371,8 @@ function renderPrioritering() {
   const wrap = document.getElementById('tableWrap');
   // ── 1. Data preparation: source lists, filters, model inputs ──
   const PRIO_LIST_W = HIERARCHY_LIST_WIDTH;
-  const features = getFeatureItems(allItems);
-  const stories = getStoryItems(allItems);
+  const features = getFeatureItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
+  const stories = getStoryItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
   const epics = allItems.filter(i => {
     if (!isWorkItemType(i, WI_TYPE_EPIC)) return false;
     const s = workItemStateLower(i);
@@ -12845,8 +12887,8 @@ function renderTimeline() {
     }
     return false;
   });
-  const features = getFeatureItems(allItems);
-  const stories = getStoryItems(allItems);
+  const features = getFeatureItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
+  const stories = getStoryItems(allItems).filter(i => !EXCLUDED_STATES.some(ex => workItemStateLower(i).includes(ex)));
   const appKey = ep => standardHierarchyGroupLabel(ep, timelineGroupMode);
 
   // Build rows early (needed for label/date/chart rendering below)
@@ -14563,6 +14605,29 @@ function boardNativeFindChildPos(runtime, node) {
   return { x: rightMost.x + step, y: rightMost.y };
 }
 
+function boardNativeLayoutChildrenSymmetric(runtime, parentNode) {
+  if (!runtime || !parentNode) return;
+  const children = runtime.state.nodes
+    .filter(n => n.parentId === parentNode.id)
+    .sort((a, b) => (a.x - b.x) || (a.id - b.id));
+  if (!children.length) return;
+
+  const parentWidth = boardNativeNodeWidth(runtime, parentNode);
+  const siblingGap = 26;
+  const levelOffsetY = 126;
+  const widths = children.map(c => boardNativeNodeWidth(runtime, c));
+  const totalWidth = widths.reduce((sum, w) => sum + w, 0) + (Math.max(0, children.length - 1) * siblingGap);
+  let cursorX = parentNode.x + (parentWidth / 2) - (totalWidth / 2);
+  const targetY = parentNode.y + levelOffsetY;
+
+  children.forEach((child, idx) => {
+    child.x = cursorX;
+    child.y = targetY;
+    if (runtime.state.showTimeAxis) boardNativeSyncNodeDatesFromLayout(runtime, child);
+    cursorX += widths[idx] + siblingGap;
+  });
+}
+
 function boardNativeSnapshot(runtime) {
   return {
     version: 1,
@@ -15149,6 +15214,7 @@ function boardNativeRenderAxes(runtime) {
   const xAxis = document.getElementById('boardNativeXAxis');
   const yAxis = document.getElementById('boardNativeYAxis');
   const timeAxis = document.getElementById('boardNativeTimeAxis');
+  const timeScaleControls = document.getElementById('boardTimeScaleControls');
   const xWrap = document.getElementById('boardNativeXMarkers');
   const yWrap = document.getElementById('boardNativeYMarkers');
   const timeScale = document.getElementById('boardNativeTimeScale');
@@ -15173,6 +15239,7 @@ function boardNativeRenderAxes(runtime) {
   xAxis.style.display = runtime.state.showXAxis ? 'block' : 'none';
   yAxis.style.display = runtime.state.showYAxis ? 'block' : 'none';
   if (timeAxis) timeAxis.style.display = runtime.state.showTimeAxis ? 'block' : 'none';
+  if (timeScaleControls) timeScaleControls.style.display = runtime.state.showTimeAxis ? 'flex' : 'none';
 
   const xMarkers = (runtime.state.xMarkers || []).map(m => {
     const sx = m.x * runtime.state.zoom + runtime.state.panX;
@@ -15494,6 +15561,17 @@ function boardNativeRender(runtime) {
     }
   }
 
+  let placementGhostHtml = '';
+  if (runtime.pendingPlacement) {
+    const p = runtime.pendingPlacement;
+    const ghostType = String(p.type || 'Task').toLowerCase();
+    placementGhostHtml = `<div class="board-native-node ${ghostType}" style="left:${p.x}px;top:${p.y}px;width:220px;opacity:0.45;pointer-events:none;border-style:dashed;z-index:9999;">
+      <div class="board-native-node-head"><span class="board-native-node-id">Ny</span><span>Placera</span></div>
+      <div class="board-native-node-title">${escHtml(String(p.title || 'Nytt objekt'))}</div>
+      <span class="board-native-node-sprint">Klicka för att placera</span>
+    </div>`;
+  }
+
   const html = runtime.state.nodes.map(node => {
     if (!visibleIds.has(node.id)) return '';
     const cls = String(node.type || 'Task').toLowerCase();
@@ -15537,7 +15615,7 @@ function boardNativeRender(runtime) {
     </div>`;
   }).join('');
 
-  runtime.stage.innerHTML = `<svg class="board-native-links">${baseLinks}${previewLink}</svg>${html || '<div class="board-native-empty">Lägg till ett item från vänsterpanelen</div>'}`;
+  runtime.stage.innerHTML = `<svg class="board-native-links">${baseLinks}${previewLink}</svg>${html || '<div class="board-native-empty">Lägg till ett item från vänsterpanelen</div>'}${placementGhostHtml}`;
   boardNativeSetTransform(runtime);
   boardNativeRenderAxes(runtime);
   boardNativeRenderSprintChips(runtime);
@@ -15767,6 +15845,10 @@ function boardNativeRender(runtime) {
       if (!node) return;
       boardNativePushUndo(runtime);
       node.collapsed = !node.collapsed;
+      if (!node.collapsed) {
+        // Keep all unrelated objects fixed; only position direct children symmetrically.
+        boardNativeLayoutChildrenSymmetric(runtime, node);
+      }
       boardNativeRender(runtime);
     });
   });
@@ -16068,6 +16150,17 @@ function boardNativeMount() {
         boardNativeRender(rt);
         return;
       }
+      if (rt.pendingPlacement) {
+        const rect = rt.viewport.getBoundingClientRect();
+        const boardX = (e.clientX - rect.left - rt.state.panX) / rt.state.zoom;
+        const boardY = (e.clientY - rect.top - rt.state.panY) / rt.state.zoom;
+        if (rt.pendingPlacement.x !== boardX || rt.pendingPlacement.y !== boardY) {
+          rt.pendingPlacement.x = boardX;
+          rt.pendingPlacement.y = boardY;
+          boardNativeRender(rt);
+        }
+        return;
+      }
       if (!rt.drag) return;
       const dx = (e.clientX - rt.drag.sx) / rt.state.zoom;
       const dy = (e.clientY - rt.drag.sy) / rt.state.zoom;
@@ -16209,6 +16302,12 @@ function boardNativeMount() {
         e.preventDefault();
         if (hasNodes) boardNativeDeleteSelected(rt);
         if (hasMarkers) boardNativeDeleteSelectedMarkers(rt);
+        return;
+      }
+
+      if (e.key === 'Escape' && rt.pendingPlacement) {
+        e.preventDefault();
+        boardCancelPendingPlacement(true);
       }
     }, { capture: true });
     window.__boardNativePointerMoveBound = true;
@@ -16232,6 +16331,14 @@ function boardNativeMount() {
     }
 
     if (e.button !== 0) return;
+    if (runtime.pendingPlacement) {
+      const rect = runtime.viewport.getBoundingClientRect();
+      const boardX = (e.clientX - rect.left - runtime.state.panX) / runtime.state.zoom;
+      const boardY = (e.clientY - rect.top - runtime.state.panY) / runtime.state.zoom;
+      boardCommitPendingPlacement(runtime, boardX, boardY);
+      e.preventDefault();
+      return;
+    }
     if (interactiveTarget) return;
 
     const additive = e.ctrlKey || e.metaKey;
@@ -16253,8 +16360,20 @@ function boardNativeMount() {
   viewport.addEventListener('wheel', (e) => {
     e.preventDefault();
     if (e.ctrlKey || e.metaKey) {
-      const next = Math.max(0.4, Math.min(2.2, runtime.state.zoom * Math.exp(-e.deltaY * 0.0015)));
-      runtime.state.zoom = next;
+      const rect = runtime.viewport.getBoundingClientRect();
+      const pointerX = e.clientX - rect.left;
+      const pointerY = e.clientY - rect.top;
+      const prevZoom = runtime.state.zoom;
+      const nextZoom = Math.max(0.4, Math.min(2.2, prevZoom * Math.exp(-e.deltaY * 0.0015)));
+      if (nextZoom === prevZoom) return;
+
+      // Keep the board-space point under the cursor fixed while zooming.
+      const boardX = (pointerX - runtime.state.panX) / prevZoom;
+      const boardY = (pointerY - runtime.state.panY) / prevZoom;
+
+      runtime.state.zoom = nextZoom;
+      runtime.state.panX = pointerX - (boardX * nextZoom);
+      runtime.state.panY = pointerY - (boardY * nextZoom);
       boardNativeSetTransform(runtime);
       return;
     }
@@ -16356,6 +16475,73 @@ function boardToggleSprintChip(name) {
 
 function boardOnSpikeFrameLoad() {}
 
+function boardCancelPendingPlacement(showMessage = false) {
+  if (!boardNativeRuntime || !boardNativeRuntime.pendingPlacement) return;
+  boardNativeRuntime.pendingPlacement = null;
+  boardNativeRender(boardNativeRuntime);
+  if (showMessage) showToast('Placering avbruten.');
+}
+
+function boardCommitPendingPlacement(runtime, boardX, boardY) {
+  const pending = runtime?.pendingPlacement;
+  if (!pending || !Array.isArray(pending.descriptors) || !pending.descriptors.length) return;
+
+  boardNativePushUndo(runtime);
+
+  const wiIdToNodeId = new Map();
+  runtime.state.nodes.forEach(n => {
+    if (n.sourceWorkItemId) wiIdToNodeId.set(n.sourceWorkItemId, n.id);
+  });
+
+  const prepared = pending.descriptors.map(desc => {
+    const nodeId = runtime.state.idSeq++;
+    wiIdToNodeId.set(desc.wi.id, nodeId);
+    return { desc, nodeId };
+  });
+
+  prepared.forEach(({ desc, nodeId }) => {
+    const wi = desc.wi;
+    const node = {
+      id: nodeId,
+      title: wi.fields['System.Title'] || `#${wi.id}`,
+      type: desc.nodeType,
+      x: boardX + desc.relX,
+      y: boardY + desc.relY,
+      parentId: desc.wiParentId ? (wiIdToNodeId.get(desc.wiParentId) ?? null) : null,
+      sourceWorkItemId: wi.id,
+      sourceProject: workItemProject(wi, ''),
+      linkedParentWorkItemId: Number.isFinite(Number(desc.wiParentId)) ? Number(desc.wiParentId) : null,
+      sprint: sprintNameFromIteration(wi),
+      timeStartDate: boardNativeIsoDate(desc.rawStart),
+      timeEndDate: boardNativeIsoDate(desc.rawEnd),
+      boardWidth: 220,
+      collapsed: (desc.depth >= 1) || (desc.depth === 0 && desc.nodeType === 'Epic'),
+    };
+    runtime.state.nodes.push(node);
+    if (runtime.state.showTimeAxis && (!node.timeStartDate || !node.timeEndDate)) boardNativeSyncNodeDatesFromLayout(runtime, node);
+    if (runtime.state.showTimeAxis) boardNativeSyncNodeFromDates(runtime, node);
+  });
+
+  if (runtime.state.treeLayout) {
+    boardNativeApplyTreeLayout(runtime);
+  }
+
+  const rootAdded = prepared.find(p => Number(p.desc.wi.id) === Number(pending.rootWorkItemId));
+  const addedNodeIds = new Set(prepared.map(p => p.nodeId));
+  runtime.state.selectedId = rootAdded?.nodeId ?? null;
+  runtime.selectedIds = runtime.state.treeLayout
+    ? (rootAdded ? new Set([rootAdded.nodeId]) : new Set())
+    : addedNodeIds;
+  runtime.selectedXMarkerIds = new Set();
+  runtime.selectedYMarkerIds = new Set();
+  runtime.selectedTimeMilestoneIds = new Set();
+
+  runtime.pendingPlacement = null;
+  boardNativeRender(runtime);
+  const added = prepared.length;
+  boardSetStatus(`Lade till ${added} item${added !== 1 ? 's' : ''} (#${pending.descriptors.map(d => d.wi.id).join(', #')}) i board`);
+}
+
 function boardAddIssueToWhiteboard(itemId) {
   const id = Number(itemId);
   const item = allItems.find(i => i.id === id);
@@ -16393,62 +16579,34 @@ function boardAddIssueToWhiteboard(itemId) {
     return;
   }
 
-  boardNativePushUndo(boardNativeRuntime);
-
-  // Map sourceWorkItemId → board node id (include existing nodes so parent links work across adds)
-  const wiIdToNodeId = new Map();
-  boardNativeRuntime.state.nodes.forEach(n => {
-    if (n.sourceWorkItemId) wiIdToNodeId.set(n.sourceWorkItemId, n.id);
-  });
-
-  // Pre-assign node ids so parent links can reference them (BFS ensures parent assigned before child)
-  const newNodes = newItems.map(entry => {
+  const descriptors = newItems.map((entry, idx) => {
     const wi = entry.wi;
-    const nodeId = boardNativeRuntime.state.idSeq++;
-    wiIdToNodeId.set(wi.id, nodeId);
-    return { wi, nodeId, depth: entry.depth };
-  });
-
-  newNodes.forEach(({ wi, nodeId, depth }, idx) => {
-    const rawStart = wi.fields['Microsoft.VSTS.Scheduling.StartDate'] || wi.fields['Custom.StartDate'] || '';
-    const rawEnd = wi.fields['Microsoft.VSTS.Scheduling.FinishDate'] || wi.fields['Microsoft.VSTS.Scheduling.TargetDate'] || wi.fields['Custom.EndDate'] || '';
-    const wiParentId = workItemParentId(wi);
-    const node = {
-      id: nodeId,
-      title: wi.fields['System.Title'] || `#${wi.id}`,
-      type: boardMapTypeToSpike(wi.fields['System.WorkItemType'] || ''),
-      x: 56 + (idx % 6) * 240 + Math.random() * 20,
-      y: 56 + Math.floor(idx / 6) * 130 + Math.random() * 20,
-      parentId: wiParentId ? (wiIdToNodeId.get(wiParentId) ?? null) : null,
-      sourceWorkItemId: wi.id,
-      sourceProject: workItemProject(wi, ''),
-      linkedParentWorkItemId: Number.isFinite(Number(wiParentId)) ? Number(wiParentId) : null,
-      sprint: sprintNameFromIteration(wi),
-      timeStartDate: boardNativeIsoDate(rawStart),
-      timeEndDate: boardNativeIsoDate(rawEnd),
-      boardWidth: 220,
-      collapsed: depth >= 2,
+    return {
+      wi,
+      depth: entry.depth,
+      wiParentId: workItemParentId(wi),
+      nodeType: boardMapTypeToSpike(wi.fields['System.WorkItemType'] || ''),
+      rawStart: wi.fields['Microsoft.VSTS.Scheduling.StartDate'] || wi.fields['Custom.StartDate'] || '',
+      rawEnd: wi.fields['Microsoft.VSTS.Scheduling.FinishDate'] || wi.fields['Microsoft.VSTS.Scheduling.TargetDate'] || wi.fields['Custom.EndDate'] || '',
+      relX: (idx % 6) * 240,
+      relY: Math.floor(idx / 6) * 130,
     };
-    boardNativeRuntime.state.nodes.push(node);
-    if (boardNativeRuntime.state.showTimeAxis && (!node.timeStartDate || !node.timeEndDate)) boardNativeSyncNodeDatesFromLayout(boardNativeRuntime, node);
-    if (boardNativeRuntime.state.showTimeAxis) boardNativeSyncNodeFromDates(boardNativeRuntime, node);
   });
 
-  // Always place newly added items in tree structure at insertion time.
-  boardNativeApplyTreeLayout(boardNativeRuntime);
+  const viewportRect = boardNativeRuntime.viewport.getBoundingClientRect();
+  const centerBoardX = ((viewportRect.width / 2) - boardNativeRuntime.state.panX) / boardNativeRuntime.state.zoom;
+  const centerBoardY = ((viewportRect.height / 2) - boardNativeRuntime.state.panY) / boardNativeRuntime.state.zoom;
 
-  const rootNode = boardNativeRuntime.state.nodes.find(n => n.sourceWorkItemId === id);
-  const addedNodeIds = new Set(newNodes.map(n => n.nodeId));
-  boardNativeRuntime.state.selectedId = rootNode?.id ?? null;
-  boardNativeRuntime.selectedIds = boardNativeRuntime.state.treeLayout
-    ? (rootNode ? new Set([rootNode.id]) : new Set())
-    : addedNodeIds;
-  boardNativeRuntime.selectedXMarkerIds = new Set();
-  boardNativeRuntime.selectedYMarkerIds = new Set();
-  boardNativeRuntime.selectedTimeMilestoneIds = new Set();
+  boardNativeRuntime.pendingPlacement = {
+    rootWorkItemId: id,
+    descriptors,
+    x: centerBoardX,
+    y: centerBoardY,
+    title: String(item.fields?.['System.Title'] || `#${id}`),
+    type: boardMapTypeToSpike(item.fields?.['System.WorkItemType'] || ''),
+  };
+  boardSetStatus('Klicka i boarden för att placera objektet. Tryck Esc för att avbryta.');
   boardNativeRender(boardNativeRuntime);
-  const added = newNodes.length;
-  boardSetStatus(`Lade till ${added} item${added !== 1 ? 's' : ''} (#${newItems.map(wi => wi.id).join(', #')}) i board`);
 }
 
 async function boardDeleteIssue(itemId) {
@@ -17834,7 +17992,7 @@ async function renderBoardTab() {
               <input type="checkbox" id="boardShowTimeAxisToggle" onchange="boardToggleTimeAxis(this.checked)">
               <span>Tid-axel</span>
             </label>
-            <div style="display:flex;align-items:center;gap:4px;">
+            <div id="boardTimeScaleControls" style="display:none;align-items:center;gap:4px;">
               <button class="btn btn-outline btn-xs-icon" style="width:auto;padding:2px 7px;font-size:.75rem;line-height:1;" onclick="boardAdjustTimeScale(-8)" title="Minska avstånd mellan veckstreck">−</button>
               <span id="boardTimeScaleValue" style="min-width:58px;text-align:center;color:var(--muted);font-size:.68rem;font-family:'JetBrains Mono',monospace;">56 px/v</span>
               <button class="btn btn-outline btn-xs-icon" style="width:auto;padding:2px 7px;font-size:.75rem;line-height:1;" onclick="boardAdjustTimeScale(8)" title="Öka avstånd mellan veckstreck">+</button>
@@ -17937,7 +18095,7 @@ setTopSection('backlog');
   const saved = localStorage.getItem(LS_PAT);
   if (saved) {
     patEl.value = saved;
-    // On reload: only load Teams metadata immediately if Team mode is active.
+    // On reload: team metadata is needed for Project mode; favorites data is loaded on demand.
     loadProjects({ loadTeams: projectPanelMode === 'favorites' });
   }
   patEl.addEventListener('change', () => {
