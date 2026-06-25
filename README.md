@@ -1,7 +1,7 @@
 # DevOps Backlog Explorer
 
 En fristaende, klientbaserad webbapp for att utforska och analysera Azure DevOps-backloggar.
-Den aktiva appversionen i repot ar `devops_backlog_gui_v2.1.html`.
+Den aktiva appversionen i repot ar `bdo-devops-gui.html`.
 
 ## Vad appen gor
 
@@ -22,7 +22,7 @@ Den aktiva appversionen i repot ar `devops_backlog_gui_v2.1.html`.
 
 ## Snabbstart
 
-1. Oppna `devops_backlog_gui_v2.1.html` i en webblasare.
+1. Oppna `bdo-devops-gui.html` i en webblasare.
 2. Fyll i ditt PAT-falt i sidopanelen.
 3. Klicka pa `Hamta projekt`.
 4. Valj ett eller flera projekt/team.
@@ -151,11 +151,11 @@ Info-vyn ar till for att hantera strukturerad dokumentation kopplad till Epic el
 ## Testning
 
 Det finns ingen separat inbyggd smoke-testfil i detta repo langre.
-Testning bor utga fran den aktiva appfilen `devops_backlog_gui_v2.1.html` och den funktionella setup-checklistan ovan.
+Testning bor utga fran den aktiva appfilen `bdo-devops-gui.html` och den funktionella setup-checklistan ovan.
 
 ## Filstruktur
 
-- `devops_backlog_gui_v2.1.html`: aktiv huvudversion av applikationen.
+- `bdo-devops-gui.html`: aktiv huvudversion av applikationen.
 - `processmallar.html`: en egen frame för tabben Info
 
 ## Begransningar

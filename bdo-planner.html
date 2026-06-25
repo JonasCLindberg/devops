@@ -3499,7 +3499,7 @@ function explainFetchError(error) {
   const message = error?.message ? String(error.message) : String(error || 'Okänt fel');
   const lower = message.toLowerCase();
   if (lower === 'load failed' || lower === 'failed to fetch' || lower.includes('networkerror')) {
-    return 'Browsern blockerade nätanropet (vanligt i Chrome från file:// p.g.a. CORS). Kör sidan via lokal server, t.ex. i terminalen: python3 -m http.server 5500 och öppna http://localhost:5500/devops_backlog_gui_v2.1.html';
+    return 'Browsern blockerade nätanropet (vanligt i Chrome från file:// p.g.a. CORS). Kör sidan via lokal server, t.ex. i terminalen: python3 -m http.server 5500 och öppna http://localhost:5500/bdo-devops-gui.html';
   }
   return message;
 }
