@@ -150,18 +150,13 @@ Info-vyn ar till for att hantera strukturerad dokumentation kopplad till Epic el
 
 ## Testning
 
-README hade tidigare referenser till inbyggda smoke-tests i `devops_backlog_gui_v2.0.html`.
-Den aktiva appfilen i detta repo ar nu `devops_backlog_gui_v2.1.html`, och README bor inte langre utga fran att `v2.0` ar den primara korbara versionen.
-
-Om ni fortsatt vill behalla de aldre test-runner-funktionerna som referens bor det framga att de ar kopplade till `v2.0` och inte till den aktuella huvudfilen.
+Det finns ingen separat inbyggd smoke-testfil i detta repo langre.
+Testning bor utga fran den aktiva appfilen `devops_backlog_gui_v2.1.html` och den funktionella setup-checklistan ovan.
 
 ## Filstruktur
 
 - `devops_backlog_gui_v2.1.html`: aktiv huvudversion av applikationen.
-- `devops_backlog_gui.html`: aldre huvudfil/bevarad variant.
-- `devops_backlog_gui_v2.0.html`: tidigare refactor-version.
 - `processmallar.html`: en egen frame för tabben Info
-- `board.html`, `bdo-planner.html`, `breakdown_spike.html`: relaterade experiment- eller sidospårsfiler.
 
 ## Begransningar
 

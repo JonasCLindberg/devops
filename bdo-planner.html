@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BDO Planner</title>
 <link rel="icon" type="image/png" href="favicon.png" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -938,6 +941,410 @@
     padding: 0;
     background: var(--surface);
   }
+  .status-layout {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(200px, clamp(200px, 24vw, 380px)) minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+    height: 100%;
+  }
+  .status-left,
+  .status-right {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-left {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+  .status-left-head,
+  .status-right-head {
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .status-left-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 12px;
+    font-size:0.78rem;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  .status-left-summary,
+  .status-lane-summary {
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    align-items:center;
+  }
+  .status-summary-chip {
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:2px 7px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--surface2);
+    color:var(--text);
+    font-size:0.7rem;
+    white-space:nowrap;
+  }
+  .status-summary-chip strong { color: var(--accent2); }
+  .status-list-wrap {
+    flex:1;
+    min-height:0;
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  .status-list-wrap .backlog-standard-list td.title-cell { width:auto; max-width:none; }
+  .status-list-wrap .backlog-standard-list thead tr:first-child th:first-child { width:auto; min-width:0; max-width:none; }
+  .status-menu-bar {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    padding:10px 12px;
+    border-bottom:1px solid var(--border);
+    background:var(--surface);
+    flex-shrink:0;
+  }
+  .status-menu-bar .col-filter,
+  .status-menu-bar input[type="date"] {
+    width:auto;
+    min-width: 150px;
+  }
+  .status-sprint-filter-group {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:nowrap;
+    white-space:nowrap;
+  }
+  .status-sprint-filter-group #statusSprintSelect {
+    min-width: 120px;
+    max-width: 220px;
+  }
+  .status-date-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .status-right-body {
+    flex:1;
+    min-height:0;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:12px;
+  }
+  .status-right-tabs {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+  }
+  .status-right-tab-btn {
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--muted);
+    border-radius:999px;
+    padding:4px 12px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    line-height:1.2;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .status-right-tab-btn:hover {
+    border-color:var(--accent2);
+    color:var(--text);
+  }
+  .status-right-tab-btn.active {
+    background:var(--accent2);
+    border-color:var(--accent2);
+    color:var(--bg);
+    font-weight:700;
+  }
+  .status-right-tab-panels {
+    flex:1;
+    min-height:0;
+    display:flex;
+  }
+  .status-right-tab-panel {
+    display:none;
+    flex:1;
+    min-height:0;
+  }
+  .status-right-tab-panel.active {
+    display:flex;
+    flex-direction:column;
+  }
+  .status-lanes-panel {
+    flex:1;
+    height:auto;
+    display:flex;
+    flex-direction:column;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--surface);
+    min-height:0;
+  }
+  .status-burndown-panel {
+    flex:1;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+    min-height:0;
+    overflow:hidden;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .status-burndown-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    color:var(--muted);
+  }
+  .status-burndown-title {
+    color:var(--text);
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    font-size:0.72rem;
+  }
+  .status-burndown-metrics {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .status-burndown-chart {
+    flex:0 0 260px;
+    min-height:260px;
+    max-height:260px;
+    border:1px solid rgba(125,133,144,.2);
+    border-radius:8px;
+    background:linear-gradient(180deg, rgba(125,133,144,.04), rgba(125,133,144,.01));
+    overflow:hidden;
+    display:flex;
+  }
+  .status-burndown-chart svg {
+    flex:1;
+    min-width:0;
+    display:block;
+  }
+  .status-burndown-empty {
+    flex:0 0 260px;
+    min-height:260px;
+    max-height:260px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.76rem;
+    color:var(--muted);
+    opacity:0.8;
+    border:1px dashed rgba(125,133,144,.25);
+    border-radius:8px;
+  }
+  .status-feature-panel {
+    flex:1;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+    min-height:0;
+    overflow:hidden;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .status-feature-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    color:var(--muted);
+  }
+  .status-feature-title {
+    color:var(--text);
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    font-size:0.72rem;
+  }
+  .status-feature-list {
+    flex:1;
+    min-height:0;
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding-right:2px;
+  }
+  .status-feature-row {
+    display:grid;
+    grid-template-columns: minmax(220px, 340px) minmax(280px, 1fr) auto;
+    align-items:center;
+    gap:10px;
+    padding:8px 10px;
+    border:1px solid rgba(125,133,144,.16);
+    border-radius:8px;
+    background:linear-gradient(180deg, rgba(125,133,144,.04), rgba(125,133,144,.01));
+  }
+  .status-feature-name {
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:0.82rem;
+    color:var(--text);
+  }
+  .status-feature-bar {
+    height:16px;
+    border-radius:999px;
+    background:transparent;
+    overflow:hidden;
+    display:flex;
+    border:none;
+  }
+  .status-feature-bar-burned {
+    background:linear-gradient(90deg, rgba(22,163,74,.9), rgba(34,197,94,.78));
+    min-width:0;
+  }
+  .status-feature-bar-remaining {
+    background:rgba(36,99,235,.35);
+    min-width:0;
+  }
+  .status-feature-metrics {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .status-feature-empty {
+    flex:1;
+    min-height:160px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.76rem;
+    color:var(--muted);
+    opacity:0.8;
+    border:1px dashed rgba(125,133,144,.25);
+    border-radius:8px;
+  }
+  .status-lane {
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    border-bottom:1px solid rgba(125,133,144,.12);
+    overflow:hidden;
+  }
+  .status-lane:last-child {
+    border-bottom:none;
+  }
+  .status-lane-started .status-lane-head { background:rgba(36,99,235,.08); }
+  .status-lane-testing .status-lane-head { background:rgba(234,88,12,.08); }
+  .status-lane-done .status-lane-head { background:rgba(22,163,74,.08); }
+  .status-lane-head {
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:10px 12px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--muted);
+    border-bottom:1px solid var(--border);
+  }
+  .status-lane-head-title { display:flex; align-items:center; gap:8px; min-width:0; }
+  .status-lane-head-title strong { color: var(--text); }
+  .status-lane-body {
+    flex:1;
+    min-height:0;
+    overflow:auto;
+    padding:6px 8px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .status-lane-row-item {
+    display:grid;
+    grid-template-columns: 70px minmax(0, 1fr) 150px 110px 110px;
+    gap:8px;
+    align-items:center;
+    padding:4px 6px;
+    border:none;
+    border-radius:4px;
+    background:transparent;
+    cursor:pointer;
+    border-bottom:1px solid rgba(125,133,144,.08);
+  }
+  .status-lane-row-item:hover { background:rgba(125,133,144,.06); border-bottom-color:rgba(125,133,144,.12); }
+  .status-lane-item-title {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:0.84rem;
+    color:var(--text);
+    min-width:0;
+  }
+  .status-lane-item-state { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .status-lane-item-num {
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .status-lane-empty {
+    padding:10px 12px;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.76rem;
+    opacity:0.7;
+  }
   .board-json-panel {
     min-height: 0;
     display: flex;
@@ -1537,7 +1944,7 @@
     letter-spacing: 0;
   }
   .filter-row th:hover { color: var(--muted); }
-  .backlog-standard-list { --backlog-list-w: 600px; }
+  .backlog-standard-list { --backlog-list-w: 600px; width: 100%; border-collapse: collapse; }
   .backlog-standard-list thead tr:first-child th:first-child {
     width: var(--backlog-list-w);
     min-width: var(--backlog-list-w);
@@ -1548,6 +1955,8 @@
     height: 32px;
     box-sizing: border-box;
     vertical-align: middle;
+    width: auto;
+    white-space: nowrap;
   }
   .backlog-standard-list thead tr:first-child th > div {
     height: 32px;
@@ -1948,7 +2357,6 @@
   td {
     padding: 9px 14px;
     vertical-align: middle;
-    max-width: 320px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2960,6 +3368,7 @@
     <!-- Tab bar -->
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-backlog" onclick="showTab('backlog')" disabled>📋 Backlog</button>
+      <button class="tab-btn" id="tab-status" onclick="showTab('status')" disabled>📈 Status</button>
       <button class="tab-btn" id="tab-estimering" onclick="showTab('estimering')" disabled>📐 Estimering</button>
       <button class="tab-btn" id="tab-prioritering" onclick="showTab('prioritering')" disabled>⚡ Prioritering</button>
       <button class="tab-btn" id="tab-timeline" onclick="showTab('timeline')" disabled>📅 Timeline</button>
@@ -3183,6 +3592,179 @@ function closeWorkItemModal() {
   workItemModalOriginTab = null;
 }
 
+function buildEpicHierarchy(epicItem) {
+  if (!epicItem) return null;
+
+  const getDisplayName = (name) => {
+    return String(name || '').trim() || '–';
+  };
+
+  const getRemainingWork = (item) => {
+    const remaining = item?.fields?.['Microsoft.VSTS.Scheduling.RemainingWork'];
+    if (remaining === null || remaining === undefined) return '–';
+    return String(remaining);
+  };
+
+  const buildNode = (item, level = 0) => {
+    return {
+      id: item.id,
+      title: getDisplayName(item.fields?.['System.Title']),
+      type: workItemType(item),
+      status: String(item.fields?.['System.State'] || '–').trim(),
+      prio: workItemPriorityLevel(item),
+      workRemaining: getRemainingWork(item),
+      level: level,
+      children: []
+    };
+  };
+
+  const epicNode = buildNode(epicItem, 0);
+
+  // Find all features that are direct children of this epic
+  const features = allItems.filter(item => 
+    workItemType(item) === WI_TYPE_FEATURE && 
+    workItemParentId(item) === epicItem.id
+  );
+
+  features.forEach(feature => {
+    const featureNode = buildNode(feature, 1);
+
+    // Find all stories and bugs that are children of this feature
+    const stories = allItems.filter(item =>
+      (workItemType(item) === WI_TYPE_STORY || workItemType(item) === WI_TYPE_BUG) &&
+      workItemParentId(item) === feature.id
+    );
+
+    stories.forEach(story => {
+      featureNode.children.push(buildNode(story, 2));
+    });
+
+    epicNode.children.push(featureNode);
+  });
+
+  return epicNode;
+}
+
+function flattenEpicHierarchyForPDF(node, rows = [], level = 0) {
+  if (level > 0) {
+    rows.push({
+      title: node.title,
+      type: node.type,
+      displayTitle: `${level > 1 ? '     ' : ''}${level === 1 ? String(node.title || '').toUpperCase() : node.title}`,
+      status: node.status,
+      prio: node.prio,
+      workRemaining: node.workRemaining,
+      level,
+    });
+  }
+
+  node.children.forEach(child => flattenEpicHierarchyForPDF(child, rows, level + 1));
+
+  return rows;
+}
+
+function epicPdfRowTextColor(status) {
+  const normalized = String(status || '').trim().toLowerCase();
+  if (normalized === 'in progress' || normalized === 'ready for test') return [36, 99, 235];
+  if (normalized === 'ready for deploy to production' || normalized === 'in production' || normalized === 'completed') return [22, 163, 74];
+  return [0, 0, 0];
+}
+
+function exportEpicToPDF(epicId) {
+  const item = allItems.find(i => i.id === epicId);
+  if (!item || workItemType(item) !== WI_TYPE_EPIC) {
+    showToast('Kunde inte hitta epics');
+    return;
+  }
+
+  const hierarchy = buildEpicHierarchy(item);
+  if (!hierarchy) {
+    showToast('Kunde inte bygga hierarki');
+    return;
+  }
+
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    showToast('PDF-bibliotek saknas.');
+    return;
+  }
+
+  const epicTitle = String(item.fields?.['System.Title'] || `Epic #${epicId}`).trim();
+  const fileName = `Epic_${epicId}_${epicTitle.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
+  const rows = flattenEpicHierarchyForPDF(hierarchy);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.text(`Epic: ${epicTitle}`, 32, 36);
+
+  doc.autoTable({
+    startY: 56,
+    margin: { left: 32, right: 32, top: 56, bottom: 32 },
+    tableWidth: pageWidth - 64,
+    columns: [
+      { header: 'Namn', dataKey: 'title' },
+      { header: 'Type', dataKey: 'type' },
+      { header: 'Status', dataKey: 'status' },
+      { header: 'Prio', dataKey: 'prio' },
+      { header: 'Återstående', dataKey: 'workRemaining' },
+    ],
+    body: rows,
+    theme: 'grid',
+    pageBreak: 'auto',
+    rowPageBreak: 'avoid',
+    styles: {
+      font: 'helvetica',
+      fontSize: 9,
+      cellPadding: { top: 4, right: 6, bottom: 4, left: 6 },
+      overflow: 'linebreak',
+      valign: 'middle',
+    },
+    headStyles: {
+      fillColor: [240, 240, 240],
+      textColor: [40, 40, 40],
+      fontStyle: 'bold',
+      halign: 'left',
+      fontSize: 8,
+    },
+    columnStyles: {
+      title: { cellWidth: 395 },
+      type: { cellWidth: 80 },
+      status: { cellWidth: 95 },
+      prio: { cellWidth: 60 },
+      workRemaining: { cellWidth: 80, halign: 'right' },
+    },
+    didParseCell: data => {
+      if (data.section !== 'body') return;
+      const level = Number(data.row.raw?.level || 0);
+      data.cell.styles.textColor = epicPdfRowTextColor(data.row.raw?.status);
+      if (data.column.dataKey === 'title') {
+        data.cell.text = [String(data.row.raw?.displayTitle || data.cell.text || '')];
+        data.cell.styles.cellPadding.left = 10 + (level === 1 ? 0 : 6);
+        data.cell.styles.fontStyle = level === 1 ? 'bold' : 'normal';
+      }
+      if (data.column.dataKey === 'type') {
+        data.cell.text = [String(data.row.raw?.type || '').trim()];
+        data.cell.styles.fontStyle = level === 1 ? 'bold' : 'normal';
+      }
+      if (data.column.dataKey === 'title' && level > 1) {
+        data.cell.styles.cellPadding.left = 10;
+      }
+    },
+    didDrawPage: data => {
+      const pageCount = doc.internal.getNumberOfPages();
+      const pageNumber = data.pageNumber;
+      doc.setFontSize(8);
+      doc.setTextColor(120);
+      doc.text(`Sida ${pageNumber} av ${pageCount}`, pageWidth - 32, doc.internal.pageSize.getHeight() - 16, { align: 'right' });
+    },
+  });
+
+  doc.save(fileName);
+  showToast(`PDF exporterad: ${fileName}`);
+}
+
 function normalizeWikiPageUrl(rawUrl) {
   const value = String(rawUrl || '').trim();
   if (!value) return null;
@@ -3215,26 +3797,6 @@ function openWikiPageFromInput(inputId) {
 
 async function createEpicFromHierarchyList(projectHint = '') {
   const hint = String(projectHint || '').trim();
-  const selected = [...selectedProjects].map(p => String(p || '').trim()).filter(Boolean);
-  const projects = [...new Set([hint, ...selected].filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }));
-
-  if (!projects.length) {
-    showToast('Välj minst ett projekt först.');
-    return;
-  }
-
-  let project = projects[0];
-  if (projects.length > 1) {
-    const picked = await chooseEpicProjectFromList(projects, project);
-    if (!picked) return;
-    const normalized = String(picked || '').trim();
-    if (!normalized || !projects.includes(normalized)) {
-      showToast('Ogiltigt projektval. Välj ett projekt från listan.');
-      return;
-    }
-    project = normalized;
-  }
 
   const titleRaw = prompt('Namn på ny Epic', `Epic ${new Date().toLocaleDateString('sv-SE')}`);
   if (titleRaw == null) return;
@@ -3711,6 +4273,7 @@ function openWorkItemModal(itemId) {
         `<div class="wi-modal-action-buttons">` +
           `<button class="wi-modal-save-btn" id="wiDeleteBtn" style="border-color:var(--danger);color:var(--danger);" onclick="deleteWorkItemModal(${item.id})">Ta bort</button>` +
           `<button class="wi-modal-save-btn" style="border-color:var(--accent);color:var(--accent);" onclick="openCreateChildModal(${item.id})">+ Skapa child</button>` +
+          (isWorkItemType(item, WI_TYPE_EPIC) ? `<button class="wi-modal-save-btn" style="border-color:#10b981;color:#10b981;" onclick="exportEpicToPDF(${item.id})" title="Exportera Epic med hierarki till PDF">Exportera</button>` : '') +
           `<button class="wi-modal-save-btn" id="wiSaveBtn" onclick="saveWorkItemModal(${item.id})">Spara ändringar</button>` +
         `</div>` +
       `</div>` +
@@ -3733,6 +4296,7 @@ const FIELDS = [
   'Microsoft.VSTS.Common.StackRank',
   'Microsoft.VSTS.Scheduling.StoryPoints',
   'Microsoft.VSTS.Scheduling.Effort',
+  'Microsoft.VSTS.Scheduling.OriginalEstimate',
   'Microsoft.VSTS.Scheduling.RemainingWork',
   'Microsoft.VSTS.Common.BusinessValue',
   'Microsoft.VSTS.Common.TimeCriticality',
@@ -3771,6 +4335,7 @@ const HIERARCHY_LIST_WIDTH = 600;
 const WI_TYPE_EPIC = 'Epic';
 const WI_TYPE_FEATURE = 'Feature';
 const WI_TYPE_STORY = 'User Story';
+const WI_TYPE_BUG = 'Bug';
 const WI_TYPE_SPRINT_GOAL = 'Sprint Goal';
 const WI_TYPE_INFO = 'Info';
 
@@ -3796,6 +4361,10 @@ function getFeatureItems(items = allItems) {
 
 function getStoryItems(items = allItems) {
   return getItemsByType(WI_TYPE_STORY, items);
+}
+
+function getBugItems(items = allItems) {
+  return getItemsByType(WI_TYPE_BUG, items);
 }
 
 function getInfoItems(items = allItems) {
@@ -3827,6 +4396,619 @@ function workItemParentId(item) {
 
 function workItemEffort(item) {
   return item?.fields?.['Microsoft.VSTS.Scheduling.Effort'] ?? item?.fields?.['Microsoft.VSTS.Scheduling.StoryPoints'] ?? null;
+}
+
+function workItemOriginalEstimate(item) {
+  return item?.fields?.['Microsoft.VSTS.Scheduling.OriginalEstimate']
+    ?? item?.fields?.['Microsoft.VSTS.Scheduling.Effort']
+    ?? item?.fields?.['Microsoft.VSTS.Scheduling.StoryPoints']
+    ?? null;
+}
+
+function workItemPriorityLevel(item) {
+  const fields = item?.fields || {};
+  const priorityLevelField = (typeof PRIORITY_FIELD === 'string' && PRIORITY_FIELD)
+    ? PRIORITY_FIELD
+    : 'Custom.Prioritylevel';
+  const value = fields[priorityLevelField];
+  const text = String(value ?? '').trim();
+  return text;
+}
+
+function parseNumericFieldValue(value) {
+  const text = String(value ?? '').replace(',', '.').trim();
+  if (!text) return null;
+  const number = Number(text);
+  return Number.isFinite(number) ? number : null;
+}
+
+function formatNumericOrDash(value) {
+  const number = parseNumericFieldValue(value);
+  return number == null ? '–' : String(number);
+}
+
+function normalizeDateInputValue(value, endOfDay = false) {
+  const text = String(value || '').trim();
+  if (!text) return null;
+  const date = new Date(`${text}T${endOfDay ? '23:59:59.999' : '00:00:00'}`);
+  return Number.isFinite(date.getTime()) ? date : null;
+}
+
+function statusLaneKeyForState(state) {
+  const normalized = String(state || '').trim().toLowerCase();
+  if (normalized === 'in progress') return 'started';
+  if (normalized === 'ready for test') return 'testing';
+  if (normalized === 'ready for deploy to production' || normalized === 'in production' || normalized === 'completed') return 'done';
+  return '';
+}
+
+function statusLaneLabel(key) {
+  return key === 'started' ? 'Påbörjade' : 'Klara';
+}
+
+function statusLaneClass(key) {
+  return key === 'started' ? 'status-lane-started' : 'status-lane-done';
+}
+
+function statusEligibleItemType(item) {
+  const type = workItemType(item);
+  return !['Epic', 'Sprint Goal', 'Info', 'Visual board'].includes(type);
+}
+
+function statusItemUnderSelectedEpic(item) {
+  if (statusSelectedEpicIds.size === 0) return true;
+  let currentItem = item;
+  for (let i = 0; i < 10; i++) {
+    const parentId = workItemParentId(currentItem);
+    if (!parentId) break;
+    if (statusSelectedEpicIds.has(parentId)) return true;
+    const parentItem = allItems.find(it => it.id === parentId);
+    if (!parentItem) break;
+    currentItem = parentItem;
+  }
+  return false;
+}
+
+function statusItemMatchesSprint(item, selectedPath) {
+  const itemPath = String(item?.fields?.['System.IterationPath'] || '').trim();
+  if (!selectedPath) return true;
+  if (!itemPath) return false;
+  return sprintPathIdentity(itemPath) === sprintPathIdentity(selectedPath);
+}
+
+function statusSprintOptions() {
+  const paths = new Set();
+  sprintIterationsCatalog.forEach(iter => {
+    const path = String(iter.path || '').trim();
+    if (path) paths.add(path);
+  });
+  allItems.forEach(item => {
+    const path = String(item?.fields?.['System.IterationPath'] || '').trim();
+    if (path && sprintIsIterationLikePath(path)) paths.add(path);
+  });
+  return [...paths].sort((a, b) => {
+    const ma = sprintColumnMetaForPath(a);
+    const mb = sprintColumnMetaForPath(b);
+    const da = ma.startDate ? new Date(ma.startDate).getTime() : Number.POSITIVE_INFINITY;
+    const db = mb.startDate ? new Date(mb.startDate).getTime() : Number.POSITIVE_INFINITY;
+    if (da !== db) return da - db;
+    return ma.name.localeCompare(mb.name, 'sv-SE', { numeric: true, sensitivity: 'base' });
+  });
+}
+
+function statusDefaultSprintPath() {
+  const options = statusSprintOptions();
+  if (!options.length) return '';
+  const now = Date.now();
+  const active = options.find(path => {
+    const meta = sprintColumnMetaForPath(path);
+    const start = meta.startDate ? new Date(meta.startDate).getTime() : null;
+    const finish = meta.finishDate ? new Date(meta.finishDate).getTime() : null;
+    const from = start != null ? start : Number.NEGATIVE_INFINITY;
+    const to = finish != null ? finish : Number.POSITIVE_INFINITY;
+    return from <= now && now <= to;
+  });
+  return active || options[0];
+}
+
+function statusSprintLabel(path) {
+  const meta = sprintColumnMetaForPath(path);
+  const parts = [];
+  if (meta.project) parts.push(meta.project);
+  if (meta.name) parts.push(meta.name);
+  const dateText = [meta.startDate, meta.finishDate].filter(Boolean).join(' - ');
+  return `${parts.join(' / ') || path}${dateText ? ` (${dateText})` : ''}`;
+}
+
+function statusSelectedDateRange() {
+  const defaultMeta = statusFilterBySprint
+    ? sprintColumnMetaForPath(statusSelectedSprintPath || statusDefaultSprintPath())
+    : {};
+  const from = normalizeDateInputValue(statusTabFromDate)
+    || normalizeDateInputValue(defaultMeta.startDate)
+    || new Date(Date.now() - 7 * 86400000);
+  const to = normalizeDateInputValue(statusTabToDate, true)
+    || normalizeDateInputValue(defaultMeta.finishDate, true)
+    || new Date();
+  if (from && to && from.getTime() > to.getTime()) return { from: to, to: from };
+  return { from, to };
+}
+
+function statusOriginalEstimateValue(item) {
+  return parseNumericFieldValue(workItemOriginalEstimate(item));
+}
+
+function statusRemainingWorkValue(item) {
+  return parseNumericFieldValue(item?.fields?.['Microsoft.VSTS.Scheduling.RemainingWork']);
+}
+
+async function statusFetchWorkItemRevisions(itemId, project) {
+  const cacheKey = `${project || ''}::${itemId}`;
+  if (statusRevisionCache.has(cacheKey)) return statusRevisionCache.get(cacheKey);
+  const urls = [];
+  if (project) {
+    urls.push(`https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/workitems/${itemId}/revisions?api-version=7.1`);
+  }
+  urls.push(`https://dev.azure.com/${ORG}/_apis/wit/workitems/${itemId}/revisions?api-version=7.1`);
+
+  for (const url of urls) {
+    const res = await apiGet(url);
+    if (!res.ok) continue;
+    const data = await res.json();
+    const revisions = Array.isArray(data?.value) ? data.value : [];
+    statusRevisionCache.set(cacheKey, revisions);
+    return revisions;
+  }
+
+  statusRevisionCache.set(cacheKey, []);
+  return [];
+}
+
+function statusPickTransition(revisions, rangeFrom, rangeTo) {
+  const fieldValue = value => {
+    if (value == null) return '';
+    if (typeof value === 'object') {
+      if (value.newValue != null) return value.newValue;
+      if (value.value != null) return value.value;
+    }
+    return value;
+  };
+
+  const timeline = (revisions || []).map(rev => {
+    const state = String(fieldValue(rev?.fields?.['System.State']) || '').trim();
+    const changedDateText = String(
+      rev?.revisedDate
+      || fieldValue(rev?.fields?.['System.ChangedDate'])
+      || rev?.changedDate
+      || ''
+    ).trim();
+    const changedDate = new Date(changedDateText);
+    if (!state || !Number.isFinite(changedDate.getTime())) return null;
+    return { state, changedDate };
+  }).filter(Boolean)
+    .sort((a, b) => a.changedDate.getTime() - b.changedDate.getTime());
+
+  let latest = null;
+  timeline.forEach((point, index) => {
+    const state = point.state;
+    const changedDate = point.changedDate;
+    const previous = index > 0 ? timeline[index - 1] : null;
+    const previousState = String(previous?.state || '').trim().toLowerCase();
+    const currentState = String(state || '').trim().toLowerCase();
+
+    // Only include true transitions where state value actually changed.
+    if (previous && previousState === currentState) return;
+
+    const ts = changedDate.getTime();
+    if (ts < rangeFrom.getTime() || ts > rangeTo.getTime()) return;
+    const laneKey = statusLaneKeyForState(state);
+    if (!laneKey) return;
+    if (!latest || ts >= latest.changedDate.getTime()) {
+      latest = { state, laneKey, changedDate };
+    }
+  });
+  return latest;
+}
+
+function statusBuildListRowHtml(item) {
+  const title = String(item?.fields?.['System.Title'] || `#${item.id}`).trim();
+  const state = workItemState(item);
+  const remaining = formatNumericOrDash(statusRemainingWorkValue(item));
+  return `<tr onclick="openWorkItemModal(${item.id})" style="cursor:pointer;">
+    <td class="title-cell"><a href="#" onclick="openWorkItemModal(${item.id});return false;" title="${escHtml(title)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;color:var(--text);text-decoration:none;">${escHtml(title)}</a></td>
+    <td data-col="status"><span class="badge ${stateBadgeClass(state)}">${escHtml(state || '–')}</span></td>
+    <td data-col="remaining" style="font-family:'JetBrains Mono',monospace;text-align:right;">${escHtml(remaining)}</td>
+  </tr>`;
+}
+
+function statusTreeRowHtml(row, features, stories, listWidth) {
+  if (!row) return '';
+  if (row.type === 'group') {
+    return `<div style="display:flex;height:30px;background:var(--surface);border-bottom:1px solid var(--border);box-sizing:border-box;flex-shrink:0;">
+      ${hierarchyGroupRowLeadHtml(row.label, { width: `${listWidth}px`, height: 30 })}
+      <div style="flex-shrink:0;width:28px;border-left:1px solid var(--border);"></div>
+    </div>`;
+  }
+
+  const item = row.item;
+  const type = row.type;
+  const rowHeight = type === 'epic' ? 38 : 32;
+  const hasChildren = hierarchyRowHasChildren(item, type, features, stories);
+  
+  let buttonHtml = '';
+  if (type === 'epic') {
+    const isSelected = statusSelectedEpicIds.has(item.id);
+    const buttonBgColor = isSelected ? 'var(--accent2)' : 'transparent';
+    const buttonOpacity = isSelected ? '1' : '0.5';
+    buttonHtml = `<button style="flex-shrink:0;width:28px;height:100%;background:${buttonBgColor};border:none;border-left:1px solid var(--border);color:${isSelected ? 'white' : 'var(--muted)'};cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.88rem;opacity:${buttonOpacity};padding:0;transition:all 0.2s;" onclick="event.stopPropagation();statusToggleEpicFilter(${item.id})" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='${buttonOpacity}'" title="Filtrera">🔍</button>`;
+  } else {
+    buttonHtml = `<div style="flex-shrink:0;width:28px;height:100%;border-left:1px solid var(--border);"></div>`;
+  }
+  
+  return `<div style="display:flex;height:${rowHeight}px;border-bottom:1px solid rgba(125,133,144,.08);box-sizing:border-box;flex-shrink:0;align-items:center;min-width:0;">
+    <div style="flex:1;min-width:0;max-width:${listWidth}px;">
+      ${hierarchyListCellHtml(item, { type, width: `${listWidth}px`, height: rowHeight, hasChildren })}
+    </div>
+    ${buttonHtml}
+  </div>`;
+}
+
+function statusTreeRowsHtml(rows, features, stories, listWidth) {
+  return (rows || []).map(row => statusTreeRowHtml(row, features, stories, listWidth)).join('');
+}
+
+function statusLaneItemHtml(item) {
+  const title = String(item?.fields?.['System.Title'] || `#${item.id}`).trim();
+  const state = workItemState(item);
+  const type = workItemType(item);
+  const remaining = formatNumericOrDash(statusRemainingWorkValue(item));
+  const original = formatNumericOrDash(statusOriginalEstimateValue(item));
+  return `<div class="status-lane-row-item" onclick="openWorkItemModal(${item.id})">
+    <div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(type)}</div>
+    <div class="status-lane-item-title" title="${escHtml(title)}">${escHtml(title)}</div>
+    <div class="status-lane-item-state"><span class="badge ${stateBadgeClass(state)}">${escHtml(state || '–')}</span></div>
+    <div class="status-lane-item-num" style="text-align:right;">${escHtml(remaining)}</div>
+    <div class="status-lane-item-num" style="text-align:right;">${escHtml(original)}</div>
+  </div>`;
+}
+
+function statusLaneEmptyHtml() {
+  return '<div class="status-lane-empty">Inga tickets</div>';
+}
+
+function statusLaneHeaderSummaryHtml(items) {
+  return `
+    <span class="status-summary-chip">Tickets <strong>${items.length}</strong></span>
+    <span class="status-summary-chip">Remaining <strong>${statusSumDisplay(items, statusRemainingWorkValue)}</strong></span>
+    <span class="status-summary-chip">Original <strong>${statusSumDisplay(items, statusOriginalEstimateValue)}</strong></span>`;
+}
+
+function statusBurndownDateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function statusBurndownIsZeroRemainingState(state) {
+  const normalized = String(state || '').trim().toLowerCase();
+  return statusLaneKeyForState(state) === 'testing' || statusLaneKeyForState(state) === 'done';
+}
+
+function statusDoneDateFromRevisions(revisions) {
+  const fieldValue = value => {
+    if (value == null) return '';
+    if (typeof value === 'object') {
+      if (value.newValue != null) return value.newValue;
+      if (value.value != null) return value.value;
+    }
+    return value;
+  };
+
+  const timeline = (revisions || []).map(rev => {
+    const state = String(fieldValue(rev?.fields?.['System.State']) || '').trim();
+    const changedDateText = String(
+      rev?.revisedDate
+      || fieldValue(rev?.fields?.['System.ChangedDate'])
+      || rev?.changedDate
+      || ''
+    ).trim();
+    const changedDate = new Date(changedDateText);
+    if (!state || !Number.isFinite(changedDate.getTime())) return null;
+    return { state, changedDate };
+  }).filter(Boolean)
+    .sort((a, b) => a.changedDate.getTime() - b.changedDate.getTime());
+
+  for (const point of timeline) {
+    if (statusBurndownIsZeroRemainingState(point.state)) return point.changedDate;
+  }
+  return null;
+}
+
+function statusBuildWorkBurndownSeries(revisionResults, from, to) {
+  if (!from || !to) return [];
+  const fromDay = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const toDay = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+  if (fromDay.getTime() > toDay.getTime()) return [];
+
+  const days = [];
+  for (let t = fromDay.getTime(); t <= toDay.getTime(); t += 86400000) {
+    days.push(new Date(t));
+  }
+
+  const models = (revisionResults || []).map(result => {
+    const item = result?.item;
+    const originalValue = statusOriginalEstimateValue(item);
+    const remainingValue = statusRemainingWorkValue(item);
+    const scopeValue = Number.isFinite(originalValue)
+      ? Number(originalValue)
+      : (Number.isFinite(remainingValue) ? Number(remainingValue) : 0);
+    const remaining = Math.max(0, scopeValue);
+    const doneDate = statusDoneDateFromRevisions(result?.revisions || []);
+    const doneFromCurrentState = statusBurndownIsZeroRemainingState(workItemState(item)) ? toDay : null;
+    return {
+      remaining,
+      doneDate: doneDate || doneFromCurrentState
+    };
+  });
+
+  return days.map(day => {
+    const dayEnd = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59, 999);
+    let total = 0;
+    models.forEach(model => {
+      if (!model.remaining) return;
+      if (model.doneDate && dayEnd.getTime() >= model.doneDate.getTime()) return;
+      total += model.remaining;
+    });
+    return { date: day, remaining: Math.round(total * 100) / 100 };
+  });
+}
+
+function statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to) {
+  if (!from || !to) return { series: [], deltas: [] };
+
+  const fromDay = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const baselineFrom = new Date(fromDay.getTime() - 86400000);
+  const extended = statusBuildWorkBurndownSeries(revisionResults, baselineFrom, to);
+  if (extended.length <= 1) return { series: [], deltas: [] };
+
+  const series = extended.slice(1);
+  const baseline = extended[0];
+  const deltas = series.map((point, idx) => {
+    const prev = idx === 0 ? baseline : series[idx - 1];
+    const prevRemaining = Number.isFinite(prev?.remaining) ? Number(prev.remaining) : 0;
+    const currRemaining = Number.isFinite(point?.remaining) ? Number(point.remaining) : 0;
+    return Math.max(0, Math.round((prevRemaining - currRemaining) * 100) / 100);
+  });
+
+  return { series, deltas };
+}
+
+function statusBurndownOriginalTotal(revisionResults) {
+  return Math.round((revisionResults || []).reduce((sum, result) => {
+    const value = statusOriginalEstimateValue(result?.item);
+    if (!Number.isFinite(value) || value <= 0) return sum;
+    return sum + value;
+  }, 0) * 100) / 100;
+}
+
+function statusBurndownSvg(series, options = {}) {
+  if (!series.length) return '';
+  const width = 900;
+  const height = 220;
+  const padL = 44;
+  const padR = 44; // wider right pad for secondary axis labels
+  const padT = 12;
+  const padB = 50;
+  const innerW = width - padL - padR;
+  const innerH = height - padT - padB;
+
+  const values = series.map(p => Number.isFinite(p.remaining) ? p.remaining : 0);
+  const forcedMaxY = Number.isFinite(options.maxY) ? Number(options.maxY) : 0;
+  const maxY = Math.max(1, forcedMaxY, ...values);
+  const dayCount = Math.max(1, series.length);
+  const daySlotW = innerW / dayCount;
+  const barWidthFactor = series.length > 6 ? 0.56 : 0.62;
+  const barWidth = Math.max(2, daySlotW * barWidthFactor);
+  const xFor = idx => padL + (daySlotW * (idx + 0.5));
+  const yFor = value => padT + innerH - ((Math.max(0, value) / maxY) * innerH);
+
+  // Daily delta (burn per day): one value per day, where day 1 uses baseline day before range.
+  const providedDeltas = Array.isArray(options.deltas) ? options.deltas : [];
+  const deltas = series.map((p, i) => {
+    const provided = providedDeltas[i];
+    if (Number.isFinite(provided)) return Math.max(0, Number(provided));
+    if (i === 0) return 0;
+    return Math.max(0, Math.round((values[i - 1] - values[i]) * 100) / 100);
+  });
+  const maxDelta = Math.max(1, ...deltas);
+  const barMaxH = innerH * 0.38; // bars occupy up to 38% of chart height, from bottom
+  const baselineY = padT + innerH;
+  const yBar = delta => baselineY - ((Math.max(0, delta) / maxDelta) * barMaxH);
+
+  // Draw bars centered on the actual day index (i), where delta[i] is burn for that day.
+  let barsHtml = '';
+  let barLabelsHtml = '';
+  series.forEach((point, i) => {
+    const delta = deltas[i];
+    const cx = xFor(i);
+    const barX = cx - (barWidth / 2);
+    const barH = Math.max(1, baselineY - yBar(delta));
+    const y = baselineY - barH;
+    const label = statusBurndownDateKey(point.date).slice(5);
+    const fill = delta > 0 ? 'rgba(22,120,58,.45)' : 'rgba(125,133,144,.18)';
+    barsHtml += `<rect x="${barX.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${barH.toFixed(2)}" fill="${fill}" rx="2"></rect>`;
+    barLabelsHtml += `<text x="${cx.toFixed(2)}" y="${(height - 8).toFixed(2)}" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="JetBrains Mono,monospace">${escHtml(label)}</text>`;
+  });
+
+  const actualPath = series.map((p, i) => `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(2)} ${yFor(p.remaining).toFixed(2)}`).join(' ');
+
+  const yTicks = [0, 0.5, 1].map(v => {
+    const yVal = maxY * v;
+    const y = yFor(yVal);
+    return `<line x1="${padL}" y1="${y.toFixed(2)}" x2="${(width - padR).toFixed(2)}" y2="${y.toFixed(2)}" stroke="rgba(125,133,144,.22)" stroke-dasharray="3 3"></line>
+      <text x="${(padL - 6).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="end" fill="var(--muted)" font-size="10" font-family="JetBrains Mono,monospace">${(Math.round(yVal * 100) / 100).toString()}</text>`;
+  }).join('');
+
+  // Right axis ticks for daily delta
+  const deltaAxisTicks = [0, 0.5, 1].map(v => {
+    const dVal = Math.round(maxDelta * v * 100) / 100;
+    const y = baselineY - ((dVal / maxDelta) * barMaxH);
+    return `<text x="${(width - padR + 6).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="start" fill="rgba(22,120,58,.8)" font-size="9" font-family="JetBrains Mono,monospace">${dVal.toString()}</text>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" height="100%" preserveAspectRatio="none" role="img" aria-label="Burndown chart">
+    <defs>
+      <clipPath id="burndownClip">
+        <rect x="${padL}" y="${padT}" width="${innerW}" height="${innerH + padB - padT}"></rect>
+      </clipPath>
+    </defs>
+    <rect x="0" y="0" width="${width}" height="${height}" fill="transparent"></rect>
+    <g clip-path="url(#burndownClip)">${barsHtml}</g>
+    ${barLabelsHtml}
+    ${yTicks}
+    ${deltaAxisTicks}
+    <line x1="${padL}" y1="${(height - padB).toFixed(2)}" x2="${(width - padR).toFixed(2)}" y2="${(height - padB).toFixed(2)}" stroke="rgba(125,133,144,.4)"></line>
+    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${(height - padB).toFixed(2)}" stroke="rgba(125,133,144,.4)"></line>
+    <line x1="${(width - padR).toFixed(2)}" y1="${padT}" x2="${(width - padR).toFixed(2)}" y2="${(height - padB).toFixed(2)}" stroke="rgba(22,120,58,.2)"></line>
+    <path d="${actualPath}" fill="none" stroke="var(--accent2)" stroke-width="2.2"></path>
+    <circle cx="${xFor(series.length - 1).toFixed(2)}" cy="${yFor(values[values.length - 1] || 0).toFixed(2)}" r="3.2" fill="var(--accent2)"></circle>
+  </svg>`;
+}
+
+function statusRenderBurndownPanel(targetEl, revisionResults, from, to, hasActiveFilter) {
+  if (!targetEl) return;
+
+  if (!hasActiveFilter) {
+    targetEl.innerHTML = '<div class="status-burndown-head"><span class="status-burndown-title">Burndown</span></div><div class="status-burndown-empty">Aktivera sprintfilter eller epicfilter för att visa burndown.</div>';
+    return;
+  }
+
+  const { series, deltas } = statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to);
+  if (!series.length) {
+    targetEl.innerHTML = '<div class="status-burndown-head"><span class="status-burndown-title">Burndown</span></div><div class="status-burndown-empty">Ingen data i valt datumintervall.</div>';
+    return;
+  }
+
+  const originalTotal = statusBurndownOriginalTotal(revisionResults);
+  const start = series[0]?.remaining || 0;
+  const end = series[series.length - 1]?.remaining || 0;
+  const done = Math.max(0, Math.round((start - end) * 100) / 100);
+  const donePct = start > 0 ? Math.max(0, Math.min(100, Math.round((done / start) * 100))) : 0;
+
+  targetEl.innerHTML = `
+    <div class="status-burndown-head">
+      <span class="status-burndown-title">Work Burndown</span>
+      <div class="status-burndown-metrics">
+        <span class="status-summary-chip">Original <strong>${escHtml(String(originalTotal))}</strong></span>
+        <span class="status-summary-chip">Start <strong>${escHtml(String(start))}</strong></span>
+        <span class="status-summary-chip">Nu <strong>${escHtml(String(end))}</strong></span>
+        <span class="status-summary-chip">Burned <strong>${escHtml(String(done))}</strong></span>
+        <span class="status-summary-chip">Klart <strong>${escHtml(String(donePct))}%</strong></span>
+      </div>
+    </div>
+    <div class="status-burndown-chart">${statusBurndownSvg(series, { maxY: start, idealStart: start, deltas })}</div>`;
+}
+
+function statusFeatureForItem(item) {
+  if (!item) return null;
+  let currentItem = item;
+  for (let i = 0; i < 12; i++) {
+    if (isWorkItemType(currentItem, WI_TYPE_FEATURE)) return currentItem;
+    const parentId = Number(workItemParentId(currentItem) || 0);
+    if (!parentId) break;
+    const parentItem = allItems.find(it => Number(it.id) === parentId);
+    if (!parentItem) break;
+    currentItem = parentItem;
+  }
+  return null;
+}
+
+function statusBuildPerFeatureRows(revisionResults) {
+  const byFeature = new Map();
+  (revisionResults || []).forEach(result => {
+    const item = result?.item;
+    if (!item) return;
+    const feature = statusFeatureForItem(item);
+    if (!feature) return;
+
+    const featureId = Number(feature.id || 0);
+    if (!featureId) return;
+    if (!byFeature.has(featureId)) {
+      byFeature.set(featureId, {
+        id: featureId,
+        title: String(feature.fields?.['System.Title'] || `Feature #${featureId}`).trim(),
+        original: 0,
+        burned: 0,
+      });
+    }
+
+    const bucket = byFeature.get(featureId);
+    const original = Math.max(0, statusOriginalEstimateValue(item) || 0);
+    const remainingRaw = Math.max(0, statusRemainingWorkValue(item) || 0);
+    const remaining = statusBurndownIsZeroRemainingState(workItemState(item)) ? 0 : remainingRaw;
+    const burned = Math.max(0, original - remaining);
+
+    bucket.original += original;
+    bucket.burned += burned;
+  });
+
+  const rows = [...byFeature.values()]
+    .map(row => ({
+      ...row,
+      original: Math.round(row.original * 100) / 100,
+      burned: Math.min(Math.round(row.original * 100) / 100, Math.round(row.burned * 100) / 100),
+    }))
+    .filter(row => row.original > 0)
+    .sort((a, b) => (b.original - a.original) || (b.burned - a.burned) || a.title.localeCompare(b.title, 'sv-SE', { sensitivity: 'base', numeric: true }));
+
+  const totalOriginal = Math.round(rows.reduce((sum, row) => sum + row.original, 0) * 100) / 100;
+  const totalBurned = Math.round(rows.reduce((sum, row) => sum + row.burned, 0) * 100) / 100;
+  const maxOriginal = Math.max(1, ...rows.map(row => row.original), 1);
+
+  return { rows, totalOriginal, totalBurned, maxOriginal };
+}
+
+function statusRenderPerFeaturePanel(targetEl, revisionResults, hasActiveFilter) {
+  if (!targetEl) return;
+
+  if (!hasActiveFilter) {
+    targetEl.innerHTML = '<div class="status-feature-head"><span class="status-feature-title">Per feature</span></div><div class="status-feature-empty">Aktivera sprintfilter eller epicfilter för att visa feature-aggregat.</div>';
+    return;
+  }
+
+  const featureData = statusBuildPerFeatureRows(revisionResults);
+  const rows = featureData.rows;
+
+  if (!rows.length) {
+    targetEl.innerHTML = '<div class="status-feature-head"><span class="status-feature-title">Per feature</span></div><div class="status-feature-empty">Ingen Original Estimate-data för feature i valt urval.</div>';
+    return;
+  }
+
+  const maxOriginal = featureData.maxOriginal;
+  const totalOriginal = featureData.totalOriginal;
+  const totalBurned = featureData.totalBurned;
+
+  const rowsHtml = rows.map(row => {
+    const burnPct = Math.max(0, Math.min(100, (row.burned / maxOriginal) * 100));
+    const remainPct = Math.max(0, Math.min(100 - burnPct, ((row.original - row.burned) / maxOriginal) * 100));
+    const hasBurn = burnPct > 0.01;
+    const hasRemain = remainPct > 0.01;
+    const burnedRadius = hasRemain ? '999px 0 0 999px' : '999px';
+    const remainingRadius = hasBurn ? '0 999px 999px 0' : '999px';
+    return `<div class="status-feature-row">
+      <div class="status-feature-name" title="${escHtml(row.title)}">${escHtml(row.title)}</div>
+      <div class="status-feature-bar" title="Original ${row.original} / Burned ${row.burned}">
+        ${hasBurn ? `<div class="status-feature-bar-burned" style="width:${burnPct.toFixed(2)}%;border-radius:${burnedRadius};"></div>` : ''}
+        ${hasRemain ? `<div class="status-feature-bar-remaining" style="width:${remainPct.toFixed(2)}%;border-radius:${remainingRadius};"></div>` : ''}
+      </div>
+      <div class="status-feature-metrics">Burned <strong>${escHtml(String(row.burned))}</strong> / Original <strong>${escHtml(String(row.original))}</strong></div>
+    </div>`;
+  }).join('');
+
+  targetEl.innerHTML = `
+    <div class="status-feature-head">
+      <span class="status-feature-title">Per feature</span>
+      <div class="status-feature-metrics">Burned <strong>${escHtml(String(totalBurned))}</strong> / Original <strong>${escHtml(String(totalOriginal))}</strong></div>
+    </div>
+    <div class="status-feature-list">${rowsHtml}</div>`;
 }
 
 function expandAllEpicsAndFeatures(items = allItems) {
@@ -3982,7 +5164,7 @@ function sprintDebug(eventName, data = {}) {
   } catch (_) {}
 }
 
-const BACKLOG_SECTION_TABS = ['backlog','estimering','prioritering','timeline','roadmap','sprint','board','info'];
+const BACKLOG_SECTION_TABS = ['backlog','status','estimering','prioritering','timeline','roadmap','sprint','board','info'];
 const PORTFOLIO_SECTION_TABS = ['dashboard','kalkyl','analys','kostnader'];
 const UTILITY_TABS = ['audit'];
 const NAV_TABS = [...BACKLOG_SECTION_TABS, ...PORTFOLIO_SECTION_TABS, ...UTILITY_TABS];
@@ -4044,9 +5226,9 @@ function showTab(tab) {
   const searchAndTogglesBar = document.getElementById('searchAndTogglesBar');
   if (searchAndTogglesBar) searchAndTogglesBar.style.display = tab === 'backlog' ? '' : 'none';
   if (tab === 'backlog') renderBacklogControlBar();
-  // Hide original grouping bar in Backlog tab
+  // Hide original grouping bar in Backlog and Status tabs
   const groupingBar = document.getElementById('defaultGroupingBar');
-  if (groupingBar) groupingBar.style.display = tab === 'backlog' ? 'none' : '';
+  if (groupingBar) groupingBar.style.display = (tab === 'backlog' || tab === 'status') ? 'none' : '';
 
   // Remove old Backlog toolbar if present
   const toolbar = document.getElementById('backlogToolbar');
@@ -4068,6 +5250,9 @@ function showTab(tab) {
       ? `Backlog &nbsp;<span style="color:var(--muted);font-size:0.86rem;">Visar items</span>`
       : 'Backlog';
     info.style.display = '';
+  } else if (tab === 'status') {
+    info.innerHTML = 'Status';
+    info.style.display = '';
   } else if (tab === 'board') {
     info.innerHTML = 'Board';
     info.style.display = '';
@@ -4081,6 +5266,8 @@ function showTab(tab) {
 
   if (tab === 'estimering') {
     if (allItems.length) renderEstimering(); else showEmpty('Klicka "Hämta data" för att ladda.');
+  } else if (tab === 'status') {
+    if (allItems.length) renderStatusTab(); else showEmpty('Klicka "Hämta data" för att ladda.');
   } else if (tab === 'prioritering') {
     if (allItems.length) renderPrioritering(); else showEmpty('Klicka "Hämta data" för att ladda.');
   } else if (tab === 'timeline') {
@@ -4849,6 +6036,7 @@ function renderActiveView() {
   if (activeTab === 'timeline') renderTimeline();
   else if (activeTab === 'prioritering') renderPrioritering();
   else if (activeTab === 'estimering') renderEstimering();
+  else if (activeTab === 'status') renderStatusTab();
   else if (activeTab === 'board') {
     if (boardNativeRuntime) {
       const snapshot = boardNativeSnapshot(boardNativeRuntime);
@@ -4867,7 +6055,7 @@ async function refreshStandardTicketLists() {
     setTabBtnsEnabled(true);
     return;
   }
-  if (['backlog','estimering','prioritering','timeline'].includes(tabBefore)) {
+  if (['backlog','status','estimering','prioritering','timeline'].includes(tabBefore)) {
     showTab(tabBefore);
     setTabBtnsEnabled(true);
   }
@@ -6488,7 +7676,7 @@ async function fetchItems(options = {}) {
       const isExcluded = EXCLUDED_STATES.some(ex => state.includes(ex));
       if (!isExcluded) return true;
       const type = (item.fields['System.WorkItemType'] || '').toLowerCase().trim();
-      return type === 'epic' || type === 'feature' || type === 'user story' || type === 'sprint goal';
+      return type === 'epic' || type === 'feature' || type === 'user story' || type === 'bug' || type === 'task' || type === 'sprint goal';
     });
     normalizeRoadmapValuesOnItems(allItems);
 
@@ -6703,9 +7891,9 @@ function getFilteredItems() {
     if (colFilters.status && !state.includes(colFilters.status)) return false;
     if (colFilters.sprint) {
       const iterPath = f['System.IterationPath'] || '';
-      const parts = iterPath.split('\\');
-      const sprint = (parts.length > 1 ? parts[parts.length - 1] : '').toLowerCase();
-      if (!sprint.includes(colFilters.sprint)) return false;
+      const sprintLabel = (iterPath.split('\\').filter(Boolean).pop() || iterPath || '').toLowerCase();
+      const iterPathLower = iterPath.toLowerCase();
+      if (!sprintLabel.includes(colFilters.sprint) && !iterPathLower.includes(colFilters.sprint)) return false;
     }
     if (colFilters.valuearea) {
       const ao = (f[AFFARSOM_FIELD] || '').toLowerCase();
@@ -7008,8 +8196,7 @@ function renderTable() {
   const wrap = document.getElementById('tableWrap');
   const info = document.getElementById('resultInfo');
 
-  info.style.display = '';
-  info.innerHTML = `Backlog &nbsp;<span style="color:var(--muted);font-size:0.86rem;">Visar <strong style="color:var(--accent2)">${filtered.length}</strong> av ${allItems.length} items</span>`;
+  info.style.display = 'none';
 
   const hasActiveColFilter = Object.keys(colFilters).length > 0;
   if (filtered.length === 0 && !hasActiveColFilter) {
@@ -7119,10 +8306,9 @@ function renderTable() {
     const tags    = (f['System.Tags'] || '').split(';').map(t => t.trim()).filter(Boolean);
     const tagsHtml = tags.map(t => `<span class="tag-chip">${t}</span>`).join('');
     const changed  = f['System.ChangedDate'] ? new Date(f['System.ChangedDate']).toLocaleDateString('sv-SE') : '';
-    // Sprint: last segment of IterationPath (e.g. "Project\Sprint 5" → "Sprint 5")
+    // Sprint: last segment of IterationPath, fallback to raw path when no separators exist.
     const iterPath = f['System.IterationPath'] || '';
-    const sprintParts = iterPath.split('\\');
-    const sprint = sprintParts.length > 1 ? sprintParts[sprintParts.length - 1] : '';
+    const sprint = iterPath.split('\\').filter(Boolean).pop() || iterPath;
     // AO (Affärsområde)
     const AFFARSOM_FIELD = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
     const AFFARSOM_OPTIONS = [
@@ -7371,7 +8557,19 @@ function renderTable() {
               <option value="">Alla</option>
             </select>
           </th>
-          <th data-col="sprint"><input class="col-filter" data-fcol="sprint" placeholder="Sprint…" oninput="setColFilter('sprint',this.value)"></th>
+          <th data-col="sprint">
+            <select class="col-filter" data-fcol="sprint" onchange="setColFilter('sprint',this.value)">
+              <option value="">Alla</option>
+              ${[...new Set(allItems
+                .map(i => String(i?.fields?.['System.IterationPath'] || '').trim())
+                .filter(Boolean)
+                .map(p => (p.split('\\').filter(Boolean).pop() || p).trim())
+                .filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }))
+                .map(s => `<option value="${s.toLowerCase()}" ${colFilters.sprint===s.toLowerCase()?'selected':''}>${escHtml(s)}</option>`)
+                .join('')}
+            </select>
+          </th>
           <th data-col="customtyp">
             <select class="col-filter" data-fcol="customtyp" onchange="setColFilter('customtyp',this.value)">
               <option value="">Alla</option>
@@ -12104,6 +13302,14 @@ let infoParentInfoMap = new Map();
 let infoParentInfoTypeMap = new Map();
 let infoFrameResetForParentId = null;
 let infoIsApplyingTemplate = false;
+let statusSelectedSprintPath = '';
+let statusTabFromDate = '';
+let statusTabToDate = '';
+let statusRevisionCache = new Map();
+let statusRenderSeq = 0;
+let statusSelectedEpicIds = new Set();
+let statusFilterBySprint = false;
+let statusRightTab = 'tickets';
 
 function toggleEstSizingGuide(kind) {
   estSizingGuideOpen = estSizingGuideOpen === kind ? '' : kind;
@@ -18038,6 +19244,787 @@ async function renderBoardTab() {
   boardUpdateFullscreenButton();
 
   boardNativeMount();
+}
+
+function statusSetSprint(path) {
+  statusSelectedSprintPath = String(path || '').trim();
+  if (statusFilterBySprint) {
+    const meta = sprintColumnMetaForPath(statusSelectedSprintPath || statusDefaultSprintPath());
+    statusTabFromDate = meta.startDate ? String(meta.startDate).slice(0, 10) : '';
+    statusTabToDate = meta.finishDate ? String(meta.finishDate).slice(0, 10) : '';
+  }
+  renderStatusTab();
+}
+
+function statusSetFromDate(value) {
+  statusTabFromDate = String(value || '').trim();
+  renderStatusTab();
+}
+
+function statusSetToDate(value) {
+  statusTabToDate = String(value || '').trim();
+  renderStatusTab();
+}
+
+function statusSetRightTab(tab) {
+  const requested = String(tab || '').toLowerCase();
+  const nextTab = (requested === 'burndown' || requested === 'feature') ? requested : 'tickets';
+  statusRightTab = nextTab;
+
+  const ticketsBtn = document.getElementById('statusRightTabBtnTickets');
+  const burndownBtn = document.getElementById('statusRightTabBtnBurndown');
+  const featureBtn = document.getElementById('statusRightTabBtnFeature');
+  if (ticketsBtn) ticketsBtn.classList.toggle('active', nextTab === 'tickets');
+  if (burndownBtn) burndownBtn.classList.toggle('active', nextTab === 'burndown');
+  if (featureBtn) featureBtn.classList.toggle('active', nextTab === 'feature');
+
+  const ticketsPanel = document.getElementById('statusRightPanelTickets');
+  const burndownPanel = document.getElementById('statusRightPanelBurndown');
+  const featurePanel = document.getElementById('statusRightPanelFeature');
+  if (ticketsPanel) ticketsPanel.classList.toggle('active', nextTab === 'tickets');
+  if (burndownPanel) burndownPanel.classList.toggle('active', nextTab === 'burndown');
+  if (featurePanel) featurePanel.classList.toggle('active', nextTab === 'feature');
+}
+
+function statusApplyDatePreset(days) {
+  const n = Number(days);
+  if (!Number.isFinite(n) || n <= 0) return;
+  const today = new Date();
+  const from = new Date(today);
+  from.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  from.setDate(from.getDate() - Math.max(0, Math.floor(n) - 1));
+  const formatYmd = d => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  statusTabFromDate = formatYmd(from);
+  statusTabToDate = formatYmd(today);
+  renderStatusTab();
+}
+
+function statusRefresh() {
+  statusRevisionCache = new Map();
+  renderStatusTab();
+}
+
+function statusExportRowFromItem(item, transition) {
+  const changedDate = transition?.changedDate instanceof Date && Number.isFinite(transition.changedDate.getTime())
+    ? transition.changedDate
+    : null;
+  return {
+    id: Number(item?.id || 0),
+    type: workItemType(item),
+    title: String(item?.fields?.['System.Title'] || `#${item?.id || ''}`).trim(),
+    status: workItemState(item),
+    prio: workItemPriorityLevel(item),
+    remaining: formatNumericOrDash(statusRemainingWorkValue(item)),
+    original: formatNumericOrDash(statusOriginalEstimateValue(item)),
+    changedDateText: changedDate ? changedDate.toLocaleString('sv-SE') : '–',
+  };
+}
+
+function statusPdfColorForState(state) {
+  const normalized = String(state || '').trim().toLowerCase();
+  if (normalized === 'in progress' || normalized === 'ready for test') return [36, 99, 235];
+  if (normalized === 'ready for deploy to production' || normalized === 'in production' || normalized === 'completed') return [22, 163, 74];
+  return [70, 76, 84];
+}
+
+function statusPdfLaneTitle(laneKey) {
+  if (laneKey === 'started') return 'Påbörjade';
+  if (laneKey === 'testing') return 'In testing';
+  return 'Klara';
+}
+
+function statusPdfDrawBurndownChart(doc, series, options = {}) {
+  if (!doc || !series || !series.length) return;
+
+  const x = Number(options.x || 32);
+  const y = Number(options.y || 120);
+  const width = Number(options.width || 760);
+  const height = Number(options.height || 160);
+
+  const leftPad = 34;
+  const rightPad = 36;
+  const topPad = 16;
+  const bottomPad = 34;
+
+  const innerW = Math.max(1, width - leftPad - rightPad);
+  const innerH = Math.max(1, height - topPad - bottomPad);
+
+  const values = series.map(point => Number.isFinite(point?.remaining) ? Number(point.remaining) : 0);
+  const maxY = Math.max(1, Number(options.maxY || 0), ...values);
+  const dayCount = Math.max(1, series.length);
+  const daySlotW = innerW / dayCount;
+  const barWidthFactor = series.length > 6 ? 0.56 : 0.62;
+  const barWidth = Math.max(2, daySlotW * barWidthFactor);
+  const xFor = idx => x + leftPad + (daySlotW * (idx + 0.5));
+  const yFor = value => y + topPad + innerH - ((Math.max(0, value) / maxY) * innerH);
+  const chartBottomY = y + topPad + innerH;
+
+  const providedDeltas = Array.isArray(options.deltas) ? options.deltas : [];
+  const deltas = series.map((point, i) => {
+    const provided = providedDeltas[i];
+    if (Number.isFinite(provided)) return Math.max(0, Number(provided));
+    if (i === 0) return 0;
+    return Math.max(0, Math.round((values[i - 1] - values[i]) * 100) / 100);
+  });
+  const maxDelta = Math.max(1, ...deltas);
+  const barMaxH = innerH * 0.4;
+
+  doc.setDrawColor(198, 205, 213);
+  doc.setLineWidth(0.6);
+  doc.rect(x, y, width, height);
+
+  [0, 0.5, 1].forEach(fraction => {
+    const yValue = maxY * fraction;
+    const yy = yFor(yValue);
+    doc.setDrawColor(225, 229, 235);
+    doc.setLineWidth(0.4);
+    doc.line(x + leftPad, yy, x + width - rightPad, yy);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(96, 103, 112);
+    doc.text(String(Math.round(yValue * 100) / 100), x + leftPad - 4, yy + 3, { align: 'right' });
+  });
+
+  [0, 0.5, 1].forEach(fraction => {
+    const deltaValue = Math.round(maxDelta * fraction * 100) / 100;
+    const yy = chartBottomY - ((deltaValue / maxDelta) * barMaxH);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(22, 120, 58);
+    doc.text(String(deltaValue), x + width - rightPad + 4, yy + 3, { align: 'left' });
+  });
+
+  for (let i = 0; i < series.length; i++) {
+    const delta = deltas[i];
+    const cx = xFor(i);
+    const barX = cx - (barWidth / 2);
+    const barH = Math.max(1, (delta / maxDelta) * barMaxH);
+    const barY = chartBottomY - barH;
+    if (delta > 0) {
+      doc.setFillColor(22, 120, 58);
+      doc.setDrawColor(22, 120, 58);
+    } else {
+      doc.setFillColor(180, 186, 195);
+      doc.setDrawColor(180, 186, 195);
+    }
+    doc.rect(barX, barY, barWidth, barH, 'F');
+
+    const label = statusBurndownDateKey(series[i].date).slice(5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(96, 103, 112);
+    doc.text(label, cx, y + height - 6, { align: 'center' });
+  }
+
+  doc.setDrawColor(120, 127, 136);
+  doc.setLineWidth(0.7);
+  doc.line(x + leftPad, y + topPad, x + leftPad, chartBottomY);
+  doc.line(x + leftPad, chartBottomY, x + width - rightPad, chartBottomY);
+  doc.setDrawColor(22, 120, 58);
+  doc.setLineWidth(0.5);
+  doc.line(x + width - rightPad, chartBottomY - barMaxH, x + width - rightPad, chartBottomY);
+
+  doc.setDrawColor(46, 95, 163);
+  doc.setLineWidth(1.7);
+  for (let i = 1; i < series.length; i++) {
+    doc.line(xFor(i - 1), yFor(values[i - 1]), xFor(i), yFor(values[i]));
+  }
+  const lastX = xFor(series.length - 1);
+  const lastY = yFor(values[values.length - 1] || 0);
+  doc.setFillColor(46, 95, 163);
+  doc.circle(lastX, lastY, 2.1, 'F');
+
+}
+
+async function statusCollectExportSnapshot() {
+  if (!statusSelectedSprintPath) {
+    statusSelectedSprintPath = statusDefaultSprintPath();
+  }
+
+  const sprintOptions = statusSprintOptions();
+  const selectedPath = statusSelectedSprintPath || sprintOptions[0] || '';
+  if (selectedPath && selectedPath !== statusSelectedSprintPath) statusSelectedSprintPath = selectedPath;
+
+  const { from, to } = statusSelectedDateRange();
+  const hasActiveFilter = statusFilterBySprint || statusSelectedEpicIds.size > 0;
+
+  const laneSourceItems = !hasActiveFilter ? [] : allItems.filter(item => {
+    const itemType = workItemType(item);
+    if (statusFilterBySprint && !statusItemMatchesSprint(item, selectedPath)) return false;
+    if (statusSelectedEpicIds.size > 0) {
+      if (!['User Story', 'Bug'].includes(itemType)) return false;
+    } else {
+      if (!statusEligibleItemType(item)) return false;
+    }
+    return statusItemUnderSelectedEpic(item);
+  });
+
+  const revisionResults = await Promise.all(laneSourceItems.map(async item => {
+    const project = workItemProject(item, '');
+    try {
+      const revisions = await statusFetchWorkItemRevisions(item.id, project);
+      const transition = statusPickTransition(revisions, from, to);
+      return { item, transition, revisions };
+    } catch (_) {
+      return { item, transition: null, revisions: [] };
+    }
+  }));
+
+  const laneItems = { started: [], testing: [], done: [] };
+  revisionResults.forEach(result => {
+    if (!result.transition) return;
+    const currentLaneKey = statusLaneKeyForState(workItemState(result.item));
+    const laneKey = currentLaneKey || result.transition.laneKey;
+    if (!laneKey) return;
+    laneItems[laneKey].push({ item: result.item, transition: result.transition });
+  });
+
+  const sortByTransition = (a, b) => {
+    const ad = a.transition?.changedDate?.getTime?.() || 0;
+    const bd = b.transition?.changedDate?.getTime?.() || 0;
+    if (bd !== ad) return bd - ad;
+    return String(a.item?.fields?.['System.Title'] || '').localeCompare(String(b.item?.fields?.['System.Title'] || ''), 'sv-SE', { numeric: true, sensitivity: 'base' });
+  };
+
+  laneItems.started.sort(sortByTransition);
+  laneItems.testing.sort(sortByTransition);
+  laneItems.done.sort(sortByTransition);
+
+  const burndown = statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to);
+  const series = burndown.series;
+  const deltas = burndown.deltas;
+  const featureData = statusBuildPerFeatureRows(revisionResults);
+  const originalTotal = statusBurndownOriginalTotal(revisionResults);
+  const start = series[0]?.remaining || 0;
+  const end = series.length ? (series[series.length - 1]?.remaining || 0) : 0;
+  const burned = Math.max(0, Math.round((start - end) * 100) / 100);
+  const donePct = start > 0 ? Math.max(0, Math.min(100, Math.round((burned / start) * 100))) : 0;
+
+  return {
+    from,
+    to,
+    selectedPath,
+    hasActiveFilter,
+    laneRows: {
+      started: laneItems.started.map(row => statusExportRowFromItem(row.item, row.transition)),
+      testing: laneItems.testing.map(row => statusExportRowFromItem(row.item, row.transition)),
+      done: laneItems.done.map(row => statusExportRowFromItem(row.item, row.transition)),
+    },
+    burndown: {
+      series,
+      deltas,
+      originalTotal,
+      start,
+      end,
+      burned,
+      donePct,
+    },
+    feature: featureData,
+  };
+}
+
+function statusExportPdfLaneTable(doc, laneKey, rows, startY) {
+  const laneTitle = statusPdfLaneTitle(laneKey);
+  const safeRows = rows.length ? rows : [{ type: '–', title: 'Inga tickets', status: '–', prio: '–', remaining: '–', original: '–', changedDateText: '–' }];
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(30, 36, 42);
+  doc.text(laneTitle, 32, startY);
+
+  doc.autoTable({
+    startY: startY + 6,
+    margin: { left: 32, right: 32 },
+    columns: [
+      { header: 'Type', dataKey: 'type' },
+      { header: 'Titel', dataKey: 'title' },
+      { header: 'Status', dataKey: 'status' },
+      { header: 'Prio', dataKey: 'prio' },
+      { header: 'Remaining', dataKey: 'remaining' },
+      { header: 'Original', dataKey: 'original' },
+      { header: 'Bytt', dataKey: 'changedDateText' },
+    ],
+    body: safeRows,
+    theme: 'grid',
+    rowPageBreak: 'avoid',
+    styles: {
+      font: 'helvetica',
+      fontSize: 8,
+      overflow: 'linebreak',
+      cellPadding: { top: 3, right: 5, bottom: 3, left: 5 },
+    },
+    headStyles: {
+      fillColor: [240, 240, 240],
+      textColor: [40, 40, 40],
+      fontStyle: 'bold',
+      halign: 'left',
+      fontSize: 8,
+    },
+    columnStyles: {
+      type: { cellWidth: 58 },
+      title: { cellWidth: 280 },
+      status: { cellWidth: 125 },
+      prio: { cellWidth: 45 },
+      remaining: { cellWidth: 52, halign: 'right' },
+      original: { cellWidth: 52, halign: 'right' },
+      changedDateText: { cellWidth: 100 },
+    },
+    didParseCell: data => {
+      if (data.section !== 'body') return;
+      if (data.column.dataKey !== 'status') return;
+      data.cell.styles.textColor = statusPdfColorForState(data.cell.raw);
+    },
+  });
+
+  return (doc.lastAutoTable?.finalY || (startY + 16));
+}
+
+function statusPdfDrawPerFeatureChart(doc, featureData, options = {}) {
+  const rows = Array.isArray(featureData?.rows) ? featureData.rows : [];
+  const x = Number(options.x || 32);
+  const y = Number(options.y || 320);
+  const width = Number(options.width || 778);
+  const maxRows = Math.max(1, Number(options.maxRows || 10));
+  const titleHeight = 18;
+  const rowHeight = 20;
+  const rowGap = 8;
+  const nameW = 250;
+  const metricsW = 124;
+  const barX = x + nameW + 12;
+  const barW = Math.max(80, width - nameW - metricsW - 28);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(30, 36, 42);
+  doc.text('Per feature', x, y);
+
+  if (!rows.length) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(120, 127, 136);
+    doc.rect(x, y + 8, width, 44);
+    doc.text('Ingen feature-data i valt urval.', x + 10, y + 34);
+    return y + 60;
+  }
+
+  const visibleRows = rows.slice(0, maxRows);
+  const maxOriginal = Math.max(1, ...visibleRows.map(row => Number(row.original) || 0));
+  const chartTop = y + titleHeight;
+
+  visibleRows.forEach((row, idx) => {
+    const yy = chartTop + (idx * (rowHeight + rowGap));
+    const original = Math.max(0, Number(row.original) || 0);
+    const burned = Math.max(0, Math.min(original, Number(row.burned) || 0));
+    const remaining = Math.max(0, original - burned);
+    const totalW = (original / maxOriginal) * barW;
+    const burnedW = (burned / maxOriginal) * barW;
+    const remainingW = (remaining / maxOriginal) * barW;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(50, 56, 63);
+    doc.text(String(row.title || '').slice(0, 52), x, yy + 13);
+
+    if (totalW > 0) {
+      doc.setDrawColor(194, 200, 208);
+      doc.setLineWidth(0.4);
+      doc.roundedRect(barX, yy + 2, totalW, rowHeight - 4, 4, 4, 'S');
+    }
+    if (burnedW > 0) {
+      doc.setFillColor(22, 163, 74);
+      doc.setDrawColor(22, 163, 74);
+      doc.roundedRect(barX, yy + 2, burnedW, rowHeight - 4, 4, 4, 'F');
+    }
+    if (remainingW > 0) {
+      doc.setFillColor(90, 148, 226);
+      doc.setDrawColor(90, 148, 226);
+      doc.roundedRect(barX + burnedW, yy + 2, remainingW, rowHeight - 4, 4, 4, 'F');
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.2);
+    doc.setTextColor(70, 76, 84);
+    doc.text(`${burned} / ${original}`, x + width - 6, yy + 13, { align: 'right' });
+  });
+
+  if (rows.length > visibleRows.length) {
+    const yy = chartTop + (visibleRows.length * (rowHeight + rowGap));
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(120, 127, 136);
+    doc.text(`Visar ${visibleRows.length} av ${rows.length} features`, x, yy + 10);
+    return yy + 18;
+  }
+
+  return chartTop + (visibleRows.length * (rowHeight + rowGap));
+}
+
+async function statusExportPdf() {
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    showToast('PDF-bibliotek saknas.');
+    return;
+  }
+
+  showToast('Bygger status-PDF...');
+
+  const snapshot = await statusCollectExportSnapshot();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+
+  const sprintLabel = snapshot.selectedPath ? statusSprintLabel(snapshot.selectedPath) : 'Ingen sprint';
+  const fromText = snapshot.from ? snapshot.from.toLocaleDateString('sv-SE') : '–';
+  const toText = snapshot.to ? snapshot.to.toLocaleDateString('sv-SE') : '–';
+  const exportedAt = new Date().toLocaleString('sv-SE');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.setTextColor(20, 25, 31);
+  doc.text('Status Export', 32, 36);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(85, 92, 100);
+  doc.text(`Sprint: ${sprintLabel}`, 32, 54);
+  doc.text(`Intervall: ${fromText} -> ${toText}`, 32, 68);
+  doc.text(`Exporterad: ${exportedAt}`, 32, 82);
+
+  const totalTickets = snapshot.laneRows.started.length + snapshot.laneRows.testing.length + snapshot.laneRows.done.length;
+  const summary = [
+    `Tickets ${totalTickets}`,
+    `Original ${snapshot.burndown.originalTotal}`,
+    `Start ${snapshot.burndown.start}`,
+    `Nu ${snapshot.burndown.end}`,
+    `Burned ${snapshot.burndown.burned}`,
+    `Klart ${snapshot.burndown.donePct}%`,
+  ].join('   |   ');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(36, 44, 52);
+  doc.text(summary, 32, 100);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(30, 36, 42);
+  doc.text('Work Burndown', 32, 122);
+
+  if (snapshot.hasActiveFilter && snapshot.burndown.series.length) {
+    statusPdfDrawBurndownChart(doc, snapshot.burndown.series, {
+      x: 32,
+      y: 130,
+      width: 778,
+      height: 170,
+      maxY: snapshot.burndown.start,
+      deltas: snapshot.burndown.deltas,
+    });
+  } else {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(120, 127, 136);
+    doc.rect(32, 130, 778, 170);
+    doc.text('Ingen burndown-data: aktivera sprintfilter eller epicfilter och välj intervall.', 40, 150);
+  }
+
+  let y = 320;
+  y = statusPdfDrawPerFeatureChart(doc, snapshot.feature, {
+    x: 32,
+    y,
+    width: 778,
+    maxRows: 10,
+  }) + 18;
+
+  if (y > 500) {
+    doc.addPage();
+    y = 44;
+  }
+
+  y = statusExportPdfLaneTable(doc, 'started', snapshot.laneRows.started, y) + 20;
+
+  if (y > 500) {
+    doc.addPage();
+    y = 44;
+  }
+  y = statusExportPdfLaneTable(doc, 'testing', snapshot.laneRows.testing, y) + 20;
+
+  if (y > 500) {
+    doc.addPage();
+    y = 44;
+  }
+  statusExportPdfLaneTable(doc, 'done', snapshot.laneRows.done, y);
+
+  const dateKey = new Date().toISOString().slice(0, 10);
+  const fileName = `Status_Export_${dateKey}.pdf`;
+  doc.save(fileName);
+  showToast('PDF exporterad.');
+}
+
+function statusToggleEpicFilter(epicId) {
+  if (statusSelectedEpicIds.has(epicId)) {
+    statusSelectedEpicIds.delete(epicId);
+  } else {
+    statusSelectedEpicIds.add(epicId);
+  }
+  renderStatusTab();
+}
+
+function statusToggleSprintFilter(checked) {
+  statusFilterBySprint = Boolean(checked);
+  if (statusFilterBySprint) {
+    const meta = sprintColumnMetaForPath(statusSelectedSprintPath || statusDefaultSprintPath());
+    statusTabFromDate = meta.startDate ? String(meta.startDate).slice(0, 10) : '';
+    statusTabToDate = meta.finishDate ? String(meta.finishDate).slice(0, 10) : '';
+  }
+  renderStatusTab();
+}
+
+function statusSumDisplay(items, getter) {
+  const values = (items || []).map(getter).filter(v => v != null && Number.isFinite(v));
+  if (!values.length) return '–';
+  return String(values.reduce((sum, value) => sum + value, 0));
+}
+
+async function renderStatusTab() {
+  const wrap = document.getElementById('tableWrap');
+  if (!wrap) return;
+
+  if (!statusSelectedSprintPath) {
+    statusSelectedSprintPath = statusDefaultSprintPath();
+  }
+  const sprintMeta = sprintColumnMetaForPath(statusSelectedSprintPath || '');
+  if (!statusTabFromDate) statusTabFromDate = sprintMeta.startDate ? String(sprintMeta.startDate).slice(0, 10) : '';
+  if (!statusTabToDate) statusTabToDate = sprintMeta.finishDate ? String(sprintMeta.finishDate).slice(0, 10) : '';
+
+  const renderSeq = ++statusRenderSeq;
+  const sprintOptions = statusSprintOptions();
+  const selectedPath = statusSelectedSprintPath || sprintOptions[0] || '';
+  if (selectedPath && selectedPath !== statusSelectedSprintPath) statusSelectedSprintPath = selectedPath;
+
+  const { from, to } = statusSelectedDateRange();
+  const statusEpics = allItems.filter(item => {
+    if (!isWorkItemType(item, WI_TYPE_EPIC)) return false;
+    const stateLower = workItemStateLower(item);
+    const isCompleted = EXCLUDED_STATES.some(ex => stateLower.includes(ex));
+    if (!isCompleted) return true;
+    if (!showCompletedEpics) return false;
+    const changed = item.fields['System.ChangedDate'];
+    if (!changed) return false;
+    return (Date.now() - new Date(changed).getTime()) / 86400000 <= 180;
+  });
+  const statusFeatures = getFeatureItems(allItems).filter(item => {
+    return !EXCLUDED_STATES.some(ex => workItemStateLower(item).includes(ex));
+  });
+  const statusStories = getStoryItems(allItems).filter(item => {
+    return !EXCLUDED_STATES.some(ex => workItemStateLower(item).includes(ex));
+  });
+  const statusRows = standardBuildGroupedHierarchyRows(statusEpics, statusFeatures, statusStories, { groupMode: 'projekt', includeStories: true });
+  const statusListItems = statusRows.filter(row => row.item);
+  const leftItems = statusListItems.map(row => row.item).sort((a, b) => {
+    const ad = Date.parse(a?.fields?.['System.ChangedDate'] || '') || 0;
+    const bd = Date.parse(b?.fields?.['System.ChangedDate'] || '') || 0;
+    if (bd !== ad) return bd - ad;
+    return String(a?.fields?.['System.Title'] || '').localeCompare(String(b?.fields?.['System.Title'] || ''), 'sv-SE', { numeric: true, sensitivity: 'base' });
+  });
+
+  const hasActiveFilter = statusFilterBySprint || statusSelectedEpicIds.size > 0;
+  const laneSourceItems = !hasActiveFilter ? [] : allItems.filter(item => {
+    const itemType = workItemType(item);
+    if (statusFilterBySprint && !statusItemMatchesSprint(item, selectedPath)) return false;
+    if (statusSelectedEpicIds.size > 0) {
+      if (!['User Story', 'Bug'].includes(itemType)) return false;
+    } else {
+      if (!statusEligibleItemType(item)) return false;
+    }
+    return statusItemUnderSelectedEpic(item);
+  });
+
+  wrap.innerHTML = `<div class="status-layout">
+    <div class="status-left">
+      <section class="board-pane" style="flex:1;min-height:0;">
+        <div class="board-pane-head">
+          <span>Epic/Feature/Story</span>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-outline" style="width:auto;padding:5px 8px;font-size:.72rem;line-height:1.1;" onclick="statusRefresh()" title="Uppdatera listan">↻</button>
+          </div>
+        </div>
+        <div class="board-pane-list" style="gap:0;overflow-x:hidden;" id="statusLeftBody">
+          ${statusRows.length ? statusTreeRowsHtml(statusRows, statusFeatures, statusStories, 280) : '<div style="padding:14px;color:var(--muted);font-size:0.8rem;">Hämtar statehistorik…</div>'}
+        </div>
+      </section>
+    </div>
+    <div class="status-right">
+      <div class="status-menu-bar">
+        <div class="status-sprint-filter-group">
+          <label style="display:flex;align-items:center;gap:4px;color:var(--muted);font-size:0.78rem;font-family:'JetBrains Mono',monospace;white-space:nowrap;">
+            <input type="checkbox" id="statusFilterBySprintToggle" ${statusFilterBySprint ? 'checked' : ''} onchange="statusToggleSprintFilter(this.checked)">
+            <span>Filtrera sprint</span>
+          </label>
+          <select id="statusSprintSelect" class="col-filter" onchange="statusSetSprint(this.value)">
+            ${sprintOptions.map(path => `<option value="${escHtml(path)}" ${path === selectedPath ? 'selected' : ''}>${escHtml(statusSprintLabel(path))}</option>`).join('')}
+          </select>
+        </div>
+        <div class="status-date-row">
+          <label style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.78rem;font-family:'JetBrains Mono',monospace;">
+            <span>Från</span>
+            <input id="statusFromDate" type="date" class="col-filter" value="${escHtml(statusTabFromDate || '')}" onchange="statusSetFromDate(this.value)">
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.78rem;font-family:'JetBrains Mono',monospace;">
+            <span>Till</span>
+            <input id="statusToDate" type="date" class="col-filter" value="${escHtml(statusTabToDate || '')}" onchange="statusSetToDate(this.value)">
+          </label>
+          <button class="btn btn-outline" style="width:auto;padding:5px 8px;font-size:0.72rem;line-height:1.1;" onclick="statusApplyDatePreset(2)">1 dag</button>
+          <button class="btn btn-outline" style="width:auto;padding:5px 8px;font-size:0.72rem;line-height:1.1;" onclick="statusApplyDatePreset(7)">1 vecka</button>
+          <button class="btn btn-outline" style="width:auto;padding:5px 10px;" onclick="statusRefresh()">↻</button>
+          <button class="btn btn-outline" style="width:auto;padding:5px 10px;font-size:0.72rem;line-height:1.1;" onclick="statusExportPdf()" title="Exportera till PDF">⬇ PDF</button>
+          <span style="margin-left:auto;color:var(--muted);font-size:0.75rem;font-family:'JetBrains Mono',monospace;">${escHtml(from ? from.toLocaleDateString('sv-SE') : '–')} → ${escHtml(to ? to.toLocaleDateString('sv-SE') : '–')}</span>
+        </div>
+      </div>
+      <div class="status-right-body" id="statusRightBody">
+        <div class="status-right-tabs" role="tablist" aria-label="Status högra panel">
+          <button type="button" class="status-right-tab-btn" id="statusRightTabBtnTickets" onclick="statusSetRightTab('tickets')">Tickets</button>
+          <button type="button" class="status-right-tab-btn" id="statusRightTabBtnBurndown" onclick="statusSetRightTab('burndown')">Burndown</button>
+          <button type="button" class="status-right-tab-btn" id="statusRightTabBtnFeature" onclick="statusSetRightTab('feature')">Per feature</button>
+        </div>
+        <div class="status-right-tab-panels">
+          <div class="status-right-tab-panel" id="statusRightPanelTickets">
+            <div class="status-lanes-panel">
+              <div class="status-lane status-lane-started" id="statusLaneStarted">
+                <div class="status-lane-head">
+                  <div class="status-lane-head-title">
+                    <strong>Påbörjade</strong>
+                    <span class="status-summary-chip">In progress</span>
+                  </div>
+                  <div class="status-lane-summary" id="statusLaneStartedSummary"></div>
+                </div>
+                <div class="status-lane-body" id="statusLaneStartedBody"><div class="status-lane-empty">Hämtar statehistorik…</div></div>
+              </div>
+              <div class="status-lane status-lane-testing" id="statusLaneTesting">
+                <div class="status-lane-head">
+                  <div class="status-lane-head-title">
+                    <strong>In testing</strong>
+                    <span class="status-summary-chip">Ready for test</span>
+                  </div>
+                  <div class="status-lane-summary" id="statusLaneTestingSummary"></div>
+                </div>
+                <div class="status-lane-body" id="statusLaneTestingBody"><div class="status-lane-empty">Hämtar statehistorik…</div></div>
+              </div>
+              <div class="status-lane status-lane-done" id="statusLaneDone">
+                <div class="status-lane-head">
+                  <div class="status-lane-head-title">
+                    <strong>Klara</strong>
+                    <span class="status-summary-chip">Ready for deploy to production / In Production</span>
+                  </div>
+                  <div class="status-lane-summary" id="statusLaneDoneSummary"></div>
+                </div>
+                <div class="status-lane-body" id="statusLaneDoneBody"><div class="status-lane-empty">Hämtar statehistorik…</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="status-right-tab-panel" id="statusRightPanelBurndown">
+            <div class="status-burndown-panel" id="statusBurndownPanel"></div>
+          </div>
+          <div class="status-right-tab-panel" id="statusRightPanelFeature">
+            <div class="status-feature-panel" id="statusFeaturePanel"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  statusSetRightTab(statusRightTab);
+
+  const revisionResults = await Promise.all(laneSourceItems.map(async item => {
+    const project = workItemProject(item, '');
+    try {
+      const revisions = await statusFetchWorkItemRevisions(item.id, project);
+      const transition = statusPickTransition(revisions, from, to);
+      return { item, transition, revisions };
+    } catch (_) {
+      return { item, transition: null, revisions: [] };
+    }
+  }));
+
+  if (renderSeq !== statusRenderSeq || activeTab !== 'status') return;
+
+  const laneItems = { started: [], testing: [], done: [] };
+  revisionResults.forEach(result => {
+    if (!result.transition) return;
+    const currentLaneKey = statusLaneKeyForState(workItemState(result.item));
+    const laneKey = currentLaneKey || result.transition.laneKey;
+    if (!laneKey) return;
+    laneItems[laneKey].push({ item: result.item, transition: result.transition });
+  });
+
+  const sortByTransition = (a, b) => {
+    const ad = a.transition?.changedDate?.getTime?.() || 0;
+    const bd = b.transition?.changedDate?.getTime?.() || 0;
+    if (bd !== ad) return bd - ad;
+    return String(a.item?.fields?.['System.Title'] || '').localeCompare(String(b.item?.fields?.['System.Title'] || ''), 'sv-SE', { numeric: true, sensitivity: 'base' });
+  };
+  laneItems.started.sort(sortByTransition);
+  laneItems.testing.sort(sortByTransition);
+  laneItems.done.sort(sortByTransition);
+
+  const leftBody = document.getElementById('statusLeftBody');
+  if (leftBody) {
+    leftBody.innerHTML = statusRows.length
+      ? statusTreeRowsHtml(statusRows, statusFeatures, statusStories, HIERARCHY_LIST_WIDTH)
+      : '<div style="padding:14px;color:var(--muted);font-size:0.8rem;">Inga tickets i listan.</div>';
+  }
+
+  const startedBody = document.getElementById('statusLaneStartedBody');
+  const startedSummary = document.getElementById('statusLaneStartedSummary');
+  if (startedBody) {
+    if (!hasActiveFilter) {
+      startedBody.innerHTML = '<div class="status-lane-empty">Välj en epic eller aktivera sprint-filter för att visa tickets.</div>';
+    } else {
+      startedBody.innerHTML = laneItems.started.length
+        ? laneItems.started.map(row => statusLaneItemHtml(row.item)).join('')
+        : statusLaneEmptyHtml();
+    }
+  }
+  if (startedSummary) startedSummary.innerHTML = hasActiveFilter ? statusLaneHeaderSummaryHtml(laneItems.started.map(row => row.item)) : '';
+
+  const testingBody = document.getElementById('statusLaneTestingBody');
+  const testingSummary = document.getElementById('statusLaneTestingSummary');
+  if (testingBody) {
+    if (!hasActiveFilter) {
+      testingBody.innerHTML = '';
+    } else {
+      testingBody.innerHTML = laneItems.testing.length
+        ? laneItems.testing.map(row => statusLaneItemHtml(row.item)).join('')
+        : statusLaneEmptyHtml();
+    }
+  }
+  if (testingSummary) testingSummary.innerHTML = hasActiveFilter ? statusLaneHeaderSummaryHtml(laneItems.testing.map(row => row.item)) : '';
+
+  const doneBody = document.getElementById('statusLaneDoneBody');
+  const doneSummary = document.getElementById('statusLaneDoneSummary');
+  if (doneBody) {
+    if (!hasActiveFilter) {
+      doneBody.innerHTML = '';
+    } else {
+      doneBody.innerHTML = laneItems.done.length
+        ? laneItems.done.map(row => statusLaneItemHtml(row.item)).join('')
+        : statusLaneEmptyHtml();
+    }
+  }
+  if (doneSummary) doneSummary.innerHTML = hasActiveFilter ? statusLaneHeaderSummaryHtml(laneItems.done.map(row => row.item)) : '';
+
+  statusRenderBurndownPanel(document.getElementById('statusBurndownPanel'), revisionResults, from, to, hasActiveFilter);
+  statusRenderPerFeaturePanel(document.getElementById('statusFeaturePanel'), revisionResults, hasActiveFilter);
+
+  const sprintSelect = document.getElementById('statusSprintSelect');
+  if (sprintSelect) sprintSelect.value = selectedPath;
+  const fromInput = document.getElementById('statusFromDate');
+  if (fromInput) fromInput.value = statusTabFromDate || '';
+  const toInput = document.getElementById('statusToDate');
+  if (toInput) toInput.value = statusTabToDate || '';
 }
 
 function applySidebarCollapsed(collapsed) {
