@@ -3278,7 +3278,7 @@
 <header>
   <div class="logo-mark"><img src="getsitelogo.png" alt="BDO logo" /></div>
   <div>
-    <h1>BDO DevOps GUI <span>/ v2.4</span></h1>
+    <h1>DevOps GUI <span>/ v2.4</span></h1>
   </div>
   <div class="top-section-switch" aria-label="Sektioner">
     <button class="top-section-btn active" id="section-backlog" onclick="setTopSection('backlog')">Backlog</button>
@@ -4625,8 +4625,8 @@ function statusTreeRowHtml(row, features, stories, listWidth) {
   if (!row) return '';
   if (row.type === 'group') {
     return `<div style="display:flex;height:30px;background:var(--surface);border-bottom:1px solid var(--border);box-sizing:border-box;flex-shrink:0;">
-      ${hierarchyGroupRowLeadHtml(row.label, { width: `${listWidth}px`, height: 30 })}
-      <div style="flex-shrink:0;width:28px;border-left:1px solid var(--border);"></div>
+      ${hierarchyGroupRowLeadHtml(row.label, { width: `${listWidth}px`, height: 30, borderRight: 'none' })}
+      <div style="flex-shrink:0;width:28px;"></div>
     </div>`;
   }
 
@@ -4640,14 +4640,14 @@ function statusTreeRowHtml(row, features, stories, listWidth) {
     const isSelected = statusSelectedEpicIds.has(item.id);
     const buttonBgColor = isSelected ? 'var(--accent2)' : 'transparent';
     const buttonOpacity = isSelected ? '1' : '0.5';
-    buttonHtml = `<button style="flex-shrink:0;width:28px;height:100%;background:${buttonBgColor};border:none;border-left:1px solid var(--border);color:${isSelected ? 'white' : 'var(--muted)'};cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.88rem;opacity:${buttonOpacity};padding:0;transition:all 0.2s;" onclick="event.stopPropagation();statusToggleEpicFilter(${item.id})" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='${buttonOpacity}'" title="Filtrera">🔍</button>`;
+    buttonHtml = `<button style="flex-shrink:0;width:28px;height:100%;background:${buttonBgColor};border:none;color:${isSelected ? 'white' : 'var(--muted)'};cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.88rem;opacity:${buttonOpacity};padding:0;transition:all 0.2s;" onclick="event.stopPropagation();statusToggleEpicFilter(${item.id})" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='${buttonOpacity}'" title="Filtrera">🔍</button>`;
   } else {
-    buttonHtml = `<div style="flex-shrink:0;width:28px;height:100%;border-left:1px solid var(--border);"></div>`;
+    buttonHtml = `<div style="flex-shrink:0;width:28px;height:100%;"></div>`;
   }
   
   return `<div style="display:flex;height:${rowHeight}px;border-bottom:1px solid rgba(125,133,144,.08);box-sizing:border-box;flex-shrink:0;align-items:center;min-width:0;">
     <div style="flex:1;min-width:0;max-width:${listWidth}px;">
-      ${hierarchyListCellHtml(item, { type, width: `${listWidth}px`, height: rowHeight, hasChildren })}
+      ${hierarchyListCellHtml(item, { type, width: `${listWidth}px`, height: rowHeight, hasChildren, borderRight: 'none' })}
     </div>
     ${buttonHtml}
   </div>`;
@@ -19792,6 +19792,7 @@ function statusSumDisplay(items, getter) {
 async function renderStatusTab() {
   const wrap = document.getElementById('tableWrap');
   if (!wrap) return;
+  const statusTreeListWidth = 280;
 
   if (!statusSelectedSprintPath) {
     statusSelectedSprintPath = statusDefaultSprintPath();
@@ -19847,13 +19848,13 @@ async function renderStatusTab() {
     <div class="status-left">
       <section class="board-pane" style="flex:1;min-height:0;">
         <div class="board-pane-head">
-          <span>Epic/Feature/Story</span>
+          <span>Välj epic(s) att se status på med 🔍</span>
           <div style="display:flex;gap:6px;">
             <button class="btn btn-outline" style="width:auto;padding:5px 8px;font-size:.72rem;line-height:1.1;" onclick="statusRefresh()" title="Uppdatera listan">↻</button>
           </div>
         </div>
         <div class="board-pane-list" style="gap:0;overflow-x:hidden;" id="statusLeftBody">
-          ${statusRows.length ? statusTreeRowsHtml(statusRows, statusFeatures, statusStories, 280) : '<div style="padding:14px;color:var(--muted);font-size:0.8rem;">Hämtar statehistorik…</div>'}
+          ${statusRows.length ? statusTreeRowsHtml(statusRows, statusFeatures, statusStories, statusTreeListWidth) : '<div style="padding:14px;color:var(--muted);font-size:0.8rem;">Hämtar statehistorik…</div>'}
         </div>
       </section>
     </div>
@@ -19973,7 +19974,7 @@ async function renderStatusTab() {
   const leftBody = document.getElementById('statusLeftBody');
   if (leftBody) {
     leftBody.innerHTML = statusRows.length
-      ? statusTreeRowsHtml(statusRows, statusFeatures, statusStories, HIERARCHY_LIST_WIDTH)
+      ? statusTreeRowsHtml(statusRows, statusFeatures, statusStories, statusTreeListWidth)
       : '<div style="padding:14px;color:var(--muted);font-size:0.8rem;">Inga tickets i listan.</div>';
   }
 
