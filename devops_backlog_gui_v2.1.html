@@ -3278,7 +3278,7 @@
 <header>
   <div class="logo-mark"><img src="getsitelogo.png" alt="BDO logo" /></div>
   <div>
-    <h1>BDO Planner <span>/ v2.3</span></h1>
+    <h1>BDO Planner <span>/ v2.4</span></h1>
   </div>
   <div class="top-section-switch" aria-label="Sektioner">
     <button class="top-section-btn active" id="section-backlog" onclick="setTopSection('backlog')">Backlog</button>
@@ -4833,7 +4833,7 @@ function statusBurndownSvg(series, options = {}) {
     const barH = Math.max(1, baselineY - yBar(delta));
     const y = baselineY - barH;
     const label = statusBurndownDateKey(point.date).slice(5);
-    const fill = delta > 0 ? 'rgba(22,120,58,.45)' : 'rgba(125,133,144,.18)';
+    const fill = delta > 0 ? 'rgba(22,163,74,.45)' : 'rgba(125,133,144,.18)';
     barsHtml += `<rect x="${barX.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${barH.toFixed(2)}" fill="${fill}" rx="2"></rect>`;
     barLabelsHtml += `<text x="${cx.toFixed(2)}" y="${(height - 8).toFixed(2)}" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="JetBrains Mono,monospace">${escHtml(label)}</text>`;
   });
@@ -4851,7 +4851,7 @@ function statusBurndownSvg(series, options = {}) {
   const deltaAxisTicks = [0, 0.5, 1].map(v => {
     const dVal = Math.round(maxDelta * v * 100) / 100;
     const y = baselineY - ((dVal / maxDelta) * barMaxH);
-    return `<text x="${(width - padR + 6).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="start" fill="rgba(22,120,58,.8)" font-size="9" font-family="JetBrains Mono,monospace">${dVal.toString()}</text>`;
+    return `<text x="${(width - padR + 6).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="start" fill="rgba(22,163,74,.8)" font-size="9" font-family="JetBrains Mono,monospace">${dVal.toString()}</text>`;
   }).join('');
 
   return `<svg viewBox="0 0 ${width} ${height}" width="100%" height="100%" preserveAspectRatio="none" role="img" aria-label="Burndown chart">
@@ -4867,7 +4867,7 @@ function statusBurndownSvg(series, options = {}) {
     ${deltaAxisTicks}
     <line x1="${padL}" y1="${(height - padB).toFixed(2)}" x2="${(width - padR).toFixed(2)}" y2="${(height - padB).toFixed(2)}" stroke="rgba(125,133,144,.4)"></line>
     <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${(height - padB).toFixed(2)}" stroke="rgba(125,133,144,.4)"></line>
-    <line x1="${(width - padR).toFixed(2)}" y1="${padT}" x2="${(width - padR).toFixed(2)}" y2="${(height - padB).toFixed(2)}" stroke="rgba(22,120,58,.2)"></line>
+    <line x1="${(width - padR).toFixed(2)}" y1="${padT}" x2="${(width - padR).toFixed(2)}" y2="${(height - padB).toFixed(2)}" stroke="rgba(22,163,74,.2)"></line>
     <path d="${actualPath}" fill="none" stroke="var(--accent2)" stroke-width="2.2"></path>
     <circle cx="${xFor(series.length - 1).toFixed(2)}" cy="${yFor(values[values.length - 1] || 0).toFixed(2)}" r="3.2" fill="var(--accent2)"></circle>
   </svg>`;
@@ -19407,8 +19407,8 @@ function statusPdfDrawBurndownChart(doc, series, options = {}) {
     const barH = Math.max(1, (delta / maxDelta) * barMaxH);
     const barY = chartBottomY - barH;
     if (delta > 0) {
-      doc.setFillColor(22, 120, 58);
-      doc.setDrawColor(22, 120, 58);
+      doc.setFillColor(22, 163, 74);
+      doc.setDrawColor(22, 163, 74);
     } else {
       doc.setFillColor(180, 186, 195);
       doc.setDrawColor(180, 186, 195);
@@ -19426,7 +19426,7 @@ function statusPdfDrawBurndownChart(doc, series, options = {}) {
   doc.setLineWidth(0.7);
   doc.line(x + leftPad, y + topPad, x + leftPad, chartBottomY);
   doc.line(x + leftPad, chartBottomY, x + width - rightPad, chartBottomY);
-  doc.setDrawColor(22, 120, 58);
+  doc.setDrawColor(22, 163, 74);
   doc.setLineWidth(0.5);
   doc.line(x + width - rightPad, chartBottomY - barMaxH, x + width - rightPad, chartBottomY);
 
