@@ -4844,8 +4844,8 @@ function statusBuildWorkBurndownSeries(revisionResults, from, to) {
 
       const isBeforeFirstRevision = Number.isFinite(model.firstRevisionTs) && dayEndTs < model.firstRevisionTs;
       if (isBeforeFirstRevision) {
-        const preRevisionRemaining = model.original > 0 ? model.original : 0;
-        total += preRevisionRemaining;
+        // Before the first revision the item did not exist yet in the timeline.
+        // Count no remaining here to avoid synthetic burn on creation day.
         return;
       }
 
@@ -4855,14 +4855,14 @@ function statusBuildWorkBurndownSeries(revisionResults, from, to) {
       let effectiveRemaining;
       if (statusBurndownIsZeroRemainingState(effectiveState)) {
         effectiveRemaining = 0;
+      } else if (model.remaining != null) {
+        // If RemainingWork has been tracked in revisions, use the latest known value.
+        effectiveRemaining = model.remaining;
       } else if (model.original > 0) {
-        // Option 2: keep full scope until the item reaches done-state,
-        // so the full Original is burned on completion day.
+        // Fallback when RemainingWork is not tracked in history.
         effectiveRemaining = model.original;
       } else if (!hasHistoryForDay) {
         effectiveRemaining = model.currentRemaining;
-      } else if (hasHistoryForDay && model.remaining != null) {
-        effectiveRemaining = model.remaining;
       } else {
         effectiveRemaining = model.currentRemaining;
       }
@@ -4961,6 +4961,21 @@ function statusBurndownDebugRows(revisionResults, series, deltas) {
       title,
       original,
       timeline,
+      doneTransitionDayKeys: (() => {
+        const keys = new Set();
+        timeline.forEach((point, index) => {
+          if (!point.hasState) return;
+          const currentState = String(point.state || '').trim();
+          if (!currentState) return;
+          const previous = index > 0 ? timeline[index - 1] : null;
+          const previousState = String(previous?.state || '').trim().toLowerCase();
+          const normalizedCurrent = currentState.toLowerCase();
+          if (previous && previousState === normalizedCurrent) return;
+          if (!statusBurndownIsZeroRemainingState(currentState)) return;
+          keys.add(statusBurndownDateKey(new Date(point.ts)));
+        });
+        return keys;
+      })(),
       firstRevisionTs: timeline.length ? timeline[0].ts : null,
       cursor: -1,
       state: '',
@@ -4985,7 +5000,7 @@ function statusBurndownDebugRows(revisionResults, series, deltas) {
 
     const isBeforeFirstRevision = Number.isFinite(model.firstRevisionTs) && dayEndTs < model.firstRevisionTs;
     if (isBeforeFirstRevision) {
-      return model.original > 0 ? model.original : 0;
+      return 0;
     }
 
     const hasHistoryForDay = model.cursor >= 0;
@@ -4994,12 +5009,12 @@ function statusBurndownDebugRows(revisionResults, series, deltas) {
     let effectiveRemaining;
     if (statusBurndownIsZeroRemainingState(effectiveState)) {
       effectiveRemaining = 0;
+    } else if (model.remaining != null) {
+      effectiveRemaining = model.remaining;
     } else if (model.original > 0) {
       effectiveRemaining = model.original;
     } else if (!hasHistoryForDay) {
       effectiveRemaining = model.currentRemaining;
-    } else if (hasHistoryForDay && model.remaining != null) {
-      effectiveRemaining = model.remaining;
     } else {
       effectiveRemaining = model.currentRemaining;
     }
@@ -5019,7 +5034,12 @@ function statusBurndownDebugRows(revisionResults, series, deltas) {
     models.forEach(model => {
       const prev = Number(prevByItem.get(model.itemId) || 0);
       const curr = computeRemainingAt(model, dayEndTs);
-      const burn = Math.max(0, Math.round((prev - curr) * 100) / 100);
+      let burn = Math.max(0, Math.round((prev - curr) * 100) / 100);
+      // If an item is created and moved to done on the same day, day-end snapshots can be 0 -> 0.
+      // Credit the day with its original scope on the done-transition day.
+      if (burn === 0 && prev === 0 && curr === 0 && model.original > 0 && model.doneTransitionDayKeys.has(row.dayKey)) {
+        burn = model.original;
+      }
       if (burn > 0) {
         row.contributors.push({
           itemId: model.itemId,
