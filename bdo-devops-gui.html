@@ -3795,6 +3795,16 @@ function openWikiPageFromInput(inputId) {
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
+function openLoopPageFromInput(inputId) {
+  const input = document.getElementById(inputId);
+  const url = normalizeWikiPageUrl(input ? input.value : '');
+  if (!url) {
+    showToast('Ange en giltig Loop page-lank (http/https) i fältet Loop page.');
+    return;
+  }
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 async function createEpicFromHierarchyList(projectHint = '') {
   const hint = String(projectHint || '').trim();
 
@@ -3997,6 +4007,7 @@ async function saveWorkItemModal(itemId) {
 
   const AO_FIELD = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
   const EFFORT_FIELD = 'Microsoft.VSTS.Scheduling.Effort';
+  const stateValue = read('wiEditState') || String(item.fields?.['System.State'] || '').trim();
   const effortInputRaw = read('wiEditEffort').replace(',', '.');
   if (effortInputRaw !== '' && isNaN(Number(effortInputRaw))) {
     if (statusEl) statusEl.textContent = 'Effort måste vara ett numeriskt värde';
@@ -4007,6 +4018,7 @@ async function saveWorkItemModal(itemId) {
 
   const edits = [
     { field: 'System.Title', value: read('wiEditTitle') },
+    { field: 'System.State', value: stateValue },
     { field: 'System.IterationPath', value: read('wiEditSprintPath') },
     { field: EFFORT_FIELD, value: effortValue },
     { field: 'Custom.Typ', value: read('wiEditCustomTyp') },
@@ -4018,6 +4030,7 @@ async function saveWorkItemModal(itemId) {
     { field: 'Custom.Targetapps', value: read('wiEditTargetApps') },
     { field: 'Custom.Maconomy', value: read('wiEditMaconomy') },
     { field: 'Custom.wikipage', value: read('wiEditWikiPage') },
+    { field: 'Custom.Looppage', value: read('wiEditLoopPage') },
   ];
 
   const descText = read('wiEditDescription');
@@ -4200,7 +4213,15 @@ function openWorkItemModal(itemId) {
   const customType = f['Custom.Typ'] || '';
   const ao = f[AO_FIELD] || '';
   const superEpic = f['Custom.SuperEpic'] || '';
-  const state = f['System.State'] || '–';
+  const state = String(f['System.State'] || '').trim();
+  const stateOptions = [...new Set(
+    allItems
+      .filter(i => String(i.fields?.['System.WorkItemType'] || '').trim() === type)
+      .map(i => String(i.fields?.['System.State'] || '').trim())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, 'sv-SE', { sensitivity: 'base' }));
+  if (state && !stateOptions.includes(state)) stateOptions.push(state);
+  if (!stateOptions.length) stateOptions.push('New');
   const sprintPath = f['System.IterationPath'] || '';
   const effort = workItemEffort(item) ?? '';
   const roadmap = normalizeRoadmapValue(f['Custom.Roadmap'], '');
@@ -4209,17 +4230,18 @@ function openWorkItemModal(itemId) {
   const targetApps = f['Custom.Targetapps'] || '';
   const maconomy = f['Custom.Maconomy'] || '';
   const wikiPage = f['Custom.wikipage'] || '';
+  const loopPage = f['Custom.Looppage'] || '';
   const description = f['System.Description'] || '';
   const descriptionText = htmlToPlainText(description);
   const devopsUrl = getWorkItemUrl(item);
 
   const row = (label, value) =>
     `<div class="wi-modal-row"><span class="wi-modal-label">${label}</span><span class="wi-modal-value" title="${escHtml(value)}">${escHtml(value)}</span></div>`;
-  const selectRow = (label, id, value, options) =>
+  const selectRow = (label, id, value, options, allowEmpty = true) =>
     `<div class="wi-modal-row" style="display:block;">
       <div class="wi-modal-label" style="margin-bottom:4px;">${label}</div>
       <select class="wi-modal-input" id="${id}">
-        <option value="" ${!value ? 'selected' : ''}>–</option>
+        ${allowEmpty ? `<option value="" ${!value ? 'selected' : ''}>–</option>` : ''}
         ${options.map(v => `<option value="${escHtml(v)}" ${value===v?'selected':''}>${escHtml(v)}</option>`).join('')}
       </select>
     </div>`;
@@ -4228,12 +4250,12 @@ function openWorkItemModal(itemId) {
       <div class="wi-modal-label" style="margin-bottom:4px;">${label}</div>
       <input class="wi-modal-input" id="${id}" value="${escHtml(value || '')}" placeholder="${escHtml(placeholder)}" />
     </div>`;
-  const wikiInputRow = (label, id, value, placeholder='') =>
+  const linkInputRow = (label, id, value, placeholder='', buttonId='wiOpenLinkBtn', openFn='openWikiPageFromInput') =>
     `<div class="wi-modal-row" style="display:block;">
       <div class="wi-modal-label" style="margin-bottom:4px;">${label}</div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <input class="wi-modal-input" id="${id}" value="${escHtml(value || '')}" placeholder="${escHtml(placeholder)}" oninput="toggleWikiOpenButton('${id}','wiOpenWikiBtn')" />
-        <button class="wi-modal-save-btn" id="wiOpenWikiBtn" type="button" onclick="openWikiPageFromInput('${id}')" title="Öppna Wikipage i ny flik" style="padding:5px 8px;${String(value || '').trim() ? '' : 'display:none;'}">↗</button>
+        <input class="wi-modal-input" id="${id}" value="${escHtml(value || '')}" placeholder="${escHtml(placeholder)}" oninput="toggleWikiOpenButton('${id}','${buttonId}')" />
+        <button class="wi-modal-save-btn" id="${buttonId}" type="button" onclick="${openFn}('${id}')" title="Öppna ${escHtml(label)} i ny flik" style="padding:5px 8px;${String(value || '').trim() ? '' : 'display:none;'}">↗</button>
       </div>
     </div>`;
   const sprintOptions = [...new Set([
@@ -4252,7 +4274,7 @@ function openWorkItemModal(itemId) {
     `<div class="wi-modal-meta">` +
       inputRow('Titel', 'wiEditTitle', title, 'Titel') +
       row('Typ', type) +
-      row('Status', state) +
+      selectRow('Status', 'wiEditState', state, stateOptions, false) +
       sprintInputRow('Sprint', 'wiEditSprintPath', sprintPath) +
       inputRow('Effort', 'wiEditEffort', effort, 'Effort') +
       selectRow('Typ (Custom)', 'wiEditCustomTyp', customType, mergeOptions(CUSTOM_TYP_OPTIONS, customType)) +
@@ -4263,7 +4285,8 @@ function openWorkItemModal(itemId) {
       inputRow('Milestone', 'wiEditMilestone', milestone, 'Milestone') +
       inputRow('Target Apps', 'wiEditTargetApps', targetApps, 'Target Apps') +
       inputRow('Maconomy', 'wiEditMaconomy', maconomy, 'Maconomy') +
-      wikiInputRow('Wikipage', 'wiEditWikiPage', wikiPage, 'Wikipage') +
+      linkInputRow('Wikipage', 'wiEditWikiPage', wikiPage, 'Wikipage', 'wiOpenWikiBtn', 'openWikiPageFromInput') +
+      linkInputRow('Loop page', 'wiEditLoopPage', loopPage, 'Loop page', 'wiOpenLoopBtn', 'openLoopPageFromInput') +
     `</div>` +
     `<div class="wi-modal-desc">` +
       `<div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;">Description</div>` +
@@ -4314,6 +4337,7 @@ const FIELDS = [
   'Custom.SuperEpic',
   'Custom.Maconomy',
   'Custom.wikipage',
+  'Custom.Looppage',
   'Custom.InfoType',
   'Custom.Targetapps',
   'Custom.Tshirt',
@@ -4436,10 +4460,16 @@ function normalizeDateInputValue(value, endOfDay = false) {
 
 function statusLaneKeyForState(state) {
   const normalized = String(state || '').trim().toLowerCase();
-  if (normalized === 'in progress') return 'started';
-  if (normalized === 'ready for test') return 'testing';
-  if (normalized === 'ready for deploy to production' || normalized === 'in production' || normalized === 'completed') return 'done';
+  if (!normalized) return '';
+  if (['ready for deploy to production', 'in production', 'completed', 'closed', 'done', 'resolved', 'released', 'deployed', 'archived'].some(k => normalized.includes(k))) return 'done';
+  if (['ready for test', 'testing'].some(k => normalized.includes(k))) return 'testing';
+  if (['in progress', 'active', 'committed', 'in development', 'in review', 'doing', 'open'].some(k => normalized.includes(k))) return 'started';
   return '';
+}
+
+function statusStateUsesOriginalFallback(state) {
+  const normalized = String(state || '').trim().toLowerCase();
+  return normalized === 'new' || normalized === 'pending' || normalized === 'ready to start';
 }
 
 function statusLaneLabel(key) {
@@ -4539,7 +4569,14 @@ function statusOriginalEstimateValue(item) {
 }
 
 function statusRemainingWorkValue(item) {
-  return parseNumericFieldValue(item?.fields?.['Microsoft.VSTS.Scheduling.RemainingWork']);
+  const remaining = parseNumericFieldValue(item?.fields?.['Microsoft.VSTS.Scheduling.RemainingWork']);
+  if (remaining != null) return remaining;
+
+  const state = workItemStateLower(item);
+  const allowFallback = state === 'new' || state === 'pending' || state === 'ready to start';
+  if (!allowFallback) return remaining;
+
+  return statusOriginalEstimateValue(item);
 }
 
 async function statusFetchWorkItemRevisions(itemId, project) {
@@ -4657,11 +4694,13 @@ function statusTreeRowsHtml(rows, features, stories, listWidth) {
   return (rows || []).map(row => statusTreeRowHtml(row, features, stories, listWidth)).join('');
 }
 
-function statusLaneItemHtml(item) {
+function statusLaneItemHtml(item, options = {}) {
   const title = String(item?.fields?.['System.Title'] || `#${item.id}`).trim();
   const state = workItemState(item);
   const type = workItemType(item);
-  const remaining = formatNumericOrDash(statusRemainingWorkValue(item));
+  const forceRemainingZero = !!options.forceRemainingZero;
+  const remainingRaw = forceRemainingZero ? 0 : statusRemainingWorkValue(item);
+  const remaining = formatNumericOrDash(remainingRaw);
   const original = formatNumericOrDash(statusOriginalEstimateValue(item));
   return `<div class="status-lane-row-item" onclick="openWorkItemModal(${item.id})">
     <div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(type)}</div>
@@ -4676,10 +4715,14 @@ function statusLaneEmptyHtml() {
   return '<div class="status-lane-empty">Inga tickets</div>';
 }
 
-function statusLaneHeaderSummaryHtml(items) {
+function statusLaneHeaderSummaryHtml(items, options = {}) {
+  const forceRemainingZero = !!options.forceRemainingZero;
+  const remainingText = forceRemainingZero
+    ? '0'
+    : statusSumDisplay(items, statusRemainingWorkValue);
   return `
     <span class="status-summary-chip">Tickets <strong>${items.length}</strong></span>
-    <span class="status-summary-chip">Remaining <strong>${statusSumDisplay(items, statusRemainingWorkValue)}</strong></span>
+    <span class="status-summary-chip">Remaining <strong>${remainingText}</strong></span>
     <span class="status-summary-chip">Original <strong>${statusSumDisplay(items, statusOriginalEstimateValue)}</strong></span>`;
 }
 
@@ -4688,8 +4731,7 @@ function statusBurndownDateKey(date) {
 }
 
 function statusBurndownIsZeroRemainingState(state) {
-  const normalized = String(state || '').trim().toLowerCase();
-  return statusLaneKeyForState(state) === 'testing' || statusLaneKeyForState(state) === 'done';
+  return statusLaneKeyForState(state) === 'done';
 }
 
 function statusDoneDateFromRevisions(revisions) {
@@ -4733,29 +4775,101 @@ function statusBuildWorkBurndownSeries(revisionResults, from, to) {
     days.push(new Date(t));
   }
 
+  const fieldValue = value => {
+    if (value == null) return '';
+    if (typeof value === 'object') {
+      if (value.newValue != null) return value.newValue;
+      if (value.value != null) return value.value;
+    }
+    return value;
+  };
+
   const models = (revisionResults || []).map(result => {
     const item = result?.item;
+    const revisions = Array.isArray(result?.revisions) ? result.revisions : [];
     const originalValue = statusOriginalEstimateValue(item);
-    const remainingValue = statusRemainingWorkValue(item);
-    const scopeValue = Number.isFinite(originalValue)
-      ? Number(originalValue)
-      : (Number.isFinite(remainingValue) ? Number(remainingValue) : 0);
-    const remaining = Math.max(0, scopeValue);
-    const doneDate = statusDoneDateFromRevisions(result?.revisions || []);
-    const doneFromCurrentState = statusBurndownIsZeroRemainingState(workItemState(item)) ? toDay : null;
+    const original = Math.max(0, Number.isFinite(originalValue) ? Number(originalValue) : 0);
+
+    const timeline = revisions.map(rev => {
+      const fields = rev?.fields || {};
+      const changedDateText = String(
+        rev?.revisedDate
+        || fieldValue(fields['System.ChangedDate'])
+        || rev?.changedDate
+        || ''
+      ).trim();
+      const changedDate = new Date(changedDateText);
+      if (!Number.isFinite(changedDate.getTime())) return null;
+
+      const hasState = Object.prototype.hasOwnProperty.call(fields, 'System.State');
+      const state = hasState ? String(fieldValue(fields['System.State']) || '').trim() : '';
+      const hasRemaining = Object.prototype.hasOwnProperty.call(fields, 'Microsoft.VSTS.Scheduling.RemainingWork');
+      const parsedRemaining = hasRemaining
+        ? parseNumericFieldValue(fieldValue(fields['Microsoft.VSTS.Scheduling.RemainingWork']))
+        : null;
+
+      return {
+        ts: changedDate.getTime(),
+        hasState,
+        state,
+        hasRemaining,
+        remaining: parsedRemaining == null ? null : Math.max(0, Number(parsedRemaining)),
+      };
+    }).filter(Boolean).sort((a, b) => a.ts - b.ts);
+
     return {
-      remaining,
-      doneDate: doneDate || doneFromCurrentState
+      original,
+      timeline,
+      hasAnyRemainingHistory: timeline.some(point => point.hasRemaining),
+      firstRevisionTs: timeline.length ? timeline[0].ts : null,
+      cursor: -1,
+      state: '',
+      remaining: null,
+      currentState: workItemState(item),
+      currentRemaining: Math.max(0, statusRemainingWorkValue(item) || 0),
     };
   });
 
   return days.map(day => {
     const dayEnd = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59, 999);
+    const dayEndTs = dayEnd.getTime();
     let total = 0;
     models.forEach(model => {
-      if (!model.remaining) return;
-      if (model.doneDate && dayEnd.getTime() >= model.doneDate.getTime()) return;
-      total += model.remaining;
+      while (model.cursor + 1 < model.timeline.length && model.timeline[model.cursor + 1].ts <= dayEndTs) {
+        model.cursor += 1;
+        const point = model.timeline[model.cursor];
+        if (point.hasState) model.state = point.state;
+        if (point.hasRemaining) model.remaining = point.remaining;
+      }
+
+      const isBeforeFirstRevision = Number.isFinite(model.firstRevisionTs) && dayEndTs < model.firstRevisionTs;
+      if (isBeforeFirstRevision) {
+        const preRevisionRemaining = model.original > 0 ? model.original : 0;
+        total += preRevisionRemaining;
+        return;
+      }
+
+      const hasHistoryForDay = model.cursor >= 0;
+      const effectiveState = hasHistoryForDay ? model.state : model.currentState;
+
+      let effectiveRemaining;
+      if (statusBurndownIsZeroRemainingState(effectiveState)) {
+        effectiveRemaining = 0;
+      } else if (model.original > 0) {
+        // Option 2: keep full scope until the item reaches done-state,
+        // so the full Original is burned on completion day.
+        effectiveRemaining = model.original;
+      } else if (!hasHistoryForDay) {
+        effectiveRemaining = model.currentRemaining;
+      } else if (hasHistoryForDay && model.remaining != null) {
+        effectiveRemaining = model.remaining;
+      } else {
+        effectiveRemaining = model.currentRemaining;
+      }
+
+      const safeRemaining = Math.max(0, Number.isFinite(effectiveRemaining) ? Number(effectiveRemaining) : 0);
+      if (!safeRemaining) return;
+      total += safeRemaining;
     });
     return { date: day, remaining: Math.round(total * 100) / 100 };
   });
@@ -4778,7 +4892,8 @@ function statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to) {
     return Math.max(0, Math.round((prevRemaining - currRemaining) * 100) / 100);
   });
 
-  return { series, deltas };
+  const baselineRemaining = Math.round((Number.isFinite(baseline?.remaining) ? Number(baseline.remaining) : 0) * 100) / 100;
+  return { series, deltas, baselineRemaining };
 }
 
 function statusBurndownOriginalTotal(revisionResults) {
@@ -4787,6 +4902,164 @@ function statusBurndownOriginalTotal(revisionResults) {
     if (!Number.isFinite(value) || value <= 0) return sum;
     return sum + value;
   }, 0) * 100) / 100;
+}
+
+function statusBurndownDebugRows(revisionResults, series, deltas) {
+  const rows = (series || []).map((point, idx) => ({
+    dayKey: statusBurndownDateKey(point.date),
+    delta: Math.round((Number.isFinite(deltas?.[idx]) ? Number(deltas[idx]) : 0) * 100) / 100,
+    contributors: [],
+  }));
+  if (!rows.length) return [];
+
+  const fieldValue = value => {
+    if (value == null) return '';
+    if (typeof value === 'object') {
+      if (value.newValue != null) return value.newValue;
+      if (value.value != null) return value.value;
+    }
+    return value;
+  };
+
+  const models = (revisionResults || []).map(result => {
+    const item = result?.item;
+    if (!item) return null;
+    const itemId = Number(item.id || 0);
+    const title = String(item?.fields?.['System.Title'] || `#${itemId}`).trim();
+    const revisions = Array.isArray(result?.revisions) ? result.revisions : [];
+    const original = Math.max(0, Number(statusOriginalEstimateValue(item) || 0));
+
+    const timeline = revisions.map(rev => {
+      const fields = rev?.fields || {};
+      const changedDateText = String(
+        rev?.revisedDate
+        || fieldValue(fields['System.ChangedDate'])
+        || rev?.changedDate
+        || ''
+      ).trim();
+      const changedDate = new Date(changedDateText);
+      if (!Number.isFinite(changedDate.getTime())) return null;
+
+      const hasState = Object.prototype.hasOwnProperty.call(fields, 'System.State');
+      const state = hasState ? String(fieldValue(fields['System.State']) || '').trim() : '';
+      const hasRemaining = Object.prototype.hasOwnProperty.call(fields, 'Microsoft.VSTS.Scheduling.RemainingWork');
+      const parsedRemaining = hasRemaining
+        ? parseNumericFieldValue(fieldValue(fields['Microsoft.VSTS.Scheduling.RemainingWork']))
+        : null;
+
+      return {
+        ts: changedDate.getTime(),
+        hasState,
+        state,
+        hasRemaining,
+        remaining: parsedRemaining == null ? null : Math.max(0, Number(parsedRemaining)),
+      };
+    }).filter(Boolean).sort((a, b) => a.ts - b.ts);
+
+    return {
+      itemId,
+      title,
+      original,
+      timeline,
+      firstRevisionTs: timeline.length ? timeline[0].ts : null,
+      cursor: -1,
+      state: '',
+      remaining: null,
+      currentState: workItemState(item),
+      currentRemaining: Math.max(0, statusRemainingWorkValue(item) || 0),
+    };
+  }).filter(Boolean);
+
+  const firstDay = series[0]?.date;
+  const baselineDayEndTs = firstDay
+    ? new Date(firstDay.getFullYear(), firstDay.getMonth(), firstDay.getDate() - 1, 23, 59, 59, 999).getTime()
+    : 0;
+
+  const computeRemainingAt = (model, dayEndTs) => {
+    while (model.cursor + 1 < model.timeline.length && model.timeline[model.cursor + 1].ts <= dayEndTs) {
+      model.cursor += 1;
+      const point = model.timeline[model.cursor];
+      if (point.hasState) model.state = point.state;
+      if (point.hasRemaining) model.remaining = point.remaining;
+    }
+
+    const isBeforeFirstRevision = Number.isFinite(model.firstRevisionTs) && dayEndTs < model.firstRevisionTs;
+    if (isBeforeFirstRevision) {
+      return model.original > 0 ? model.original : 0;
+    }
+
+    const hasHistoryForDay = model.cursor >= 0;
+    const effectiveState = hasHistoryForDay ? model.state : model.currentState;
+
+    let effectiveRemaining;
+    if (statusBurndownIsZeroRemainingState(effectiveState)) {
+      effectiveRemaining = 0;
+    } else if (model.original > 0) {
+      effectiveRemaining = model.original;
+    } else if (!hasHistoryForDay) {
+      effectiveRemaining = model.currentRemaining;
+    } else if (hasHistoryForDay && model.remaining != null) {
+      effectiveRemaining = model.remaining;
+    } else {
+      effectiveRemaining = model.currentRemaining;
+    }
+    return Math.max(0, Number.isFinite(effectiveRemaining) ? Number(effectiveRemaining) : 0);
+  };
+
+  const prevByItem = new Map();
+  models.forEach(model => {
+    prevByItem.set(model.itemId, computeRemainingAt(model, baselineDayEndTs));
+  });
+
+  rows.forEach((row, idx) => {
+    const day = series[idx]?.date;
+    const dayEndTs = day
+      ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59, 999).getTime()
+      : 0;
+    models.forEach(model => {
+      const prev = Number(prevByItem.get(model.itemId) || 0);
+      const curr = computeRemainingAt(model, dayEndTs);
+      const burn = Math.max(0, Math.round((prev - curr) * 100) / 100);
+      if (burn > 0) {
+        row.contributors.push({
+          itemId: model.itemId,
+          title: model.title,
+          burn,
+          prev,
+          curr,
+        });
+      }
+      prevByItem.set(model.itemId, curr);
+    });
+    row.grossBurn = Math.round(row.contributors.reduce((sum, c) => sum + c.burn, 0) * 100) / 100;
+    row.contributors.sort((a, b) => b.burn - a.burn || a.itemId - b.itemId);
+  });
+
+  return rows;
+}
+
+function statusBurndownDebugHtml(debugRows) {
+  if (!Array.isArray(debugRows) || !debugRows.length) return '';
+  const rowsHtml = debugRows.map(row => {
+    const itemsHtml = row.contributors.length
+      ? row.contributors.map(t => {
+          return `<div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);margin-top:2px;">#${t.itemId} ${escHtml(t.title)} | burn ${t.burn} | prev ${t.prev} -> now ${t.curr}</div>`;
+        }).join('')
+      : '<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.72rem;color:var(--muted);margin-top:2px;">-</div>';
+    return `<div style="border-top:1px dashed rgba(125,133,144,.25);padding:6px 0;">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);min-width:72px;">${row.dayKey.slice(5)}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent2);">bar/netto ${row.delta}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:#16a34a;">gross burn ${row.grossBurn}</span>
+      </div>
+      ${itemsHtml}
+    </div>`;
+  }).join('');
+
+  return `<details style="margin-top:10px;border-top:1px solid rgba(125,133,144,.2);padding-top:8px;">
+    <summary style="cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);">Debug: burndown per dag (netto vs gross burn)</summary>
+    <div style="margin-top:6px;max-height:240px;overflow:auto;padding-right:4px;">${rowsHtml}</div>
+  </details>`;
 }
 
 function statusBurndownSvg(series, options = {}) {
@@ -4826,6 +5099,7 @@ function statusBurndownSvg(series, options = {}) {
   // Draw bars centered on the actual day index (i), where delta[i] is burn for that day.
   let barsHtml = '';
   let barLabelsHtml = '';
+  let barValueLabelsHtml = '';
   series.forEach((point, i) => {
     const delta = deltas[i];
     const cx = xFor(i);
@@ -4833,8 +5107,11 @@ function statusBurndownSvg(series, options = {}) {
     const barH = Math.max(1, baselineY - yBar(delta));
     const y = baselineY - barH;
     const label = statusBurndownDateKey(point.date).slice(5);
-    const fill = delta > 0 ? 'rgba(22,163,74,.45)' : 'rgba(125,133,144,.18)';
+    const deltaLabel = (Math.round(delta * 100) / 100).toString();
+    const deltaLabelY = Math.max(padT + 9, y - 3);
+    const fill = delta > 0 ? 'rgb(22,163,74)' : 'rgba(125,133,144,.18)';
     barsHtml += `<rect x="${barX.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${barH.toFixed(2)}" fill="${fill}" rx="2"></rect>`;
+    barValueLabelsHtml += `<text x="${cx.toFixed(2)}" y="${deltaLabelY.toFixed(2)}" text-anchor="middle" fill="${delta > 0 ? 'rgb(22,163,74)' : 'var(--muted)'}" font-size="9" font-family="JetBrains Mono,monospace">${escHtml(deltaLabel)}</text>`;
     barLabelsHtml += `<text x="${cx.toFixed(2)}" y="${(height - 8).toFixed(2)}" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="JetBrains Mono,monospace">${escHtml(label)}</text>`;
   });
 
@@ -4862,6 +5139,7 @@ function statusBurndownSvg(series, options = {}) {
     </defs>
     <rect x="0" y="0" width="${width}" height="${height}" fill="transparent"></rect>
     <g clip-path="url(#burndownClip)">${barsHtml}</g>
+    ${barValueLabelsHtml}
     ${barLabelsHtml}
     ${yTicks}
     ${deltaAxisTicks}
@@ -4881,17 +5159,19 @@ function statusRenderBurndownPanel(targetEl, revisionResults, from, to, hasActiv
     return;
   }
 
-  const { series, deltas } = statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to);
+  const { series, deltas, baselineRemaining } = statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to);
   if (!series.length) {
     targetEl.innerHTML = '<div class="status-burndown-head"><span class="status-burndown-title">Burndown</span></div><div class="status-burndown-empty">Ingen data i valt datumintervall.</div>';
     return;
   }
 
   const originalTotal = statusBurndownOriginalTotal(revisionResults);
-  const start = series[0]?.remaining || 0;
+  const start = baselineRemaining;
   const end = series[series.length - 1]?.remaining || 0;
   const done = Math.max(0, Math.round((start - end) * 100) / 100);
   const donePct = start > 0 ? Math.max(0, Math.min(100, Math.round((done / start) * 100))) : 0;
+  const debugRows = statusBurndownDebugRows(revisionResults, series, deltas);
+  const grossDeltas = debugRows.map(row => Math.max(0, Number(row.grossBurn) || 0));
 
   targetEl.innerHTML = `
     <div class="status-burndown-head">
@@ -4904,7 +5184,8 @@ function statusRenderBurndownPanel(targetEl, revisionResults, from, to, hasActiv
         <span class="status-summary-chip">Klart <strong>${escHtml(String(donePct))}%</strong></span>
       </div>
     </div>
-    <div class="status-burndown-chart">${statusBurndownSvg(series, { maxY: start, idealStart: start, deltas })}</div>`;
+    <div class="status-burndown-chart">${statusBurndownSvg(series, { maxY: start, idealStart: start, deltas: grossDeltas })}</div>
+    ${statusBurndownDebugHtml(debugRows)}`;
 }
 
 function statusFeatureForItem(item) {
@@ -19415,6 +19696,13 @@ function statusPdfDrawBurndownChart(doc, series, options = {}) {
     }
     doc.rect(barX, barY, barWidth, barH, 'F');
 
+    const deltaLabel = String(Math.round(delta * 100) / 100);
+    const deltaLabelY = Math.max(y + topPad + 7, barY - 2);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(delta > 0 ? 22 : 120, delta > 0 ? 120 : 127, delta > 0 ? 58 : 136);
+    doc.text(deltaLabel, cx, deltaLabelY, { align: 'center' });
+
     const label = statusBurndownDateKey(series[i].date).slice(5);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
@@ -19479,8 +19767,7 @@ async function statusCollectExportSnapshot() {
   const laneItems = { started: [], testing: [], done: [] };
   revisionResults.forEach(result => {
     if (!result.transition) return;
-    const currentLaneKey = statusLaneKeyForState(workItemState(result.item));
-    const laneKey = currentLaneKey || result.transition.laneKey;
+    const laneKey = result.transition.laneKey;
     if (!laneKey) return;
     laneItems[laneKey].push({ item: result.item, transition: result.transition });
   });
@@ -19498,10 +19785,11 @@ async function statusCollectExportSnapshot() {
 
   const burndown = statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to);
   const series = burndown.series;
-  const deltas = burndown.deltas;
+  const debugRows = statusBurndownDebugRows(revisionResults, series, burndown.deltas);
+  const deltas = debugRows.map(row => Math.max(0, Number(row.grossBurn) || 0));
   const featureData = statusBuildPerFeatureRows(revisionResults);
   const originalTotal = statusBurndownOriginalTotal(revisionResults);
-  const start = series[0]?.remaining || 0;
+  const start = burndown.baselineRemaining;
   const end = series.length ? (series[series.length - 1]?.remaining || 0) : 0;
   const burned = Math.max(0, Math.round((start - end) * 100) / 100);
   const donePct = start > 0 ? Math.max(0, Math.min(100, Math.round((burned / start) * 100))) : 0;
@@ -19955,8 +20243,7 @@ async function renderStatusTab() {
   const laneItems = { started: [], testing: [], done: [] };
   revisionResults.forEach(result => {
     if (!result.transition) return;
-    const currentLaneKey = statusLaneKeyForState(workItemState(result.item));
-    const laneKey = currentLaneKey || result.transition.laneKey;
+    const laneKey = result.transition.laneKey;
     if (!laneKey) return;
     laneItems[laneKey].push({ item: result.item, transition: result.transition });
   });
@@ -20011,11 +20298,11 @@ async function renderStatusTab() {
       doneBody.innerHTML = '';
     } else {
       doneBody.innerHTML = laneItems.done.length
-        ? laneItems.done.map(row => statusLaneItemHtml(row.item)).join('')
+        ? laneItems.done.map(row => statusLaneItemHtml(row.item, { forceRemainingZero: true })).join('')
         : statusLaneEmptyHtml();
     }
   }
-  if (doneSummary) doneSummary.innerHTML = hasActiveFilter ? statusLaneHeaderSummaryHtml(laneItems.done.map(row => row.item)) : '';
+  if (doneSummary) doneSummary.innerHTML = hasActiveFilter ? statusLaneHeaderSummaryHtml(laneItems.done.map(row => row.item), { forceRemainingZero: true }) : '';
 
   statusRenderBurndownPanel(document.getElementById('statusBurndownPanel'), revisionResults, from, to, hasActiveFilter);
   statusRenderPerFeaturePanel(document.getElementById('statusFeaturePanel'), revisionResults, hasActiveFilter);
