@@ -1272,8 +1272,9 @@
     border-radius:8px;
   }
   .status-lane {
-    flex:1;
-    min-height:0;
+    flex:0 0 auto;
+    min-height:170px;
+    max-height:230px;
     display:flex;
     flex-direction:column;
     border-bottom:1px solid rgba(125,133,144,.12);
@@ -1298,6 +1299,7 @@
     letter-spacing:.06em;
     color:var(--muted);
     border-bottom:1px solid var(--border);
+    cursor:pointer;
   }
   .status-lane-head-title { display:flex; align-items:center; gap:8px; min-width:0; }
   .status-lane-head-title strong { color: var(--text); }
@@ -1344,6 +1346,17 @@
     font-family:'JetBrains Mono',monospace;
     font-size:0.76rem;
     opacity:0.7;
+  }
+  .status-lane-focus-hidden {
+    display:none;
+  }
+  .status-lane-focused {
+    flex:1 1 auto;
+    min-height:0;
+    max-height:none;
+  }
+  .status-lanes-panel.lane-focus-active .status-lane-focused .status-lane-body {
+    flex:1;
   }
   .board-json-panel {
     min-height: 0;
@@ -4625,7 +4638,8 @@ function statusPickTransition(revisions, rangeFrom, rangeTo) {
   }).filter(Boolean)
     .sort((a, b) => a.changedDate.getTime() - b.changedDate.getTime());
 
-  let latest = null;
+  let lastTransitionInRange = null;
+  let lastMappableTransition = null;
   timeline.forEach((point, index) => {
     const state = point.state;
     const changedDate = point.changedDate;
@@ -4638,13 +4652,27 @@ function statusPickTransition(revisions, rangeFrom, rangeTo) {
 
     const ts = changedDate.getTime();
     if (ts < rangeFrom.getTime() || ts > rangeTo.getTime()) return;
+
+    // Track the latest transition within range, regardless of whether it maps to a lane
+    if (!lastTransitionInRange || ts >= lastTransitionInRange.changedDate.getTime()) {
+      lastTransitionInRange = { state, changedDate };
+    }
+
     const laneKey = statusLaneKeyForState(state);
     if (!laneKey) return;
-    if (!latest || ts >= latest.changedDate.getTime()) {
-      latest = { state, laneKey, changedDate };
+
+    // Also track the latest mappable transition
+    if (!lastMappableTransition || ts >= lastMappableTransition.changedDate.getTime()) {
+      lastMappableTransition = { state, laneKey, changedDate };
     }
   });
-  return latest;
+
+  // Only return if the latest transition is mappable; if it went to an unmappable state (like 'New'),
+  // return null so the ticket doesn't appear in any lane.
+  if (lastTransitionInRange && lastMappableTransition && lastMappableTransition.changedDate.getTime() === lastTransitionInRange.changedDate.getTime()) {
+    return lastMappableTransition;
+  }
+  return null;
 }
 
 function statusBuildListRowHtml(item) {
@@ -4764,7 +4792,7 @@ function statusDoneDateFromRevisions(revisions) {
   return null;
 }
 
-function statusBuildWorkBurndownSeries(revisionResults, from, to) {
+function statusBuildWorkBurndownSeries(revisionResults, from, to, mode = statusBurndownMode) {
   if (!from || !to) return [];
   const fromDay = new Date(from.getFullYear(), from.getMonth(), from.getDate());
   const toDay = new Date(to.getFullYear(), to.getMonth(), to.getDate());
@@ -4787,8 +4815,7 @@ function statusBuildWorkBurndownSeries(revisionResults, from, to) {
   const models = (revisionResults || []).map(result => {
     const item = result?.item;
     const revisions = Array.isArray(result?.revisions) ? result.revisions : [];
-    const originalValue = statusOriginalEstimateValue(item);
-    const original = Math.max(0, Number.isFinite(originalValue) ? Number(originalValue) : 0);
+    const original = statusBurndownScopeValue(item, mode);
 
     const timeline = revisions.map(rev => {
       const fields = rev?.fields || {};
@@ -4826,7 +4853,9 @@ function statusBuildWorkBurndownSeries(revisionResults, from, to) {
       state: '',
       remaining: null,
       currentState: workItemState(item),
-      currentRemaining: Math.max(0, statusRemainingWorkValue(item) || 0),
+      currentRemaining: mode === 'tickets'
+        ? (statusBurndownIsZeroRemainingState(workItemState(item)) ? 0 : 1)
+        : Math.max(0, statusRemainingWorkValue(item) || 0),
     };
   });
 
@@ -4855,6 +4884,8 @@ function statusBuildWorkBurndownSeries(revisionResults, from, to) {
       let effectiveRemaining;
       if (statusBurndownIsZeroRemainingState(effectiveState)) {
         effectiveRemaining = 0;
+      } else if (mode === 'tickets') {
+        effectiveRemaining = 1;
       } else if (model.remaining != null) {
         // If RemainingWork has been tracked in revisions, use the latest known value.
         effectiveRemaining = model.remaining;
@@ -4875,12 +4906,12 @@ function statusBuildWorkBurndownSeries(revisionResults, from, to) {
   });
 }
 
-function statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to) {
+function statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to, mode = statusBurndownMode) {
   if (!from || !to) return { series: [], deltas: [] };
 
   const fromDay = new Date(from.getFullYear(), from.getMonth(), from.getDate());
   const baselineFrom = new Date(fromDay.getTime() - 86400000);
-  const extended = statusBuildWorkBurndownSeries(revisionResults, baselineFrom, to);
+  const extended = statusBuildWorkBurndownSeries(revisionResults, baselineFrom, to, mode);
   if (extended.length <= 1) return { series: [], deltas: [] };
 
   const series = extended.slice(1);
@@ -4896,7 +4927,8 @@ function statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to) {
   return { series, deltas, baselineRemaining };
 }
 
-function statusBurndownOriginalTotal(revisionResults) {
+function statusBurndownTotalValue(revisionResults, mode = statusBurndownMode) {
+  if (mode === 'tickets') return Math.round(((revisionResults || []).length) * 100) / 100;
   return Math.round((revisionResults || []).reduce((sum, result) => {
     const value = statusOriginalEstimateValue(result?.item);
     if (!Number.isFinite(value) || value <= 0) return sum;
@@ -4904,7 +4936,7 @@ function statusBurndownOriginalTotal(revisionResults) {
   }, 0) * 100) / 100;
 }
 
-function statusBurndownDebugRows(revisionResults, series, deltas) {
+function statusBurndownDebugRows(revisionResults, series, deltas, mode = statusBurndownMode) {
   const rows = (series || []).map((point, idx) => ({
     dayKey: statusBurndownDateKey(point.date),
     delta: Math.round((Number.isFinite(deltas?.[idx]) ? Number(deltas[idx]) : 0) * 100) / 100,
@@ -4927,7 +4959,7 @@ function statusBurndownDebugRows(revisionResults, series, deltas) {
     const itemId = Number(item.id || 0);
     const title = String(item?.fields?.['System.Title'] || `#${itemId}`).trim();
     const revisions = Array.isArray(result?.revisions) ? result.revisions : [];
-    const original = Math.max(0, Number(statusOriginalEstimateValue(item) || 0));
+    const original = statusBurndownScopeValue(item, mode);
 
     const timeline = revisions.map(rev => {
       const fields = rev?.fields || {};
@@ -4981,7 +5013,9 @@ function statusBurndownDebugRows(revisionResults, series, deltas) {
       state: '',
       remaining: null,
       currentState: workItemState(item),
-      currentRemaining: Math.max(0, statusRemainingWorkValue(item) || 0),
+      currentRemaining: mode === 'tickets'
+        ? (statusBurndownIsZeroRemainingState(workItemState(item)) ? 0 : 1)
+        : Math.max(0, statusRemainingWorkValue(item) || 0),
     };
   }).filter(Boolean);
 
@@ -5009,6 +5043,8 @@ function statusBurndownDebugRows(revisionResults, series, deltas) {
     let effectiveRemaining;
     if (statusBurndownIsZeroRemainingState(effectiveState)) {
       effectiveRemaining = 0;
+    } else if (mode === 'tickets') {
+      effectiveRemaining = 1;
     } else if (model.remaining != null) {
       effectiveRemaining = model.remaining;
     } else if (model.original > 0) {
@@ -5171,7 +5207,7 @@ function statusBurndownSvg(series, options = {}) {
   </svg>`;
 }
 
-function statusRenderBurndownPanel(targetEl, revisionResults, from, to, hasActiveFilter) {
+function statusRenderBurndownPanel(targetEl, revisionResults, from, to, hasActiveFilter, mode = statusBurndownMode) {
   if (!targetEl) return;
 
   if (!hasActiveFilter) {
@@ -5179,28 +5215,32 @@ function statusRenderBurndownPanel(targetEl, revisionResults, from, to, hasActiv
     return;
   }
 
-  const { series, deltas, baselineRemaining } = statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to);
+  const { series, deltas, baselineRemaining } = statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to, mode);
   if (!series.length) {
     targetEl.innerHTML = '<div class="status-burndown-head"><span class="status-burndown-title">Burndown</span></div><div class="status-burndown-empty">Ingen data i valt datumintervall.</div>';
     return;
   }
 
-  const originalTotal = statusBurndownOriginalTotal(revisionResults);
+  const totalValue = statusBurndownTotalValue(revisionResults, mode);
   const start = baselineRemaining;
   const end = series[series.length - 1]?.remaining || 0;
-  const done = Math.max(0, Math.round((start - end) * 100) / 100);
-  const donePct = start > 0 ? Math.max(0, Math.min(100, Math.round((done / start) * 100))) : 0;
-  const debugRows = statusBurndownDebugRows(revisionResults, series, deltas);
+  const debugRows = statusBurndownDebugRows(revisionResults, series, deltas, mode);
   const grossDeltas = debugRows.map(row => Math.max(0, Number(row.grossBurn) || 0));
+  const done = Math.round(grossDeltas.reduce((sum, value) => sum + value, 0) * 100) / 100;
+  const donePct = totalValue > 0 ? Math.max(0, Math.min(100, Math.round((done / totalValue) * 100))) : 0;
 
   targetEl.innerHTML = `
     <div class="status-burndown-head">
       <span class="status-burndown-title">Work Burndown</span>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="status-right-tab-btn ${mode === 'estimates' ? 'active' : ''}" onclick="statusSetBurndownMode('estimates')">Estimates</button>
+        <button type="button" class="status-right-tab-btn ${mode === 'tickets' ? 'active' : ''}" onclick="statusSetBurndownMode('tickets')">Tickets</button>
+      </div>
       <div class="status-burndown-metrics">
-        <span class="status-summary-chip">Original <strong>${escHtml(String(originalTotal))}</strong></span>
+        <span class="status-summary-chip">${statusBurndownTotalLabel(mode)} <strong>${escHtml(String(totalValue))}</strong></span>
         <span class="status-summary-chip">Start <strong>${escHtml(String(start))}</strong></span>
         <span class="status-summary-chip">Nu <strong>${escHtml(String(end))}</strong></span>
-        <span class="status-summary-chip">Burned <strong>${escHtml(String(done))}</strong></span>
+        <span class="status-summary-chip">${statusBurndownDoneLabel(mode)} <strong>${escHtml(String(done))}</strong></span>
         <span class="status-summary-chip">Klart <strong>${escHtml(String(donePct))}%</strong></span>
       </div>
     </div>
@@ -5222,7 +5262,7 @@ function statusFeatureForItem(item) {
   return null;
 }
 
-function statusBuildPerFeatureRows(revisionResults) {
+function statusBuildPerFeatureRows(revisionResults, mode = statusBurndownMode) {
   const byFeature = new Map();
   (revisionResults || []).forEach(result => {
     const item = result?.item;
@@ -5242,8 +5282,10 @@ function statusBuildPerFeatureRows(revisionResults) {
     }
 
     const bucket = byFeature.get(featureId);
-    const original = Math.max(0, statusOriginalEstimateValue(item) || 0);
-    const remainingRaw = Math.max(0, statusRemainingWorkValue(item) || 0);
+    const original = statusBurndownScopeValue(item, mode);
+    const remainingRaw = mode === 'tickets'
+      ? (statusBurndownIsZeroRemainingState(workItemState(item)) ? 0 : 1)
+      : Math.max(0, statusRemainingWorkValue(item) || 0);
     const remaining = statusBurndownIsZeroRemainingState(workItemState(item)) ? 0 : remainingRaw;
     const burned = Math.max(0, original - remaining);
 
@@ -5267,7 +5309,7 @@ function statusBuildPerFeatureRows(revisionResults) {
   return { rows, totalOriginal, totalBurned, maxOriginal };
 }
 
-function statusRenderPerFeaturePanel(targetEl, revisionResults, hasActiveFilter) {
+function statusRenderPerFeaturePanel(targetEl, revisionResults, hasActiveFilter, mode = statusBurndownMode) {
   if (!targetEl) return;
 
   if (!hasActiveFilter) {
@@ -5275,11 +5317,11 @@ function statusRenderPerFeaturePanel(targetEl, revisionResults, hasActiveFilter)
     return;
   }
 
-  const featureData = statusBuildPerFeatureRows(revisionResults);
+  const featureData = statusBuildPerFeatureRows(revisionResults, mode);
   const rows = featureData.rows;
 
   if (!rows.length) {
-    targetEl.innerHTML = '<div class="status-feature-head"><span class="status-feature-title">Per feature</span></div><div class="status-feature-empty">Ingen Original Estimate-data för feature i valt urval.</div>';
+    targetEl.innerHTML = '<div class="status-feature-head"><span class="status-feature-title">Per feature</span></div><div class="status-feature-empty">Ingen feature-data i valt urval.</div>';
     return;
   }
 
@@ -5296,18 +5338,22 @@ function statusRenderPerFeaturePanel(targetEl, revisionResults, hasActiveFilter)
     const remainingRadius = hasBurn ? '0 999px 999px 0' : '999px';
     return `<div class="status-feature-row">
       <div class="status-feature-name" title="${escHtml(row.title)}">${escHtml(row.title)}</div>
-      <div class="status-feature-bar" title="Original ${row.original} / Burned ${row.burned}">
+      <div class="status-feature-bar" title="${statusBurndownTotalLabel(mode)} ${row.original} / ${statusBurndownDoneLabel(mode)} ${row.burned}">
         ${hasBurn ? `<div class="status-feature-bar-burned" style="width:${burnPct.toFixed(2)}%;border-radius:${burnedRadius};"></div>` : ''}
         ${hasRemain ? `<div class="status-feature-bar-remaining" style="width:${remainPct.toFixed(2)}%;border-radius:${remainingRadius};"></div>` : ''}
       </div>
-      <div class="status-feature-metrics">Burned <strong>${escHtml(String(row.burned))}</strong> / Original <strong>${escHtml(String(row.original))}</strong></div>
+      <div class="status-feature-metrics">${statusBurndownDoneLabel(mode)} <strong>${escHtml(String(row.burned))}</strong> / ${statusBurndownTotalLabel(mode)} <strong>${escHtml(String(row.original))}</strong></div>
     </div>`;
   }).join('');
 
   targetEl.innerHTML = `
     <div class="status-feature-head">
       <span class="status-feature-title">Per feature</span>
-      <div class="status-feature-metrics">Burned <strong>${escHtml(String(totalBurned))}</strong> / Original <strong>${escHtml(String(totalOriginal))}</strong></div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="status-right-tab-btn ${mode === 'estimates' ? 'active' : ''}" onclick="statusSetBurndownMode('estimates')">Estimates</button>
+        <button type="button" class="status-right-tab-btn ${mode === 'tickets' ? 'active' : ''}" onclick="statusSetBurndownMode('tickets')">Tickets</button>
+      </div>
+      <div class="status-feature-metrics">${statusBurndownDoneLabel(mode)} <strong>${escHtml(String(totalBurned))}</strong> / ${statusBurndownTotalLabel(mode)} <strong>${escHtml(String(totalOriginal))}</strong></div>
     </div>
     <div class="status-feature-list">${rowsHtml}</div>`;
 }
@@ -13610,7 +13656,15 @@ let statusRevisionCache = new Map();
 let statusRenderSeq = 0;
 let statusSelectedEpicIds = new Set();
 let statusFilterBySprint = false;
+const LS_STATUS_BURNDOWN_MODE = 'devops_status_burndown_mode_v1';
+let statusBurndownMode = 'estimates';
+try {
+  statusBurndownMode = localStorage.getItem(LS_STATUS_BURNDOWN_MODE) === 'tickets' ? 'tickets' : 'estimates';
+} catch (_) {
+  statusBurndownMode = 'estimates';
+}
 let statusRightTab = 'tickets';
+let statusFocusedLane = '';
 
 function toggleEstSizingGuide(kind) {
   estSizingGuideOpen = estSizingGuideOpen === kind ? '' : kind;
@@ -19587,6 +19641,35 @@ function statusSetRightTab(tab) {
   if (featurePanel) featurePanel.classList.toggle('active', nextTab === 'feature');
 }
 
+function statusToggleLaneFocus(laneKey) {
+  const key = String(laneKey || '').trim();
+  if (!['started', 'testing', 'done', 'notStarted'].includes(key)) {
+    statusFocusedLane = '';
+  } else {
+    statusFocusedLane = statusFocusedLane === key ? '' : key;
+  }
+  statusApplyLaneFocusUI();
+}
+
+function statusApplyLaneFocusUI() {
+  const panel = document.getElementById('statusLanesPanel');
+  const laneMap = {
+    started: document.getElementById('statusLaneStarted'),
+    testing: document.getElementById('statusLaneTesting'),
+    done: document.getElementById('statusLaneDone'),
+    notStarted: document.getElementById('statusLaneNotStarted'),
+  };
+  const hasFocus = !!statusFocusedLane;
+  if (panel) panel.classList.toggle('lane-focus-active', hasFocus);
+
+  Object.entries(laneMap).forEach(([key, el]) => {
+    if (!el) return;
+    const focused = hasFocus && statusFocusedLane === key;
+    el.classList.toggle('status-lane-focus-hidden', hasFocus && !focused);
+    el.classList.toggle('status-lane-focused', focused);
+  });
+}
+
 function statusApplyDatePreset(days) {
   const n = Number(days);
   if (!Number.isFinite(n) || n <= 0) return;
@@ -19604,6 +19687,32 @@ function statusApplyDatePreset(days) {
   statusTabFromDate = formatYmd(from);
   statusTabToDate = formatYmd(today);
   renderStatusTab();
+}
+
+function statusSetBurndownMode(mode) {
+  statusBurndownMode = mode === 'tickets' ? 'tickets' : 'estimates';
+  try {
+    localStorage.setItem(LS_STATUS_BURNDOWN_MODE, statusBurndownMode);
+  } catch (_) {}
+  renderStatusTab();
+}
+
+function statusBurndownModeLabel(mode = statusBurndownMode) {
+  return mode === 'tickets' ? 'Tickets' : 'Estimates';
+}
+
+function statusBurndownTotalLabel(mode = statusBurndownMode) {
+  return mode === 'tickets' ? 'Tickets' : 'Estimates';
+}
+
+function statusBurndownDoneLabel(mode = statusBurndownMode) {
+  return mode === 'tickets' ? 'Done' : 'Burned';
+}
+
+function statusBurndownScopeValue(item, mode = statusBurndownMode) {
+  if (mode === 'tickets') return 1;
+  const originalValue = statusOriginalEstimateValue(item);
+  return Math.max(0, Number.isFinite(originalValue) ? Number(originalValue) : 0);
 }
 
 function statusRefresh() {
@@ -19637,6 +19746,7 @@ function statusPdfColorForState(state) {
 function statusPdfLaneTitle(laneKey) {
   if (laneKey === 'started') return 'Påbörjade';
   if (laneKey === 'testing') return 'In testing';
+  if (laneKey === 'notStarted') return 'Ej påbörjade';
   return 'Klara';
 }
 
@@ -19803,16 +19913,31 @@ async function statusCollectExportSnapshot() {
   laneItems.testing.sort(sortByTransition);
   laneItems.done.sort(sortByTransition);
 
-  const burndown = statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to);
+  const laneTransitionIds = new Set([
+    ...laneItems.started.map(row => Number(row.item?.id || 0)),
+    ...laneItems.testing.map(row => Number(row.item?.id || 0)),
+    ...laneItems.done.map(row => Number(row.item?.id || 0)),
+  ]);
+  const notStartedItems = laneSourceItems
+    .filter(item => statusStateUsesOriginalFallback(workItemState(item)))
+    .filter(item => !laneTransitionIds.has(Number(item?.id || 0)))
+    .sort((a, b) => {
+      const ad = Date.parse(a?.fields?.['System.ChangedDate'] || '') || 0;
+      const bd = Date.parse(b?.fields?.['System.ChangedDate'] || '') || 0;
+      if (bd !== ad) return bd - ad;
+      return String(a?.fields?.['System.Title'] || '').localeCompare(String(b?.fields?.['System.Title'] || ''), 'sv-SE', { numeric: true, sensitivity: 'base' });
+    });
+
+  const burndown = statusBuildWorkBurndownSeriesWithDeltas(revisionResults, from, to, statusBurndownMode);
   const series = burndown.series;
-  const debugRows = statusBurndownDebugRows(revisionResults, series, burndown.deltas);
+  const debugRows = statusBurndownDebugRows(revisionResults, series, burndown.deltas, statusBurndownMode);
   const deltas = debugRows.map(row => Math.max(0, Number(row.grossBurn) || 0));
-  const featureData = statusBuildPerFeatureRows(revisionResults);
-  const originalTotal = statusBurndownOriginalTotal(revisionResults);
+  const featureData = statusBuildPerFeatureRows(revisionResults, statusBurndownMode);
+  const totalValue = statusBurndownTotalValue(revisionResults, statusBurndownMode);
   const start = burndown.baselineRemaining;
   const end = series.length ? (series[series.length - 1]?.remaining || 0) : 0;
-  const burned = Math.max(0, Math.round((start - end) * 100) / 100);
-  const donePct = start > 0 ? Math.max(0, Math.min(100, Math.round((burned / start) * 100))) : 0;
+  const burned = Math.round(deltas.reduce((sum, value) => sum + value, 0) * 100) / 100;
+  const donePct = totalValue > 0 ? Math.max(0, Math.min(100, Math.round((burned / totalValue) * 100))) : 0;
 
   return {
     from,
@@ -19823,11 +19948,14 @@ async function statusCollectExportSnapshot() {
       started: laneItems.started.map(row => statusExportRowFromItem(row.item, row.transition)),
       testing: laneItems.testing.map(row => statusExportRowFromItem(row.item, row.transition)),
       done: laneItems.done.map(row => statusExportRowFromItem(row.item, row.transition)),
+      notStarted: notStartedItems.map(item => statusExportRowFromItem(item, null)),
     },
     burndown: {
+      mode: statusBurndownMode,
+      totalLabel: statusBurndownTotalLabel(statusBurndownMode),
       series,
       deltas,
-      originalTotal,
+      totalValue,
       start,
       end,
       burned,
@@ -19906,6 +20034,9 @@ function statusPdfDrawPerFeatureChart(doc, featureData, options = {}) {
   const metricsW = 124;
   const barX = x + nameW + 12;
   const barW = Math.max(80, width - nameW - metricsW - 28);
+  const mode = options.mode === 'tickets' ? 'tickets' : 'estimates';
+  const totalLabel = statusBurndownTotalLabel(mode);
+  const doneLabel = statusBurndownDoneLabel(mode);
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
@@ -19958,7 +20089,7 @@ function statusPdfDrawPerFeatureChart(doc, featureData, options = {}) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.2);
     doc.setTextColor(70, 76, 84);
-    doc.text(`${burned} / ${original}`, x + width - 6, yy + 13, { align: 'right' });
+    doc.text(`${doneLabel} ${burned} / ${totalLabel} ${original}`, x + width - 6, yy + 13, { align: 'right' });
   });
 
   if (rows.length > visibleRows.length) {
@@ -20002,13 +20133,13 @@ async function statusExportPdf() {
   doc.text(`Intervall: ${fromText} -> ${toText}`, 32, 68);
   doc.text(`Exporterad: ${exportedAt}`, 32, 82);
 
-  const totalTickets = snapshot.laneRows.started.length + snapshot.laneRows.testing.length + snapshot.laneRows.done.length;
+  const totalTickets = snapshot.laneRows.started.length + snapshot.laneRows.testing.length + snapshot.laneRows.done.length + snapshot.laneRows.notStarted.length;
   const summary = [
     `Tickets ${totalTickets}`,
-    `Original ${snapshot.burndown.originalTotal}`,
+    `${snapshot.burndown.totalLabel} ${snapshot.burndown.totalValue}`,
     `Start ${snapshot.burndown.start}`,
     `Nu ${snapshot.burndown.end}`,
-    `Burned ${snapshot.burndown.burned}`,
+    `${statusBurndownDoneLabel(snapshot.burndown.mode)} ${snapshot.burndown.burned}`,
     `Klart ${snapshot.burndown.donePct}%`,
   ].join('   |   ');
 
@@ -20045,6 +20176,7 @@ async function statusExportPdf() {
     y,
     width: 778,
     maxRows: 10,
+    mode: snapshot.burndown.mode,
   }) + 18;
 
   if (y > 500) {
@@ -20064,7 +20196,13 @@ async function statusExportPdf() {
     doc.addPage();
     y = 44;
   }
-  statusExportPdfLaneTable(doc, 'done', snapshot.laneRows.done, y);
+  y = statusExportPdfLaneTable(doc, 'done', snapshot.laneRows.done, y) + 20;
+
+  if (y > 500) {
+    doc.addPage();
+    y = 44;
+  }
+  statusExportPdfLaneTable(doc, 'notStarted', snapshot.laneRows.notStarted, y);
 
   const dateKey = new Date().toISOString().slice(0, 10);
   const fileName = `Status_Export_${dateKey}.pdf`;
@@ -20201,9 +20339,9 @@ async function renderStatusTab() {
         </div>
         <div class="status-right-tab-panels">
           <div class="status-right-tab-panel" id="statusRightPanelTickets">
-            <div class="status-lanes-panel">
+            <div class="status-lanes-panel" id="statusLanesPanel">
               <div class="status-lane status-lane-started" id="statusLaneStarted">
-                <div class="status-lane-head">
+                <div class="status-lane-head" onclick="statusToggleLaneFocus('started')" title="Klicka för att visa endast denna lane">
                   <div class="status-lane-head-title">
                     <strong>Påbörjade</strong>
                     <span class="status-summary-chip">In progress</span>
@@ -20213,7 +20351,7 @@ async function renderStatusTab() {
                 <div class="status-lane-body" id="statusLaneStartedBody"><div class="status-lane-empty">Hämtar statehistorik…</div></div>
               </div>
               <div class="status-lane status-lane-testing" id="statusLaneTesting">
-                <div class="status-lane-head">
+                <div class="status-lane-head" onclick="statusToggleLaneFocus('testing')" title="Klicka för att visa endast denna lane">
                   <div class="status-lane-head-title">
                     <strong>In testing</strong>
                     <span class="status-summary-chip">Ready for test</span>
@@ -20223,14 +20361,24 @@ async function renderStatusTab() {
                 <div class="status-lane-body" id="statusLaneTestingBody"><div class="status-lane-empty">Hämtar statehistorik…</div></div>
               </div>
               <div class="status-lane status-lane-done" id="statusLaneDone">
-                <div class="status-lane-head">
+                <div class="status-lane-head" onclick="statusToggleLaneFocus('done')" title="Klicka för att visa endast denna lane">
                   <div class="status-lane-head-title">
                     <strong>Klara</strong>
-                    <span class="status-summary-chip">Ready for deploy to production / In Production</span>
+                    <span class="status-summary-chip">Ready for deploy to production / In Production / Completed</span>
                   </div>
                   <div class="status-lane-summary" id="statusLaneDoneSummary"></div>
                 </div>
                 <div class="status-lane-body" id="statusLaneDoneBody"><div class="status-lane-empty">Hämtar statehistorik…</div></div>
+              </div>
+              <div class="status-lane" id="statusLaneNotStarted">
+                <div class="status-lane-head" onclick="statusToggleLaneFocus('notStarted')" title="Klicka för att visa endast denna lane">
+                  <div class="status-lane-head-title">
+                    <strong>Ej påbörjade</strong>
+                    <span class="status-summary-chip">New / Pending / Ready to start</span>
+                  </div>
+                  <div class="status-lane-summary" id="statusLaneNotStartedSummary"></div>
+                </div>
+                <div class="status-lane-body" id="statusLaneNotStartedBody"><div class="status-lane-empty">Hämtar statehistorik…</div></div>
               </div>
             </div>
           </div>
@@ -20246,6 +20394,7 @@ async function renderStatusTab() {
   </div>`;
 
   statusSetRightTab(statusRightTab);
+  statusApplyLaneFocusUI();
 
   const revisionResults = await Promise.all(laneSourceItems.map(async item => {
     const project = workItemProject(item, '');
@@ -20277,6 +20426,21 @@ async function renderStatusTab() {
   laneItems.started.sort(sortByTransition);
   laneItems.testing.sort(sortByTransition);
   laneItems.done.sort(sortByTransition);
+
+  const laneTransitionIds = new Set([
+    ...laneItems.started.map(row => Number(row.item?.id || 0)),
+    ...laneItems.testing.map(row => Number(row.item?.id || 0)),
+    ...laneItems.done.map(row => Number(row.item?.id || 0)),
+  ]);
+  const notStartedItems = laneSourceItems
+    .filter(item => statusStateUsesOriginalFallback(workItemState(item)))
+    .filter(item => !laneTransitionIds.has(Number(item?.id || 0)))
+    .sort((a, b) => {
+      const ad = Date.parse(a?.fields?.['System.ChangedDate'] || '') || 0;
+      const bd = Date.parse(b?.fields?.['System.ChangedDate'] || '') || 0;
+      if (bd !== ad) return bd - ad;
+      return String(a?.fields?.['System.Title'] || '').localeCompare(String(b?.fields?.['System.Title'] || ''), 'sv-SE', { numeric: true, sensitivity: 'base' });
+    });
 
   const leftBody = document.getElementById('statusLeftBody');
   if (leftBody) {
@@ -20324,8 +20488,21 @@ async function renderStatusTab() {
   }
   if (doneSummary) doneSummary.innerHTML = hasActiveFilter ? statusLaneHeaderSummaryHtml(laneItems.done.map(row => row.item), { forceRemainingZero: true }) : '';
 
-  statusRenderBurndownPanel(document.getElementById('statusBurndownPanel'), revisionResults, from, to, hasActiveFilter);
-  statusRenderPerFeaturePanel(document.getElementById('statusFeaturePanel'), revisionResults, hasActiveFilter);
+  const notStartedBody = document.getElementById('statusLaneNotStartedBody');
+  const notStartedSummary = document.getElementById('statusLaneNotStartedSummary');
+  if (notStartedBody) {
+    if (!hasActiveFilter) {
+      notStartedBody.innerHTML = '';
+    } else {
+      notStartedBody.innerHTML = notStartedItems.length
+        ? notStartedItems.map(item => statusLaneItemHtml(item)).join('')
+        : statusLaneEmptyHtml();
+    }
+  }
+  if (notStartedSummary) notStartedSummary.innerHTML = hasActiveFilter ? statusLaneHeaderSummaryHtml(notStartedItems) : '';
+
+  statusRenderBurndownPanel(document.getElementById('statusBurndownPanel'), revisionResults, from, to, hasActiveFilter, statusBurndownMode);
+  statusRenderPerFeaturePanel(document.getElementById('statusFeaturePanel'), revisionResults, hasActiveFilter, statusBurndownMode);
 
   const sprintSelect = document.getElementById('statusSprintSelect');
   if (sprintSelect) sprintSelect.value = selectedPath;
