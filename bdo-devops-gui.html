@@ -3919,6 +3919,80 @@ function exportEpicToPDF(epicId) {
   showToast(`PDF exporterad: ${fileName}`);
 }
 
+function exportEpicToExcel(epicId) {
+  if (typeof XLSX === 'undefined') {
+    showToast('Excel-bibliotek saknas.');
+    return;
+  }
+  const item = allItems.find(i => i.id === epicId);
+  if (!item || workItemType(item) !== WI_TYPE_EPIC) {
+    showToast('Kunde inte hitta epic');
+    return;
+  }
+  const epicTitle = String(item.fields?.['System.Title'] || `Epic #${epicId}`).trim();
+
+  const rows = [];
+  const features = allItems.filter(i =>
+    workItemType(i) === WI_TYPE_FEATURE && workItemParentId(i) === epicId
+  );
+
+  features.forEach(feature => {
+    const featureTitle = String(feature.fields?.['System.Title'] || '').trim();
+    const stories = allItems.filter(i =>
+      (workItemType(i) === WI_TYPE_STORY || workItemType(i) === WI_TYPE_BUG) &&
+      workItemParentId(i) === feature.id
+    );
+    if (!stories.length) {
+      rows.push({
+        'Ticket ID': Number(feature?.id || 0),
+        Titel: featureTitle,
+        Typ: workItemType(feature),
+        Status: workItemState(feature),
+        'Parent Feature': '',
+        Prio: workItemPriorityLevel(feature),
+        Återstående: feature.fields?.['Microsoft.VSTS.Scheduling.RemainingWork'] ?? '',
+        Beskrivning: htmlToPlainText(feature.fields?.['System.Description'] || ''),
+      });
+    } else {
+      stories.forEach(story => {
+        rows.push({
+          'Ticket ID': Number(story?.id || 0),
+          Titel: String(story.fields?.['System.Title'] || '').trim(),
+          Typ: workItemType(story),
+          Status: workItemState(story),
+          'Parent Feature': featureTitle,
+          Prio: workItemPriorityLevel(story),
+          Återstående: story.fields?.['Microsoft.VSTS.Scheduling.RemainingWork'] ?? '',
+          Beskrivning: htmlToPlainText(story.fields?.['System.Description'] || ''),
+        });
+      });
+    }
+  });
+
+  if (!rows.length) {
+    showToast('Inga features/stories hittades under denna epic.');
+    return;
+  }
+
+  const headers = ['Ticket ID', 'Titel', 'Typ', 'Status', 'Parent Feature', 'Prio', 'Återstående', 'Beskrivning'];
+  const ws = XLSX.utils.json_to_sheet(rows, { header: headers });
+  ws['!cols'] = [
+    { wch: 12 },  // Ticket ID
+    { wch: 60 },  // Titel
+    { wch: 14 },  // Typ
+    { wch: 26 },  // Status
+    { wch: 40 },  // Parent Feature
+    { wch: 12 },  // Prio
+    { wch: 14 },  // Återstående
+    { wch: 80 },  // Beskrivning
+  ];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Epic');
+  const fileName = `Epic_${epicId}_${epicTitle.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  showToast(`Excel exporterad: ${fileName}`);
+}
+
 function normalizeWikiPageUrl(rawUrl) {
   const value = String(rawUrl || '').trim();
   if (!value) return null;
@@ -4450,7 +4524,7 @@ function openWorkItemModal(itemId) {
         `<div class="wi-modal-action-buttons">` +
           `<button class="wi-modal-save-btn" id="wiDeleteBtn" style="border-color:var(--danger);color:var(--danger);" onclick="deleteWorkItemModal(${item.id})">Ta bort</button>` +
           `<button class="wi-modal-save-btn" style="border-color:var(--accent);color:var(--accent);" onclick="openCreateChildModal(${item.id})">+ Skapa child</button>` +
-          (isWorkItemType(item, WI_TYPE_EPIC) ? `<button class="wi-modal-save-btn" style="border-color:#10b981;color:#10b981;" onclick="exportEpicToPDF(${item.id})" title="Exportera Epic med hierarki till PDF">Exportera</button>` : '') +
+          (isWorkItemType(item, WI_TYPE_EPIC) ? `<button class="wi-modal-save-btn" style="border-color:#10b981;color:#10b981;" onclick="exportEpicToPDF(${item.id})" title="Exportera Epic med hierarki till PDF">Export PDF</button><button class="wi-modal-save-btn" style="border-color:#f59e0b;color:#f59e0b;" onclick="exportEpicToExcel(${item.id})" title="Exportera Epic med hierarki till Excel">Export Excel</button>` : '') +
           `<button class="wi-modal-save-btn" id="wiSaveBtn" onclick="saveWorkItemModal(${item.id})">Spara ändringar</button>` +
         `</div>` +
       `</div>` +
@@ -4923,7 +4997,7 @@ function statusLaneItemHtml(item, options = {}) {
   const remainingRaw = forceRemainingZero ? 0 : statusRemainingWorkValue(item);
   const remaining = formatNumericOrDash(remainingRaw);
   const original = formatNumericOrDash(statusOriginalEstimateValue(item));
-  return `<div class="status-lane-row-item" onclick="openWorkItemModal(${item.id})">
+  return `<div class="status-lane-row-item" data-item-id="${Number(item?.id || 0)}" onclick="openWorkItemModal(${item.id})">
     <div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(type)}</div>
     <div class="status-lane-item-title" title="${escHtml(title)}">${escHtml(title)}</div>
     <div class="status-lane-item-state"><span class="badge ${stateBadgeClass(state)}">${escHtml(state || '–')}</span></div>
@@ -6112,6 +6186,8 @@ function toggleEditMode() {
   if (activeTab === 'backlog') {
     if (globalEditMode) isolatedCol = null;
     renderTable();
+  } else if (activeTab === 'status') {
+    renderStatusTab();
   } else if (activeTab === 'prioritering') {
     renderPrioritering();
   } else if (activeTab === 'timeline') {
@@ -13966,6 +14042,7 @@ try {
 let statusRightTab = 'tickets';
 let statusFocusedLane = '';
 let statusTriageFocusedLane = '';
+let statusDoneLaneItemIds = [];
 
 function toggleEstSizingGuide(kind) {
   estSizingGuideOpen = estSizingGuideOpen === kind ? '' : kind;
@@ -20082,17 +20159,21 @@ function statusRenderTriagePanel(targetEl, items, from, to) {
     const createdDate = item?.fields?.['System.CreatedDate']
       ? new Date(item.fields['System.CreatedDate']).toLocaleDateString('sv-SE')
       : '–';
-    const prioritySelect = `<select class="prio-select" style="width:100%;font-size:0.74rem;padding:4px 6px;" onclick="event.stopPropagation()" onchange="event.stopPropagation();savePriorityLevel(${item.id}, this.value)">
-      <option value="" ${!currentPrio ? 'selected' : ''}>–</option>
-      ${PRIORITY_OPTIONS.map(v => `<option value="${escHtml(v)}" ${currentPrio === v ? 'selected' : ''}>${escHtml(v)}</option>`).join('')}
-    </select>`;
+    const priorityCell = globalEditMode
+      ? `<select class="prio-select" style="width:100%;font-size:0.74rem;padding:4px 6px;" onclick="event.stopPropagation()" onchange="event.stopPropagation();savePriorityLevel(${item.id}, this.value)">
+          <option value="" ${!currentPrio ? 'selected' : ''}>–</option>
+          ${PRIORITY_OPTIONS.map(v => `<option value="${escHtml(v)}" ${currentPrio === v ? 'selected' : ''}>${escHtml(v)}</option>`).join('')}
+        </select>`
+      : (currentPrio
+        ? `<span class="prio-badge ${priorityBadgeClass(currentPrio)}" style="font-size:0.78rem;">${escHtml(currentPrio)}</span>`
+        : '<span style="color:var(--muted);font-size:0.78rem;">–</span>');
     return `<div class="status-triage-row-item" onclick="openWorkItemModal(${item.id})" title="#${item.id}">
       <div class="status-triage-cell-num">#${item.id}</div>
       <div class="status-triage-cell-title">${escHtml(String(item?.fields?.['System.Title'] || ''))}</div>
       <div><span class="badge ${stateBadgeClass(state)}">${escHtml(state)}</span></div>
       <div class="status-triage-cell-num" style="text-align:right;">${escHtml(original)}</div>
       <div class="status-triage-cell-date">${escHtml(createdDate)}</div>
-      <div>${prioritySelect}</div>
+      <div>${priorityCell}</div>
     </div>`;
   };
 
@@ -20331,6 +20412,7 @@ async function statusCollectExportSnapshot() {
   laneItems.started.sort(sortByTransition);
   laneItems.testing.sort(sortByTransition);
   laneItems.done.sort(sortByTransition);
+  statusDoneLaneItemIds = laneItems.done.map(row => Number(row?.item?.id || 0)).filter(Boolean);
 
   const laneTransitionIds = new Set([
     ...laneItems.started.map(row => Number(row.item?.id || 0)),
@@ -20648,6 +20730,61 @@ function statusToggleSprintFilter(checked) {
   renderStatusTab();
 }
 
+async function statusSetDoneLaneRemainingZero(ev) {
+  if (ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+  if (!globalEditMode) {
+    showToast('Aktivera Editera-läge först.');
+    return;
+  }
+
+  let ids = [...new Set((statusDoneLaneItemIds || []).map(v => Number(v) || 0).filter(Boolean))];
+  if (!ids.length) {
+    ids = [...document.querySelectorAll('#statusLaneDoneBody .status-lane-row-item[data-item-id]')]
+      .map(el => Number(el?.dataset?.itemId || 0))
+      .filter(Boolean);
+  }
+  if (!ids.length) {
+    showToast('Inga tickets i Klara.');
+    return;
+  }
+
+  if (!confirm(`Sätta Remaining Work = 0 för ${ids.length} ticket(s) i Klara?`)) return;
+
+  const btn = document.getElementById('statusLaneDoneZeroBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Sätter...';
+  }
+
+  const fieldPath = 'Microsoft.VSTS.Scheduling.RemainingWork';
+  let okCount = 0;
+  let failCount = 0;
+
+  for (const id of ids) {
+    const item = allItems.find(i => Number(i?.id || 0) === id);
+    if (!item) {
+      failCount += 1;
+      continue;
+    }
+    try {
+      const res = await witPatch(id, [{ op: 'add', path: `/fields/${fieldPath}`, value: 0 }]);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      item.fields[fieldPath] = 0;
+      okCount += 1;
+    } catch (_) {
+      failCount += 1;
+    }
+  }
+
+  await renderStatusTab();
+  if (okCount > 0 && failCount === 0) showToast(`Klara: satte Remaining Work = 0 för ${okCount} ticket(s).`);
+  else if (okCount > 0) showToast(`Klara: uppdaterade ${okCount}, misslyckades ${failCount}.`);
+  else showToast('Kunde inte uppdatera Remaining Work i Klara.');
+}
+
 function statusSumDisplay(items, getter) {
   const values = (items || []).map(getter).filter(v => v != null && Number.isFinite(v));
   if (!values.length) return '–';
@@ -20926,11 +21063,23 @@ async function renderStatusTab() {
       doneBody.innerHTML = '';
     } else {
       doneBody.innerHTML = laneItems.done.length
-        ? laneItems.done.map(row => statusLaneItemHtml(row.item, { forceRemainingZero: true })).join('')
+        ? laneItems.done.map(row => statusLaneItemHtml(row.item)).join('')
         : statusLaneEmptyHtml();
     }
   }
-  if (doneSummary) doneSummary.innerHTML = hasActiveFilter ? statusLaneHeaderSummaryHtml(laneItems.done.map(row => row.item), { forceRemainingZero: true }) : '';
+  if (doneSummary) {
+    if (!hasActiveFilter) {
+      doneSummary.innerHTML = '';
+    } else {
+      const doneCount = laneItems.done.length;
+      const disabled = !globalEditMode || doneCount === 0;
+      const btnTitle = !globalEditMode
+        ? 'Kräver Editera-läge'
+        : (doneCount === 0 ? 'Inga tickets i Klara' : 'Sätt Remaining Work = 0 för alla i Klara');
+      const zeroBtn = `<button id="statusLaneDoneZeroBtn" class="btn btn-outline" style="width:auto;padding:3px 7px;font-size:0.66rem;line-height:1.1;" onclick="statusSetDoneLaneRemainingZero(event)" title="${btnTitle}" ${disabled ? 'disabled' : ''}>Remaining=0</button>`;
+      doneSummary.innerHTML = zeroBtn + statusLaneHeaderSummaryHtml(laneItems.done.map(row => row.item));
+    }
+  }
 
   const notStartedBody = document.getElementById('statusLaneNotStartedBody');
   const notStartedSummary = document.getElementById('statusLaneNotStartedSummary');
