@@ -557,6 +557,27 @@
     padding: 4px 8px;
     font-size: 0.82rem;
   }
+  .project-group-toggle {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:16px;
+    height:16px;
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.8rem;
+    line-height:1;
+    cursor:pointer;
+    padding:0;
+    margin-right:2px;
+  }
+  .project-group-children {
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
   .sidebar-actions {
     display: flex;
     flex-direction: column;
@@ -1270,6 +1291,93 @@
     opacity:0.8;
     border:1px dashed rgba(125,133,144,.25);
     border-radius:8px;
+  }
+  .status-triage-panel {
+    flex:1;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+    min-height:0;
+    overflow:hidden;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .status-triage-head {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    color:var(--muted);
+  }
+  .status-triage-title {
+    color:var(--text);
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    font-size:0.72rem;
+  }
+  .status-triage-lanes {
+    flex:1;
+  }
+  .status-triage-lanes .status-lane-head {
+    cursor:pointer;
+  }
+  .status-triage-grid-head,
+  .status-triage-row-item {
+    display:grid;
+    grid-template-columns: 72px minmax(260px, 1fr) 150px 110px 120px 170px;
+    gap:8px;
+    align-items:center;
+    padding:4px 6px;
+  }
+  .status-triage-grid-head {
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.7rem;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--muted);
+    border-bottom:1px solid rgba(125,133,144,.12);
+    margin-bottom:4px;
+  }
+  .status-triage-row-item {
+    border-bottom:1px solid rgba(125,133,144,.08);
+    cursor:pointer;
+    border-radius:4px;
+  }
+  .status-triage-row-item:hover {
+    background:rgba(125,133,144,.06);
+    border-bottom-color:rgba(125,133,144,.12);
+  }
+  .status-triage-cell-title {
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:var(--text);
+    font-size:0.82rem;
+  }
+  .status-triage-cell-num {
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .status-triage-cell-date {
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .status-triage-empty {
+    padding:12px;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.76rem;
+    opacity:0.8;
   }
   .status-lane {
     flex:0 0 auto;
@@ -2593,6 +2701,23 @@
     gap: 8px 14px;
     margin-bottom: 14px;
   }
+  #wiOverlay .descr-popup {
+    width: min(1080px, 96vw);
+    max-width: 96vw;
+  }
+  #wiOverlay .wi-modal-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  @media (max-width: 1100px) {
+    #wiOverlay .wi-modal-meta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 760px) {
+    #wiOverlay .wi-modal-meta {
+      grid-template-columns: 1fr;
+    }
+  }
   .wi-modal-row {
     display: flex;
     align-items: baseline;
@@ -3404,7 +3529,7 @@
       <!-- Only show this combined row in Backlog tab -->
       <div class="grouping-bar grouping-bar-backlog" id="searchAndTogglesBar" style="display:none;">
         <span id="backlogGroupingMount"></span>
-        <input class="search-box" type="text" id="searchBox" placeholder="Sök titel, ID..." oninput="auditMode ? renderAuditSearch() : renderTable()" />
+        <input class="search-box" type="text" id="searchBox" placeholder="Sök titel, ID..." oninput="handleBacklogSearchInput()" />
         <label class="toggle-wrap" data-audit-hide title="Fokusläge: visa bara hierarki + Effort">
           <input type="checkbox" id="focusToggle" onchange="toggleFocusMode()" />
           <span class="toggle-track"></span>
@@ -3507,6 +3632,22 @@ const LS_COL_FOCUS   = 'devops_cols_focus';
 const LS_STATUS_KEY  = 'devops_status_settings';
 const LS_SIDEBAR_COLLAPSED = 'devops_sidebar_collapsed';
 const LS_SHOW_COMPLETED_GLOBAL = 'devops_show_completed_global';
+const LS_DEBUG_WARN = 'devops_debug_warn_v1';
+
+let debugWarnEnabled = false;
+try {
+  debugWarnEnabled = localStorage.getItem(LS_DEBUG_WARN) === '1';
+} catch (_) {
+  debugWarnEnabled = false;
+}
+
+function debugWarn(scope, error, meta = null) {
+  if (!debugWarnEnabled) return;
+  try {
+    if (meta != null) console.warn(`[debug-warn] ${scope}`, error, meta);
+    else console.warn(`[debug-warn] ${scope}`, error);
+  } catch (_) {}
+}
 
 function explainFetchError(error) {
   const message = error?.message ? String(error.message) : String(error || 'Okänt fel');
@@ -4327,6 +4468,7 @@ const EXCLUDED_STATES = [
 
 const FIELDS = [
   'System.Id', 'System.Title', 'System.WorkItemType',
+  'System.CreatedDate',
   'System.State', 'System.AssignedTo',
   'Microsoft.VSTS.Common.Priority',
   'Microsoft.VSTS.Common.StackRank',
@@ -4481,8 +4623,19 @@ function statusLaneKeyForState(state) {
 }
 
 function statusStateUsesOriginalFallback(state) {
+  return !!statusNotStartedStateKey(state);
+}
+
+function statusNotStartedStateKey(state) {
   const normalized = String(state || '').trim().toLowerCase();
-  return normalized === 'new' || normalized === 'pending' || normalized === 'ready to start';
+  if (!normalized) return '';
+  if (['ready for deploy to production', 'in production', 'completed', 'closed', 'done', 'resolved', 'released', 'deployed', 'archived'].some(k => normalized.includes(k))) return '';
+  if (['ready for test', 'testing'].some(k => normalized.includes(k))) return '';
+  if (['in progress', 'active', 'committed', 'in development', 'in review', 'doing', 'open'].some(k => normalized.includes(k))) return '';
+  if (['ready to start', 'ready for start'].some(k => normalized.includes(k))) return 'ready';
+  if (['pending', 'waiting'].some(k => normalized.includes(k))) return 'pending';
+  if (['new', 'to do', 'todo', 'proposed', 'assigned', 'not started', 'ej påbörjad'].some(k => normalized.includes(k))) return 'new';
+  return '';
 }
 
 function statusLaneLabel(key) {
@@ -4496,6 +4649,11 @@ function statusLaneClass(key) {
 function statusEligibleItemType(item) {
   const type = workItemType(item);
   return !['Epic', 'Sprint Goal', 'Info', 'Visual board'].includes(type);
+}
+
+function statusEpicFilterTypeAllowed(item) {
+  const type = workItemType(item);
+  return ['User Story', 'Bug', 'Task'].includes(type);
 }
 
 function statusItemUnderSelectedEpic(item) {
@@ -4577,6 +4735,14 @@ function statusSelectedDateRange() {
   return { from, to };
 }
 
+function statusItemCreatedInRange(item, from, to) {
+  const createdTime = Date.parse(item?.fields?.['System.CreatedDate'] || '');
+  if (!Number.isFinite(createdTime)) return !from && !to;
+  if (from && createdTime < from.getTime()) return false;
+  if (to && createdTime > to.getTime()) return false;
+  return true;
+}
+
 function statusOriginalEstimateValue(item) {
   return parseNumericFieldValue(workItemOriginalEstimate(item));
 }
@@ -4624,7 +4790,17 @@ function statusPickTransition(revisions, rangeFrom, rangeTo) {
     return value;
   };
 
-  const timeline = (revisions || []).map(rev => {
+  const stateProgressRank = state => {
+    const notStarted = statusNotStartedStateKey(state);
+    if (notStarted) return 0;
+    const lane = statusLaneKeyForState(state);
+    if (lane === 'started') return 1;
+    if (lane === 'testing') return 2;
+    if (lane === 'done') return 3;
+    return 0;
+  };
+
+  const timeline = (revisions || []).map((rev, idx) => {
     const state = String(fieldValue(rev?.fields?.['System.State']) || '').trim();
     const changedDateText = String(
       rev?.revisedDate
@@ -4634,9 +4810,26 @@ function statusPickTransition(revisions, rangeFrom, rangeTo) {
     ).trim();
     const changedDate = new Date(changedDateText);
     if (!state || !Number.isFinite(changedDate.getTime())) return null;
-    return { state, changedDate };
+    const revNumber = Number(
+      rev?.rev
+      || rev?.id
+      || fieldValue(rev?.fields?.['System.Rev'])
+      || 0
+    );
+    return { state, changedDate, revNumber, idx };
   }).filter(Boolean)
-    .sort((a, b) => a.changedDate.getTime() - b.changedDate.getTime());
+    .sort((a, b) => {
+      const ta = a.changedDate.getTime();
+      const tb = b.changedDate.getTime();
+      if (ta !== tb) return ta - tb;
+      const ra = Number(a.revNumber) || 0;
+      const rb = Number(b.revNumber) || 0;
+      if (ra !== rb) return ra - rb;
+      const pa = stateProgressRank(a.state);
+      const pb = stateProgressRank(b.state);
+      if (pa !== pb) return pa - pb;
+      return (Number(a.idx) || 0) - (Number(b.idx) || 0);
+    });
 
   let lastTransitionInRange = null;
   let lastMappableTransition = null;
@@ -5004,6 +5197,8 @@ function statusBurndownDebugRows(revisionResults, series, deltas, mode = statusB
           const normalizedCurrent = currentState.toLowerCase();
           if (previous && previousState === normalizedCurrent) return;
           if (!statusBurndownIsZeroRemainingState(currentState)) return;
+          // Only count transitions INTO done, not transitions between done states.
+          if (previous && statusBurndownIsZeroRemainingState(previousState)) return;
           keys.add(statusBurndownDateKey(new Date(point.ts)));
         });
         return keys;
@@ -5024,7 +5219,7 @@ function statusBurndownDebugRows(revisionResults, series, deltas, mode = statusB
     ? new Date(firstDay.getFullYear(), firstDay.getMonth(), firstDay.getDate() - 1, 23, 59, 59, 999).getTime()
     : 0;
 
-  const computeRemainingAt = (model, dayEndTs) => {
+  const computeSnapshotAt = (model, dayEndTs) => {
     while (model.cursor + 1 < model.timeline.length && model.timeline[model.cursor + 1].ts <= dayEndTs) {
       model.cursor += 1;
       const point = model.timeline[model.cursor];
@@ -5034,7 +5229,7 @@ function statusBurndownDebugRows(revisionResults, series, deltas, mode = statusB
 
     const isBeforeFirstRevision = Number.isFinite(model.firstRevisionTs) && dayEndTs < model.firstRevisionTs;
     if (isBeforeFirstRevision) {
-      return 0;
+      return { remaining: 0, state: '' };
     }
 
     const hasHistoryForDay = model.cursor >= 0;
@@ -5054,12 +5249,15 @@ function statusBurndownDebugRows(revisionResults, series, deltas, mode = statusB
     } else {
       effectiveRemaining = model.currentRemaining;
     }
-    return Math.max(0, Number.isFinite(effectiveRemaining) ? Number(effectiveRemaining) : 0);
+    return {
+      remaining: Math.max(0, Number.isFinite(effectiveRemaining) ? Number(effectiveRemaining) : 0),
+      state: effectiveState,
+    };
   };
 
   const prevByItem = new Map();
   models.forEach(model => {
-    prevByItem.set(model.itemId, computeRemainingAt(model, baselineDayEndTs));
+    prevByItem.set(model.itemId, computeSnapshotAt(model, baselineDayEndTs));
   });
 
   rows.forEach((row, idx) => {
@@ -5068,9 +5266,19 @@ function statusBurndownDebugRows(revisionResults, series, deltas, mode = statusB
       ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59, 999).getTime()
       : 0;
     models.forEach(model => {
-      const prev = Number(prevByItem.get(model.itemId) || 0);
-      const curr = computeRemainingAt(model, dayEndTs);
+      const prevSnapshot = prevByItem.get(model.itemId) || { remaining: 0, state: '' };
+      const currSnapshot = computeSnapshotAt(model, dayEndTs);
+      const prev = Number(prevSnapshot.remaining || 0);
+      const curr = Number(currSnapshot.remaining || 0);
       let burn = Math.max(0, Math.round((prev - curr) * 100) / 100);
+
+      // Re-estimation while still not started is scope adjustment, not burn.
+      if (mode !== 'tickets') {
+        const prevNotStarted = !!statusNotStartedStateKey(prevSnapshot.state);
+        const currNotStarted = !!statusNotStartedStateKey(currSnapshot.state);
+        if (prevNotStarted && currNotStarted) burn = 0;
+      }
+
       // If an item is created and moved to done on the same day, day-end snapshots can be 0 -> 0.
       // Credit the day with its original scope on the done-transition day.
       if (burn === 0 && prev === 0 && curr === 0 && model.original > 0 && model.doneTransitionDayKeys.has(row.dayKey)) {
@@ -5085,7 +5293,7 @@ function statusBurndownDebugRows(revisionResults, series, deltas, mode = statusB
           curr,
         });
       }
-      prevByItem.set(model.itemId, curr);
+      prevByItem.set(model.itemId, currSnapshot);
     });
     row.grossBurn = Math.round(row.contributors.reduce((sum, c) => sum + c.burn, 0) * 100) / 100;
     row.contributors.sort((a, b) => b.burn - a.burn || a.itemId - b.itemId);
@@ -5187,7 +5395,7 @@ function statusBurndownSvg(series, options = {}) {
     return `<text x="${(width - padR + 6).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="start" fill="rgba(22,163,74,.8)" font-size="9" font-family="JetBrains Mono,monospace">${dVal.toString()}</text>`;
   }).join('');
 
-  return `<svg viewBox="0 0 ${width} ${height}" width="100%" height="100%" preserveAspectRatio="none" role="img" aria-label="Burndown chart">
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Burndown chart">
     <defs>
       <clipPath id="burndownClip">
         <rect x="${padL}" y="${padT}" width="${innerW}" height="${innerH + padB - padT}"></rect>
@@ -5694,6 +5902,7 @@ let activeFavoriteId = '';
 let favoriteManageId = '';
 let favoriteSettingsId = '';
 let favoritesStorageProject = '';
+let expandedProjectGroups = new Set();
 let favoritesWiType = FAVORITES_WI_TYPE_DEFAULT;
 
 // WSJF Risk mapping: DevOps stores "1 - High", "2 - Medium", "3 - Low"
@@ -6002,6 +6211,31 @@ function roadmapClass(val) {
 
 // Column filters
 let colFilters = {};
+
+function debounce(fn, wait = 150) {
+  let timerId = null;
+  return (...args) => {
+    if (timerId) clearTimeout(timerId);
+    timerId = setTimeout(() => fn(...args), wait);
+  };
+}
+
+const renderTableDebounced = debounce(() => renderTable(), 150);
+const renderAuditSearchDebounced = debounce(() => renderAuditSearch(), 150);
+const setColFilterInputDebounced = debounce((col, val) => setColFilter(col, val), 150);
+
+function handleBacklogSearchInput() {
+  if (auditMode) {
+    renderAuditSearchDebounced();
+    return;
+  }
+  renderTableDebounced();
+}
+
+function setColFilterDebounced(col, val) {
+  setColFilterInputDebounced(col, val);
+}
+
 function setColFilter(col, val) {
   if (val === '') delete colFilters[col];
   else if (col === 'roadmap') colFilters[col] = normalizeRoadmapValue(val, '').toLowerCase();
@@ -7521,6 +7755,14 @@ function toggleProjectHidden(name) {
   renderProjectCheckboxes(window._allProjects || []);
 }
 
+function toggleProjectGroup(projectName) {
+  const key = String(projectName || '').trim();
+  if (!key) return;
+  if (expandedProjectGroups.has(key)) expandedProjectGroups.delete(key);
+  else expandedProjectGroups.add(key);
+  renderProjectCheckboxes(window._allProjects || []);
+}
+
 function projectKeyToDomId(key) {
   // Keep IDs collision-free (spaces vs underscores, etc.)
   return encodeURIComponent(String(key)).replace(/%/g, '_');
@@ -7595,6 +7837,7 @@ function renderProjectCheckboxes(projects) {
       const multiTeam = (teams || []).length > 1;
 
       if (multiTeam) {
+        const expanded = expandedProjectGroups.has(p);
         const safeProjectKey = projectKeyToDomId(p);
         const projectChecked = favKeys.has(p);
         const projectDiv = document.createElement('div');
@@ -7602,9 +7845,12 @@ function renderProjectCheckboxes(projects) {
         projectDiv.id = `pcb-wrap-${safeProjectKey}`;
         projectDiv.onclick = () => toggleFavoriteEntry(p, fav.id);
         projectDiv.innerHTML = `
+          <button type="button" class="project-group-toggle" onclick="event.stopPropagation();toggleProjectGroup('${p.replace(/'/g,"\\'")}')" title="${expanded ? 'Kollapsa subteam' : 'Expandera subteam'}">${expanded ? '▾' : '▸'}</button>
           <input type="checkbox" id="pcb-${safeProjectKey}" data-key="${p}" ${projectChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleFavoriteEntry('${p.replace(/'/g,"\\'")}', '${fav.id.replace(/'/g,"\\'")}')"/>
           <span style="font-size:0.8rem">${p}</span>`;
         container.appendChild(projectDiv);
+
+        if (!expanded) return;
 
         const header = document.createElement('div');
         header.style.cssText = 'padding:5px 2px 2px 2px;font-size:0.84rem;color:var(--muted);font-family:"JetBrains Mono",monospace;letter-spacing:.04em;';
@@ -7670,15 +7916,24 @@ function renderProjectCheckboxes(projects) {
       return;
     }
 
-    // Has multiple teams? Show project as header + team rows. Otherwise just project row.
+    // Has multiple teams? Show project row with expandable subteam list.
     const multiTeam = teams.length > 1;
 
     if (multiTeam) {
-      // Project label (non-selectable header)
-      const header = document.createElement('div');
-      header.style.cssText = 'padding:5px 2px 2px 2px;font-size:0.84rem;color:var(--muted);font-family:"JetBrains Mono",monospace;letter-spacing:.04em;';
-      header.textContent = p;
-      container.appendChild(header);
+      const expanded = expandedProjectGroups.has(p);
+
+      const projectRow = document.createElement('div');
+      projectRow.className = 'cb-item';
+      projectRow.innerHTML = `
+        <button type="button" class="project-group-toggle" onclick="event.stopPropagation();toggleProjectGroup('${p.replace(/'/g,"\\'")}')" title="${expanded ? 'Kollapsa subteam' : 'Expandera subteam'}">${expanded ? '▾' : '▸'}</button>
+        <span style="font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p}</span>`;
+      projectRow.onclick = () => toggleProjectGroup(p);
+      container.appendChild(projectRow);
+
+      if (!expanded) return;
+
+      const childrenWrap = document.createElement('div');
+      childrenWrap.className = 'project-group-children';
 
       teams.forEach(team => {
         const key = `${p}::${team}`;
@@ -7691,8 +7946,9 @@ function renderProjectCheckboxes(projects) {
         div.innerHTML = `
           <input type="checkbox" id="pcb-${safeTeamKey}" data-key="${key}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleProject('${key.replace(/'/g,"\\'")}')"/>
           <span style="font-size:0.84rem;padding-left:8px;color:var(--accent2)">↳ ${team}</span>`;
-        container.appendChild(div);
+        childrenWrap.appendChild(div);
       });
+      container.appendChild(childrenWrap);
     } else {
       // Single team or no team info — show as plain project row
       const isChecked = selectedProjects.has(p);
@@ -7728,6 +7984,31 @@ function toggleProject(name) {
 
 function selectAllProjects(checked) {
   if (projectPanelMode === 'favorites' && favoriteManageId) return;
+
+  if (projectPanelMode === 'all') {
+    const projectTeams = window._projectTeams || (window._allProjects || []).map(p => ({ proj: p, teams: [] }));
+    const visible = manageProjectsMode
+      ? projectTeams
+      : projectTeams.filter(pt => !hiddenProjects.has(pt.proj));
+
+    visible.forEach(({ proj, teams }) => {
+      if (Array.isArray(teams) && teams.length > 1) {
+        teams.forEach(team => {
+          const key = `${proj}::${team}`;
+          if (checked) selectedProjects.add(key);
+          else selectedProjects.delete(key);
+        });
+      } else {
+        if (checked) selectedProjects.add(proj);
+        else selectedProjects.delete(proj);
+      }
+    });
+
+    renderProjectCheckboxes(window._allProjects || []);
+    updateProjectSelectionButtons();
+    return;
+  }
+
   document.querySelectorAll('#projectCheckboxes .cb-item').forEach(wrap => {
     const cb = wrap.querySelector('input[type="checkbox"]');
     const projectName = cb ? cb.getAttribute('data-key') || wrap.querySelector('span').textContent.replace(/^↳\s*/, '').trim() : '';
@@ -8248,7 +8529,7 @@ function getFilteredItems() {
     }
     if (colFilters.priority) {
       if (type !== 'Epic') {
-        const prio = (f['Custom.Prioritylevel'] || '').toLowerCase();
+        const prio = (f[PRIORITY_FIELD] || '').toLowerCase();
         if (!prio || prio !== colFilters.priority) return false;
       }
     }
@@ -8882,14 +9163,14 @@ function renderTable() {
               <option value="completed">Completed</option>
             </select>
           </th>
-          <th data-col="milestone"><input class="col-filter" data-fcol="milestone" placeholder="Milestone…" oninput="setColFilter('milestone',this.value)"></th>
+          <th data-col="milestone"><input class="col-filter" data-fcol="milestone" placeholder="Milestone…" oninput="setColFilterDebounced('milestone',this.value)"></th>
           <th data-col="superepic">
             <select class="col-filter" data-fcol="superepic" onchange="setColFilter('superepic',this.value)">
               <option value="">Alla</option>
               ${[...new Set(allItems.map(i => i.fields['Custom.SuperEpic']).filter(Boolean))].sort().map(v=>`<option value="${v.toLowerCase()}">${v}</option>`).join('')}
             </select>
           </th>
-          <th data-col="maconomy"><input class="col-filter" data-fcol="maconomy" placeholder="Maconomy…" oninput="setColFilter('maconomy',this.value)"></th>
+          <th data-col="maconomy"><input class="col-filter" data-fcol="maconomy" placeholder="Maconomy…" oninput="setColFilterDebounced('maconomy',this.value)"></th>
           <th data-col="targetapps"><select class="col-filter" data-fcol="targetapps" onchange="setColFilter('targetapps',this.value)">
             <option value="">Target Apps…</option>
             ${[...new Set(allItems.map(i=>i.fields['Custom.Targetapps']).filter(Boolean))].sort().map(v=>`<option value="${v.toLowerCase()}" ${colFilters.targetapps===v.toLowerCase()?'selected':''}>${v}</option>`).join('')}
@@ -8929,7 +9210,7 @@ function renderTable() {
               ${['Fler än ett','Företagsservice','Företagsservice, Revision','Företagsservice, Revision, Skatt','Företagsservice, Skatt','Gemensam','Revision','Revision, Skatt','Rådgivning','Skatt','Stab'].map(a=>`<option value="${a.toLowerCase()}">${a}</option>`).join('')}
             </select>
           </th>
-          <th data-col="app"><input class="col-filter" data-fcol="app" placeholder="App…" oninput="setColFilter('app',this.value)"></th>
+          <th data-col="app"><input class="col-filter" data-fcol="app" placeholder="App…" oninput="setColFilterDebounced('app',this.value)"></th>
           <th data-col="andrad"></th>
         </tr>
       </thead>
@@ -8957,10 +9238,26 @@ function renderTable() {
       tags.map(t => `<option value="${t.toLowerCase()}"${t.toLowerCase()===current?' selected':''}>${t}</option>`).join('');
   }
 
+  // Populate status dropdown with live System.State values.
+  const statusSelect = document.querySelector('.col-filter[data-fcol="status"]');
+  if (statusSelect) {
+    const states = [...new Set(
+      allItems
+        .map(i => String(i?.fields?.['System.State'] || '').trim())
+        .filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, 'sv-SE', { sensitivity: 'base' }));
+    const current = colFilters.status || '';
+    statusSelect.innerHTML = `<option value="">Alla</option>` +
+      states.map(s => {
+        const v = s.toLowerCase();
+        return `<option value="${escHtml(v)}"${v===current?' selected':''}>${escHtml(s)}</option>`;
+      }).join('');
+  }
+
   // Restore filter inputs — innerHTML rewrite resets their values
   document.querySelectorAll('.col-filter').forEach(el => {
     const col = el.dataset.fcol;
-    if (!col || col === 'tags') return; // tags handled above
+    if (!col || col === 'tags' || col === 'status') return; // tags + status handled above
     const val = colFilters[col] || '';
     el.value = val;
     el.classList.toggle('active', !!val);
@@ -9002,7 +9299,8 @@ async function auditUsers() {
       let teams = [];
       try {
         teams = await fetchProjectTeams(proj);
-      } catch (_) {
+      } catch (e) {
+        debugWarn('audit.fetchProjectTeams', e, { project: proj });
         continue;
       }
 
@@ -9282,7 +9580,8 @@ async function sprintProjectWorkItemTypeNames(project) {
     if (!res.ok) return [];
     const data = await res.json();
     return (data?.value || []).map(x => String(x?.name || '').trim()).filter(Boolean);
-  } catch (_) {
+  } catch (e) {
+    debugWarn('sprintProjectWorkItemTypeNames', e, { project: proj });
     return [];
   }
 }
@@ -10747,7 +11046,8 @@ async function sprintProjectIterationPathsFromApi(project) {
     walk(iterData);
 
     return [...new Set(paths.map(x => String(x || '').trim()).filter(Boolean))];
-  } catch (_) {
+  } catch (e) {
+    debugWarn('sprintIterationPaths', e, { project: proj });
     return [];
   }
 }
@@ -12581,7 +12881,7 @@ function renderDashboard(aoFilter) {
     </div>`).join('');
 
   // Priority distribution — segmented by type
-  const prioKey = i => i.fields['Custom.Prioritylevel'] || '–';
+  const prioKey = i => i.fields[PRIORITY_FIELD] || '–';
   const prioColors = { 'Must': '#ff8a80', 'Should': '#f0c040', 'Could': '#6bdb78' };
   const prioCol = l => prioColors[l] || 'var(--muted)';
 
@@ -13665,6 +13965,7 @@ try {
 }
 let statusRightTab = 'tickets';
 let statusFocusedLane = '';
+let statusTriageFocusedLane = '';
 
 function toggleEstSizingGuide(kind) {
   estSizingGuideOpen = estSizingGuideOpen === kind ? '' : kind;
@@ -15399,7 +15700,7 @@ function renderAnalys() {
     { key:AFFARSOM_FIELD,      label:'Affärsområde' },
     { key:'System.Description',label:'Beskrivning' },
     { key:'Custom.SuperEpic',  label:'Super Epic' },
-    { key:'Custom.Prioritylevel', label:'Priority' },
+    { key:PRIORITY_FIELD, label:'Priority' },
     { key:'Microsoft.VSTS.Scheduling.StartDate',  label:'Start' },
     { key:'Microsoft.VSTS.Scheduling.TargetDate', label:'Target' },
     { key:'Custom.Maconomy',   label:'Maconomy' },
@@ -19623,22 +19924,26 @@ function statusSetToDate(value) {
 
 function statusSetRightTab(tab) {
   const requested = String(tab || '').toLowerCase();
-  const nextTab = (requested === 'burndown' || requested === 'feature') ? requested : 'tickets';
+  const nextTab = (requested === 'burndown' || requested === 'feature' || requested === 'triage') ? requested : 'tickets';
   statusRightTab = nextTab;
 
   const ticketsBtn = document.getElementById('statusRightTabBtnTickets');
   const burndownBtn = document.getElementById('statusRightTabBtnBurndown');
   const featureBtn = document.getElementById('statusRightTabBtnFeature');
+  const triageBtn = document.getElementById('statusRightTabBtnTriage');
   if (ticketsBtn) ticketsBtn.classList.toggle('active', nextTab === 'tickets');
   if (burndownBtn) burndownBtn.classList.toggle('active', nextTab === 'burndown');
   if (featureBtn) featureBtn.classList.toggle('active', nextTab === 'feature');
+  if (triageBtn) triageBtn.classList.toggle('active', nextTab === 'triage');
 
   const ticketsPanel = document.getElementById('statusRightPanelTickets');
   const burndownPanel = document.getElementById('statusRightPanelBurndown');
   const featurePanel = document.getElementById('statusRightPanelFeature');
+  const triagePanel = document.getElementById('statusRightPanelTriage');
   if (ticketsPanel) ticketsPanel.classList.toggle('active', nextTab === 'tickets');
   if (burndownPanel) burndownPanel.classList.toggle('active', nextTab === 'burndown');
   if (featurePanel) featurePanel.classList.toggle('active', nextTab === 'feature');
+  if (triagePanel) triagePanel.classList.toggle('active', nextTab === 'triage');
 }
 
 function statusToggleLaneFocus(laneKey) {
@@ -19665,6 +19970,35 @@ function statusApplyLaneFocusUI() {
   Object.entries(laneMap).forEach(([key, el]) => {
     if (!el) return;
     const focused = hasFocus && statusFocusedLane === key;
+    el.classList.toggle('status-lane-focus-hidden', hasFocus && !focused);
+    el.classList.toggle('status-lane-focused', focused);
+  });
+}
+
+function statusToggleTriageLaneFocus(laneKey) {
+  const key = String(laneKey || '').trim();
+  if (!['new', 'pending', 'ready', 'other'].includes(key)) {
+    statusTriageFocusedLane = '';
+  } else {
+    statusTriageFocusedLane = statusTriageFocusedLane === key ? '' : key;
+  }
+  statusApplyTriageLaneFocusUI();
+}
+
+function statusApplyTriageLaneFocusUI() {
+  const panel = document.getElementById('statusTriageLanesPanel');
+  const laneMap = {
+    new: document.getElementById('statusTriageLaneNew'),
+    pending: document.getElementById('statusTriageLanePending'),
+    ready: document.getElementById('statusTriageLaneReady'),
+    other: document.getElementById('statusTriageLaneOther'),
+  };
+  const hasFocus = !!statusTriageFocusedLane;
+  if (panel) panel.classList.toggle('lane-focus-active', hasFocus);
+
+  Object.entries(laneMap).forEach(([key, el]) => {
+    if (!el) return;
+    const focused = hasFocus && statusTriageFocusedLane === key;
     el.classList.toggle('status-lane-focus-hidden', hasFocus && !focused);
     el.classList.toggle('status-lane-focused', focused);
   });
@@ -19718,6 +20052,90 @@ function statusBurndownScopeValue(item, mode = statusBurndownMode) {
 function statusRefresh() {
   statusRevisionCache = new Map();
   renderStatusTab();
+}
+
+function statusRenderTriagePanel(targetEl, items, from, to) {
+  if (!targetEl) return;
+  const fromText = from ? from.toLocaleDateString('sv-SE') : '–';
+  const toText = to ? to.toLocaleDateString('sv-SE') : '–';
+
+  const laneDefs = [
+    { key: 'new', label: 'New', hint: 'State: New' },
+    { key: 'pending', label: 'Pending', hint: 'State: Pending' },
+    { key: 'ready', label: 'Ready to start', hint: 'State: Ready to start' },
+    { key: 'other', label: 'Övriga ej påbörjade', hint: 'Andra ej påbörjade states' },
+  ];
+  const laneBuckets = { new: [], pending: [], ready: [], other: [] };
+
+  (items || []).forEach(item => {
+    const key = statusNotStartedStateKey(workItemState(item));
+    if (key === 'ready') laneBuckets.ready.push(item);
+    else if (key === 'pending') laneBuckets.pending.push(item);
+    else if (key === 'new') laneBuckets.new.push(item);
+    else laneBuckets.other.push(item);
+  });
+
+  const rowHtml = (item) => {
+    const state = workItemState(item) || '–';
+    const original = formatNumericOrDash(statusOriginalEstimateValue(item));
+    const currentPrio = workItemPriorityLevel(item);
+    const createdDate = item?.fields?.['System.CreatedDate']
+      ? new Date(item.fields['System.CreatedDate']).toLocaleDateString('sv-SE')
+      : '–';
+    const prioritySelect = `<select class="prio-select" style="width:100%;font-size:0.74rem;padding:4px 6px;" onclick="event.stopPropagation()" onchange="event.stopPropagation();savePriorityLevel(${item.id}, this.value)">
+      <option value="" ${!currentPrio ? 'selected' : ''}>–</option>
+      ${PRIORITY_OPTIONS.map(v => `<option value="${escHtml(v)}" ${currentPrio === v ? 'selected' : ''}>${escHtml(v)}</option>`).join('')}
+    </select>`;
+    return `<div class="status-triage-row-item" onclick="openWorkItemModal(${item.id})" title="#${item.id}">
+      <div class="status-triage-cell-num">#${item.id}</div>
+      <div class="status-triage-cell-title">${escHtml(String(item?.fields?.['System.Title'] || ''))}</div>
+      <div><span class="badge ${stateBadgeClass(state)}">${escHtml(state)}</span></div>
+      <div class="status-triage-cell-num" style="text-align:right;">${escHtml(original)}</div>
+      <div class="status-triage-cell-date">${escHtml(createdDate)}</div>
+      <div>${prioritySelect}</div>
+    </div>`;
+  };
+
+  const laneHtml = laneDefs.map(lane => {
+    const laneItems = laneBuckets[lane.key] || [];
+    const summary = statusLaneHeaderSummaryHtml(laneItems);
+    const body = laneItems.length
+      ? `<div class="status-triage-grid-head">
+          <div>ID</div>
+          <div>Titel</div>
+          <div>State</div>
+          <div style="text-align:right;">Original</div>
+          <div>Created date</div>
+          <div>Priority level</div>
+        </div>${laneItems.map(rowHtml).join('')}`
+      : '<div class="status-triage-empty">Inga tickets</div>';
+    return `<div class="status-lane" id="statusTriageLane${lane.key === 'new' ? 'New' : lane.key === 'pending' ? 'Pending' : lane.key === 'ready' ? 'Ready' : 'Other'}">
+      <div class="status-lane-head" onclick="statusToggleTriageLaneFocus('${lane.key}')" title="Klicka för att visa endast denna lane">
+        <div class="status-lane-head-title">
+          <strong>${escHtml(lane.label)}</strong>
+          <span class="status-summary-chip">${escHtml(lane.hint)}</span>
+        </div>
+        <div class="status-lane-summary">${summary}</div>
+      </div>
+      <div class="status-lane-body">${body}</div>
+    </div>`;
+  }).join('');
+
+  const totalItems = (items || []).length;
+
+  targetEl.innerHTML = `
+    <div class="status-triage-head">
+      <span class="status-triage-title">Triage</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <span class="status-summary-chip">Tickets <strong>${totalItems}</strong></span>
+        <span class="status-summary-chip">Intervall <strong>${escHtml(fromText)} → ${escHtml(toText)}</strong></span>
+      </div>
+    </div>
+    <div class="status-lanes-panel status-triage-lanes" id="statusTriageLanesPanel">
+      ${laneHtml}
+    </div>`;
+
+  statusApplyTriageLaneFocusUI();
 }
 
 function statusExportRowFromItem(item, transition) {
@@ -19876,7 +20294,7 @@ async function statusCollectExportSnapshot() {
     const itemType = workItemType(item);
     if (statusFilterBySprint && !statusItemMatchesSprint(item, selectedPath)) return false;
     if (statusSelectedEpicIds.size > 0) {
-      if (!['User Story', 'Bug'].includes(itemType)) return false;
+      if (!statusEpicFilterTypeAllowed(item)) return false;
     } else {
       if (!statusEligibleItemType(item)) return false;
     }
@@ -19889,7 +20307,8 @@ async function statusCollectExportSnapshot() {
       const revisions = await statusFetchWorkItemRevisions(item.id, project);
       const transition = statusPickTransition(revisions, from, to);
       return { item, transition, revisions };
-    } catch (_) {
+    } catch (e) {
+      debugWarn('statusCollectExportSnapshot.revisions', e, { itemId: item.id, project });
       return { item, transition: null, revisions: [] };
     }
   }));
@@ -20283,12 +20702,13 @@ async function renderStatusTab() {
     const itemType = workItemType(item);
     if (statusFilterBySprint && !statusItemMatchesSprint(item, selectedPath)) return false;
     if (statusSelectedEpicIds.size > 0) {
-      if (!['User Story', 'Bug'].includes(itemType)) return false;
+      if (!statusEpicFilterTypeAllowed(item)) return false;
     } else {
       if (!statusEligibleItemType(item)) return false;
     }
     return statusItemUnderSelectedEpic(item);
   });
+
 
   wrap.innerHTML = `<div class="status-layout">
     <div class="status-left">
@@ -20334,6 +20754,7 @@ async function renderStatusTab() {
       <div class="status-right-body" id="statusRightBody">
         <div class="status-right-tabs" role="tablist" aria-label="Status högra panel">
           <button type="button" class="status-right-tab-btn" id="statusRightTabBtnTickets" onclick="statusSetRightTab('tickets')">Tickets</button>
+          <button type="button" class="status-right-tab-btn" id="statusRightTabBtnTriage" onclick="statusSetRightTab('triage')">Triage</button>
           <button type="button" class="status-right-tab-btn" id="statusRightTabBtnBurndown" onclick="statusSetRightTab('burndown')">Burndown</button>
           <button type="button" class="status-right-tab-btn" id="statusRightTabBtnFeature" onclick="statusSetRightTab('feature')">Per feature</button>
         </div>
@@ -20385,6 +20806,9 @@ async function renderStatusTab() {
           <div class="status-right-tab-panel" id="statusRightPanelBurndown">
             <div class="status-burndown-panel" id="statusBurndownPanel"></div>
           </div>
+          <div class="status-right-tab-panel" id="statusRightPanelTriage">
+            <div class="status-triage-panel" id="statusTriagePanel"></div>
+          </div>
           <div class="status-right-tab-panel" id="statusRightPanelFeature">
             <div class="status-feature-panel" id="statusFeaturePanel"></div>
           </div>
@@ -20402,7 +20826,8 @@ async function renderStatusTab() {
       const revisions = await statusFetchWorkItemRevisions(item.id, project);
       const transition = statusPickTransition(revisions, from, to);
       return { item, transition, revisions };
-    } catch (_) {
+    } catch (e) {
+      debugWarn('renderStatusTab.revisions', e, { itemId: item.id, project });
       return { item, transition: null, revisions: [] };
     }
   }));
@@ -20438,6 +20863,25 @@ async function renderStatusTab() {
     .sort((a, b) => {
       const ad = Date.parse(a?.fields?.['System.ChangedDate'] || '') || 0;
       const bd = Date.parse(b?.fields?.['System.ChangedDate'] || '') || 0;
+      if (bd !== ad) return bd - ad;
+      return String(a?.fields?.['System.Title'] || '').localeCompare(String(b?.fields?.['System.Title'] || ''), 'sv-SE', { numeric: true, sensitivity: 'base' });
+    });
+
+  const triageItems = allItems
+    .filter(item => {
+      if (statusFilterBySprint && !statusItemMatchesSprint(item, selectedPath)) return false;
+      if (statusSelectedEpicIds.size > 0) {
+        if (!statusEpicFilterTypeAllowed(item)) return false;
+      } else if (!statusEligibleItemType(item)) {
+        return false;
+      }
+      if (!statusItemUnderSelectedEpic(item)) return false;
+      if (!statusStateUsesOriginalFallback(workItemState(item))) return false;
+      return statusItemCreatedInRange(item, from, to);
+    })
+    .sort((a, b) => {
+      const ad = Date.parse(a?.fields?.['System.CreatedDate'] || '') || 0;
+      const bd = Date.parse(b?.fields?.['System.CreatedDate'] || '') || 0;
       if (bd !== ad) return bd - ad;
       return String(a?.fields?.['System.Title'] || '').localeCompare(String(b?.fields?.['System.Title'] || ''), 'sv-SE', { numeric: true, sensitivity: 'base' });
     });
@@ -20502,6 +20946,7 @@ async function renderStatusTab() {
   if (notStartedSummary) notStartedSummary.innerHTML = hasActiveFilter ? statusLaneHeaderSummaryHtml(notStartedItems) : '';
 
   statusRenderBurndownPanel(document.getElementById('statusBurndownPanel'), revisionResults, from, to, hasActiveFilter, statusBurndownMode);
+  statusRenderTriagePanel(document.getElementById('statusTriagePanel'), triageItems, from, to);
   statusRenderPerFeaturePanel(document.getElementById('statusFeaturePanel'), revisionResults, hasActiveFilter, statusBurndownMode);
 
   const sprintSelect = document.getElementById('statusSprintSelect');
