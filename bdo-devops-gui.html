@@ -1198,6 +1198,31 @@
     border:1px dashed rgba(125,133,144,.25);
     border-radius:8px;
   }
+  .status-burndown-debug {
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  .status-burndown-debug details {
+    border-top:1px solid rgba(125,133,144,.2);
+    padding-top:8px;
+  }
+  .status-burndown-debug details[open] {
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  .status-burndown-debug-body {
+    margin-top:6px;
+    overflow:auto;
+    min-height:0;
+    padding-right:4px;
+  }
+  .status-burndown-debug details[open] .status-burndown-debug-body {
+    flex:1;
+  }
   .status-feature-panel {
     flex:1;
     border:1px solid var(--border);
@@ -2227,29 +2252,54 @@
     align-items: center;
     gap: 6px;
   }
+  .sprint-col-focus-surface {
+    cursor: pointer;
+  }
+  .sprint-col-focus-surface:hover {
+    background: rgba(88, 166, 255, 0.05);
+  }
+  .sprint-col-focus-target {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    cursor: pointer;
+  }
+  .sprint-col-focus-target:focus-visible {
+    outline: 1px solid var(--accent2);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
   .sprint-col-phase-pill {
     font-size: 0.62rem;
-    color: var(--accent);
-    border: 1px solid var(--accent);
+    color: var(--text);
+    border: 1px solid var(--line);
     border-radius: 999px;
-    padding: 1px 6px;
+    padding: 1px 7px;
     letter-spacing: 0;
     text-transform: none;
+    font-weight: 700;
   }
   .sprint-col-phase-pill.prev {
-    color: #f0c040;
-    border-color: rgba(240, 192, 64, 0.75);
-    background: rgba(240, 192, 64, 0.14);
+    color: #ffe08a;
+    border-color: rgba(240, 192, 64, 0.95);
+    background: rgba(165, 114, 0, 0.62);
   }
   .sprint-col-phase-pill.nu {
-    color: #6bdb78;
-    border-color: rgba(107, 219, 120, 0.75);
-    background: rgba(107, 219, 120, 0.14);
+    color: #d8ffde;
+    border-color: rgba(107, 219, 120, 0.96);
+    background: rgba(20, 120, 38, 0.62);
   }
   .sprint-col-phase-pill.nasta {
-    color: #79c0ff;
-    border-color: rgba(121, 192, 255, 0.75);
-    background: rgba(121, 192, 255, 0.14);
+    color: #dff0ff;
+    border-color: rgba(121, 192, 255, 0.96);
+    background: rgba(24, 90, 160, 0.62);
   }
   .sprint-col-actions {
     display: flex;
@@ -3622,7 +3672,7 @@ const ALL_COLUMNS = [
   { key: 'status',    label: 'Status',        defaultNormal: true,  defaultFocus: false },
   { key: 'tags',        label: 'Tags',          defaultNormal: true,  defaultFocus: false },
   { key: 'sprint',      label: 'Sprint',        defaultNormal: true,  defaultFocus: false },
-  { key: 'customtyp',   label: 'Typ (custom)',  defaultNormal: true,  defaultFocus: false },
+  { key: 'customtyp',   label: 'Typ',  defaultNormal: true,  defaultFocus: false },
   { key: 'valuearea',   label: 'Affärsområde',  defaultNormal: true,  defaultFocus: false },
   { key: 'andrad',      label: 'Ändrad',        defaultNormal: true,  defaultFocus: false },
 ];
@@ -4035,6 +4085,29 @@ function openLoopPageFromInput(inputId) {
 
 async function createEpicFromHierarchyList(projectHint = '') {
   const hint = String(projectHint || '').trim();
+
+  const selectedProjectNames = [...new Set(
+    [...(selectedProjects || new Set())]
+      .map(entry => String(entry || '').trim())
+      .filter(Boolean)
+      .map(entry => entry.includes('::') ? entry.split('::')[0] : entry)
+      .map(name => String(name || '').trim())
+      .filter(Boolean)
+  )];
+  const itemProjectNames = [...new Set(
+    (allItems || [])
+      .map(item => workItemProject(item, ''))
+      .map(name => String(name || '').trim())
+      .filter(Boolean)
+  )];
+  const projectCandidates = [...new Set([
+    ...(hint ? [hint] : []),
+    ...selectedProjectNames,
+    ...itemProjectNames,
+  ])];
+  const currentProject = hint || selectedProjectNames[0] || itemProjectNames[0] || '';
+  const project = await chooseEpicProjectFromList(projectCandidates, currentProject);
+  if (!project) return;
 
   const titleRaw = prompt('Namn på ny Epic', `Epic ${new Date().toLocaleDateString('sv-SE')}`);
   if (titleRaw == null) return;
@@ -4505,7 +4578,7 @@ function openWorkItemModal(itemId) {
       selectRow('Status', 'wiEditState', state, stateOptions, false) +
       sprintInputRow('Sprint', 'wiEditSprintPath', sprintPath) +
       inputRow('Effort', 'wiEditEffort', effort, 'Effort') +
-      selectRow('Typ (Custom)', 'wiEditCustomTyp', customType, mergeOptions(CUSTOM_TYP_OPTIONS, customType)) +
+      selectRow('Typ', 'wiEditCustomTyp', customType, mergeOptions(CUSTOM_TYP_OPTIONS, customType)) +
       selectRow('Affärsområde', 'wiEditAo', ao, mergeOptions(AFFARSOM_OPTIONS, ao)) +
       inputRow('Super Epic', 'wiEditSuperEpic', superEpic, 'Super Epic') +
       selectRow('Roadmap', 'wiEditRoadmap', roadmap, mergeOptions(ROADMAP_OPTIONS, roadmap)) +
@@ -5394,10 +5467,12 @@ function statusBurndownDebugHtml(debugRows) {
     </div>`;
   }).join('');
 
-  return `<details style="margin-top:10px;border-top:1px solid rgba(125,133,144,.2);padding-top:8px;">
-    <summary style="cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);">Debug: burndown per dag (netto vs gross burn)</summary>
-    <div style="margin-top:6px;max-height:240px;overflow:auto;padding-right:4px;">${rowsHtml}</div>
-  </details>`;
+  return `<div class="status-burndown-debug">
+    <details>
+      <summary style="cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);">Burndown per dag (netto vs gross burn)</summary>
+      <div class="status-burndown-debug-body">${rowsHtml}</div>
+    </details>
+  </div>`;
 }
 
 function statusBurndownSvg(series, options = {}) {
@@ -5735,6 +5810,8 @@ let sprintInlineEditBusy = false;   // true while edit API call is in flight
 // ── Sprint focus / link-map state ────────────────────────────────────────────
 let sprintFocusPath = null;
 let sprintFocusPhase = null; // 'Prev' | 'Nu' | 'Nästa'
+let sprintFocusRestorePath = null;
+let sprintFocusRestorePhase = null;
 let sprintFocusListOnlyCurrent = false;
 let sprintFocusGroupByGoal = false;
 let sprintFocusListGroupMode = 'projekt'; // 'projekt' | 'ao' | 'roadmap' | 'maconomy'
@@ -5751,6 +5828,7 @@ let sprintCreateModalBusy = false;
 let sprintCreateModalKeyHandler = null;
 let sprintCreateModalOverlayHandler = null;
 let sprintGoalTypeByProject = new Map();
+let sprintTeamAreaPathsByProjectTeam = new Map();
 const SPRINT_DEBUG_ENABLED = true;
 
 const BOARD_STATE_FIELD_CANDIDATES = ['Custom.BoardState'];
@@ -8292,6 +8370,8 @@ async function fetchItems(options = {}) {
             const tfvData = await tfvRes.json();
             const values = tfvData.values || [];
             if (values.length > 0) {
+              const areaPaths = values.map(v => String(v?.value || '').trim()).filter(Boolean);
+              sprintRememberTeamAreaPaths(project, team, areaPaths);
               const areaClauses = values.map(v => {
                 // Escape backslashes for WIQL (backslash must be \\ in WIQL string)
                 const escapedValue = v.value.replace(/\\/g, '\\\\').replace(/'/g, "''");
@@ -8377,6 +8457,7 @@ async function fetchItems(options = {}) {
     // Filter excluded states — keep hierarchy types for Board/Sprint contexts.
     allItems = items.filter(item => {
       const state = workItemStateLower(item);
+      if (state.includes('removed')) return false;
       const isExcluded = EXCLUDED_STATES.some(ex => state.includes(ex));
       if (!isExcluded) return true;
       const type = (item.fields['System.WorkItemType'] || '').toLowerCase().trim();
@@ -8402,46 +8483,53 @@ async function fetchItems(options = {}) {
     const uniqueProjects = [...new Set([...selectedProjects].map(entry => entry.includes('::') ? entry.split('::')[0] : entry))];
     for (const project of uniqueProjects) {
       try {
-        const iterUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/classificationnodes/iterations?$depth=10&api-version=7.1`;
-        const iterRes = await apiGet(iterUrl);
-        if (!iterRes.ok) continue;
-        const iterData = await iterRes.json();
+        const projectSelectedTeams = sprintSelectedTeamsForProject(project);
+        const projectSelectedOnly = [...selectedProjects].some(entry => String(entry || '').trim() === project);
 
-        const walk = node => {
-          const children = node.children || [];
-          const attrs = node.attributes || {};
-          const rawPath = String(node.path || '').replace(/^\\+/, '').trim();
-          const fullPath = rawPath || '';
-          const isContainer = /\\Iteration$/i.test(fullPath) || /^Iteration$/i.test(fullPath) || /^Iterations$/i.test(fullPath);
-          const hasDates = !!(attrs.startDate || attrs.finishDate);
-          const isLeaf = children.length === 0;
-          const isCandidate = !isContainer && fullPath && (isLeaf || hasDates);
+        if (projectSelectedOnly || projectSelectedTeams.length === 0) {
+          const iterUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/classificationnodes/iterations?$depth=10&api-version=7.1`;
+          const iterRes = await apiGet(iterUrl);
+          if (iterRes.ok) {
+            const iterData = await iterRes.json();
 
-          // Azure DevOps API includes an "Iteration" intermediate segment in paths
-          // (e.g. "WebTools\Iteration\Sprint 14"), but System.IterationPath on work items
-          // omits it ("WebTools\Sprint 14"). Normalize to match work item format.
-          const normPath = (() => {
-            const parts = fullPath.split('\\');
-            if (parts.length >= 3 && /^iterations?$/i.test(parts[1])) {
-              return [parts[0], ...parts.slice(2)].join('\\');
-            }
-            return fullPath;
-          })();
+            const walk = node => {
+              const children = node.children || [];
+              const attrs = node.attributes || {};
+              const rawPath = String(node.path || '').replace(/^\+/, '').trim();
+              const fullPath = rawPath || '';
+              const isContainer = /\Iteration$/i.test(fullPath) || /^Iteration$/i.test(fullPath) || /^Iterations$/i.test(fullPath);
+              const hasDates = !!(attrs.startDate || attrs.finishDate);
+              const isLeaf = children.length === 0;
+              const isCandidate = !isContainer && fullPath && (isLeaf || hasDates);
 
-          if (isCandidate && !seenIterationPaths.has(normPath)) {
-            seenIterationPaths.add(normPath);
-            sprintIterationsCatalog.push({
-              project,
-              path: normPath,
-              name: node.name || fullPath.split('\\').pop() || fullPath,
-              startDate: attrs.startDate || '',
-              finishDate: attrs.finishDate || '',
-            });
+              const normPath = sprintNormalizeIterationApiPath(fullPath);
+
+              if (isCandidate && !seenIterationPaths.has(normPath)) {
+                seenIterationPaths.add(normPath);
+                sprintIterationsCatalog.push({
+                  project,
+                  path: normPath,
+                  name: node.name || fullPath.split('\\').pop() || fullPath,
+                  startDate: attrs.startDate || '',
+                  finishDate: attrs.finishDate || '',
+                });
+              }
+              children.forEach(walk);
+            };
+
+            walk(iterData);
           }
-          children.forEach(walk);
-        };
+        }
 
-        walk(iterData);
+        for (const team of projectSelectedTeams) {
+          const teamEntries = await sprintTeamIterationCatalogFromApi(project, team);
+          teamEntries.forEach(entry => {
+            const path = String(entry?.path || '').trim();
+            if (!path || seenIterationPaths.has(path)) return;
+            seenIterationPaths.add(path);
+            sprintIterationsCatalog.push(entry);
+          });
+        }
       } catch (e) {
         // Ignore iteration catalog errors for a project; board still works with loaded issues.
       }
@@ -9728,10 +9816,11 @@ async function sprintCloneGoalToProject(item, targetProject, targetPath, rankVal
   const state = String(item?.fields?.['System.State'] || '').trim();
   const description = item?.fields?.['System.Description'];
   const team = sprintTeamValue(item);
+  const areaPath = await sprintResolveCreationAreaPath(targetProject, team);
 
   const createOps = [
     { op: 'add', path: '/fields/System.Title', value: title },
-    { op: 'add', path: '/fields/System.AreaPath', value: targetProject },
+    { op: 'add', path: '/fields/System.AreaPath', value: areaPath },
   ];
   if (team) createOps.push({ op: 'add', path: '/fields/Custom.Team', value: team });
   if (state) createOps.push({ op: 'add', path: '/fields/System.State', value: state });
@@ -9790,18 +9879,18 @@ async function sprintCloneGoalToProject(item, targetProject, targetPath, rankVal
     else newItem.fields['System.IterationPath'] = '';
     newItem.fields['Microsoft.VSTS.Common.StackRank'] = rankValue;
     newItem.fields['System.TeamProject'] = targetProject;
-    newItem.fields['System.AreaPath'] = targetProject;
+    newItem.fields['System.AreaPath'] = areaPath;
   }
   return { newItem, appliedPath, createdId };
 }
 
-function sprintCoerceCreatedGoal(created, project, title, iterationPath, team) {
+function sprintCoerceCreatedGoal(created, project, title, iterationPath, team, areaPath = '') {
   const out = created && typeof created === 'object' ? created : { id: created?.id };
   out.fields = out.fields || {};
   if (!out.fields['System.WorkItemType']) out.fields['System.WorkItemType'] = 'Sprint Goal';
   if (!out.fields['System.Title']) out.fields['System.Title'] = title || 'Untitled';
   if (!out.fields['System.TeamProject']) out.fields['System.TeamProject'] = project || '';
-  if (!out.fields['System.AreaPath']) out.fields['System.AreaPath'] = project || '';
+  if (!out.fields['System.AreaPath']) out.fields['System.AreaPath'] = areaPath || project || '';
   if (iterationPath != null) out.fields['System.IterationPath'] = iterationPath;
   if (team) out.fields['Custom.Team'] = team;
   return out;
@@ -9814,17 +9903,204 @@ function sprintTeamValue(item) {
   return String(raw).trim();
 }
 
+function sprintTeamScopeKey(project, team) {
+  return `${String(project || '').trim().toLowerCase()}::${String(team || '').trim().toLowerCase()}`;
+}
+
+function sprintRememberTeamAreaPaths(project, team, areaPaths) {
+  const cleanProject = String(project || '').trim();
+  const cleanTeam = String(team || '').trim();
+  if (!cleanProject || !cleanTeam) return;
+  const uniquePaths = [...new Set((areaPaths || []).map(path => String(path || '').trim()).filter(Boolean))];
+  sprintTeamAreaPathsByProjectTeam.set(sprintTeamScopeKey(cleanProject, cleanTeam), uniquePaths);
+}
+
+function sprintTeamAreaPaths(project, team) {
+  return sprintTeamAreaPathsByProjectTeam.get(sprintTeamScopeKey(project, team)) || [];
+}
+
+function sprintSelectedTeamForProject(project) {
+  const cleanProject = String(project || '').trim();
+  if (!cleanProject) return '';
+  const selectedTeams = [...selectedProjects]
+    .map(entry => String(entry || '').trim())
+    .filter(entry => entry.startsWith(`${cleanProject}::`))
+    .map(entry => entry.split('::')[1] || '')
+    .filter(Boolean);
+  const uniqueTeams = [...new Set(selectedTeams)];
+  if (uniqueTeams.length === 1) return uniqueTeams[0];
+  if (sprintTeamFilter && uniqueTeams.includes(sprintTeamFilter)) return sprintTeamFilter;
+  return '';
+}
+
+function sprintAllowedAreaPathsForProject(project) {
+  const cleanProject = String(project || '').trim();
+  if (!cleanProject) return [];
+  if (!selectedProjects || selectedProjects.size === 0) return [];
+
+  const selectedTeams = [...(selectedProjects || new Set())]
+    .map(entry => String(entry || '').trim())
+    .filter(entry => entry.startsWith(`${cleanProject}::`))
+    .map(entry => entry.split('::')[1] || '')
+    .filter(Boolean);
+
+  const uniqueTeams = [...new Set(selectedTeams)];
+  const paths = new Set();
+  uniqueTeams.forEach(team => sprintTeamAreaPaths(cleanProject, team).forEach(path => paths.add(path)));
+  return [...paths];
+}
+
+function sprintItemMatchesAllowedAreaPaths(item) {
+  try {
+    const project = workItemProject(item, '');
+    const allowedPaths = sprintAllowedAreaPathsForProject(project);
+    if (!allowedPaths.length) return true;
+
+    const itemAreaPath = String(item?.fields?.['System.AreaPath'] || '').trim();
+    if (!itemAreaPath) return false;
+
+    return allowedPaths.some(path => {
+      const cleanPath = String(path || '').trim();
+      if (!cleanPath) return false;
+      return itemAreaPath === cleanPath || itemAreaPath.startsWith(`${cleanPath}\\`);
+    });
+  } catch (e) {
+    console.error('sprintItemMatchesAllowedAreaPaths error:', e, item);
+    return true;
+  }
+}
+
+async function sprintResolveCreationAreaPath(project, team = '') {
+  const cleanProject = String(project || '').trim();
+  if (!cleanProject) return '';
+
+  const cleanTeam = String(team || '').trim() || sprintSelectedTeamForProject(cleanProject);
+  if (cleanTeam) {
+    let areaPaths = sprintTeamAreaPaths(cleanProject, cleanTeam);
+    if (!areaPaths.length) {
+      const projectMeta = (window._projectTeams || []).find(pt => pt.proj === cleanProject);
+      const teamId = projectMeta?.teamIdByName?.[cleanTeam] || '';
+      const teamRefs = [cleanTeam, teamId].filter((value, index, list) => value && list.indexOf(value) === index);
+
+      for (const teamRef of teamRefs) {
+        try {
+          const tfvUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(cleanProject)}/${encodeURIComponent(teamRef)}/_apis/work/teamsettings/teamfieldvalues?api-version=7.1`;
+          const tfvRes = await apiGet(tfvUrl);
+          if (!tfvRes.ok) continue;
+          const tfvData = await tfvRes.json();
+          const values = (tfvData.values || []).map(v => String(v?.value || '').trim()).filter(Boolean);
+          if (values.length) {
+            sprintRememberTeamAreaPaths(cleanProject, cleanTeam, values);
+            areaPaths = values;
+            break;
+          }
+        } catch (_) {}
+      }
+    }
+
+    if (areaPaths.length) return areaPaths[0];
+  }
+
+  return cleanProject;
+}
+
 function sprintNameFromIteration(item) {
   const iter = item.fields['System.IterationPath'] || '';
   const parts = iter.split('\\').filter(Boolean);
   return parts.length ? parts[parts.length - 1] : 'Ej satt';
 }
 
-function sprintFormatDate(d) {
-  if (!d) return '';
-  const dt = new Date(d);
-  if (isNaN(dt.getTime())) return '';
-  return dt.toLocaleDateString('sv-SE');
+function sprintFormatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const dt = new Date(dateStr);
+    if (isNaN(dt.getTime())) return '';
+    return dt.toLocaleDateString('sv-SE');
+  } catch (_) {
+    return '';
+  }
+}
+
+function sprintNormalizeIterationApiPath(rawPath) {
+  const cleanPath = String(rawPath || '').replace(/^\+/, '').trim();
+  if (!cleanPath) return '';
+  const parts = cleanPath.split('\\');
+  if (parts.length >= 3 && /^iterations?$/i.test(parts[1])) {
+    return [parts[0], ...parts.slice(2)].join('\\');
+  }
+  return cleanPath;
+}
+
+function sprintSelectedTeamsForProject(project) {
+  const cleanProject = String(project || '').trim();
+  if (!cleanProject) return [];
+  return [...selectedProjects]
+    .map(entry => String(entry || '').trim())
+    .filter(entry => entry.startsWith(`${cleanProject}::`))
+    .map(entry => entry.split('::')[1] || '')
+    .filter(Boolean)
+    .filter((team, index, list) => list.indexOf(team) === index);
+}
+
+function sprintFilterIterationCatalogByScope() {
+  if (!selectedProjects || selectedProjects.size === 0) {
+    return sprintIterationsCatalog;
+  }
+
+  const allowedProjects = new Set([...selectedProjects]
+    .map(entry => String(entry || '').trim())
+    .filter(entry => !entry.includes('::'))
+    .filter(Boolean)
+  );
+
+  const projectsWithSelectedTeams = new Set();
+  [...selectedProjects].forEach(entry => {
+    const cleanEntry = String(entry || '').trim();
+    if (cleanEntry.includes('::')) {
+      const project = cleanEntry.split('::')[0];
+      if (project) projectsWithSelectedTeams.add(project);
+    }
+  });
+
+  const validProjects = [...new Set([...allowedProjects, ...projectsWithSelectedTeams])];
+  if (validProjects.length === 0) {
+    return sprintIterationsCatalog;
+  }
+
+  const allSprintGoals = allItems
+    .filter(sprintGoalType);
+
+  const allGoalsByIterationPath = new Map();
+  allSprintGoals.forEach(goal => {
+    const iterPath = String(goal.fields?.['System.IterationPath'] || '').trim();
+    if (!iterPath) return;
+    if (!allGoalsByIterationPath.has(iterPath)) {
+      allGoalsByIterationPath.set(iterPath, []);
+    }
+    allGoalsByIterationPath.get(iterPath).push(goal);
+  });
+
+  const goalsInScope = allSprintGoals
+    .filter(sprintItemMatchesAllowedAreaPaths);
+
+  const iterationsWithGoalsInScope = new Set(
+    goalsInScope
+      .map(goal => (goal.fields['System.IterationPath'] || '').trim())
+      .filter(Boolean)
+  );
+
+  return sprintIterationsCatalog.filter(iter => {
+    const iterProject = String(iter.project || '').trim();
+    if (!validProjects.includes(iterProject)) return false;
+
+    const iterPath = String(iter.path || '').trim();
+    if (!iterPath) return true;
+
+    const hasAnyGoalsInIteration = allGoalsByIterationPath.has(iterPath);
+    if (!hasAnyGoalsInIteration) return true;
+
+    return iterationsWithGoalsInScope.has(iterPath);
+  });
 }
 
 // ── Sprint rank helpers ───────────────────────────────────────────────────────
@@ -11099,24 +11375,13 @@ async function sprintProjectIterationPathsFromApi(project) {
 
     const iterData = await iterRes.json();
     const paths = [];
-    // Azure DevOps classification nodes API returns paths with an "Iteration"
-    // intermediate segment (e.g. "WebTools\Iteration\Sprint 14"), but
-    // System.IterationPath on work items omits that segment ("WebTools\Sprint 14").
-    // Strip the second segment if it is "Iteration" or "Iterations".
-    const normalizeApiPath = rawPath => {
-      const parts = rawPath.split('\\');
-      if (parts.length >= 3 && /^iterations?$/i.test(parts[1])) {
-        return [parts[0], ...parts.slice(2)].join('\\');
-      }
-      return rawPath;
-    };
     const walk = node => {
       const children = node?.children || [];
       const rawPath = String(node?.path || '').replace(/^\\+/, '').trim();
       const isContainer = /\\Iteration$/i.test(rawPath) || /^Iteration$/i.test(rawPath) || /^Iterations$/i.test(rawPath);
       // Keep all non-container iteration nodes.
       const isAssignable = !isContainer && rawPath;
-      if (isAssignable) paths.push(normalizeApiPath(rawPath));
+      if (isAssignable) paths.push(sprintNormalizeIterationApiPath(rawPath));
       children.forEach(walk);
     };
     walk(iterData);
@@ -11126,6 +11391,45 @@ async function sprintProjectIterationPathsFromApi(project) {
     debugWarn('sprintIterationPaths', e, { project: proj });
     return [];
   }
+}
+
+async function sprintTeamIterationCatalogFromApi(project, team) {
+  const proj = String(project || '').trim();
+  const cleanTeam = String(team || '').trim();
+  if (!proj || !cleanTeam) return [];
+
+  const projectMeta = (window._projectTeams || []).find(pt => pt.proj === proj);
+  const teamId = projectMeta?.teamIdByName?.[cleanTeam] || '';
+  const teamRefs = [cleanTeam, teamId].filter((value, index, list) => value && list.indexOf(value) === index);
+
+  for (const teamRef of teamRefs) {
+    try {
+      const iterUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(proj)}/${encodeURIComponent(teamRef)}/_apis/work/teamsettings/iterations?api-version=7.1`;
+      const iterRes = await apiGet(iterUrl);
+      if (!iterRes.ok) continue;
+
+      const iterData = await iterRes.json();
+      const rawList = Array.isArray(iterData) ? iterData : (Array.isArray(iterData?.value) ? iterData.value : (Array.isArray(iterData?.values) ? iterData.values : []));
+      const entries = rawList
+        .map(node => {
+          const rawPath = sprintNormalizeIterationApiPath(node?.path || node?.iterationPath || node?.iteration?.path || '');
+          if (!rawPath) return null;
+          const attrs = node?.attributes || node?.iteration?.attributes || {};
+          return {
+            project: proj,
+            path: rawPath,
+            name: String(node?.name || rawPath.split('\\').pop() || rawPath).trim(),
+            startDate: String(attrs.startDate || '').trim(),
+            finishDate: String(attrs.finishDate || '').trim(),
+          };
+        })
+        .filter(Boolean);
+
+      if (entries.length) return entries;
+    } catch (_) {}
+  }
+
+  return [];
 }
 
 async function sprintIterationPatchCandidatesValidated(project, rawPath) {
@@ -11268,10 +11572,11 @@ async function sprintCommitInlineCreate(inputEl) {
     sprintCancelInlineCreate();
     return;
   }
+  const areaPath = await sprintResolveCreationAreaPath(project, sprintTeamFilter);
 
   const createOps = [
     { op: 'add', path: '/fields/System.Title', value: title },
-    { op: 'add', path: '/fields/System.AreaPath', value: project },
+    { op: 'add', path: '/fields/System.AreaPath', value: areaPath },
   ];
   if (sprintTeamFilter) createOps.push({ op: 'add', path: '/fields/Custom.Team', value: sprintTeamFilter });
 
@@ -11302,7 +11607,7 @@ async function sprintCommitInlineCreate(inputEl) {
 
     const finalPath = (created.fields && created.fields['System.IterationPath']) || (targetPath || '');
     const hydrated = await sprintFetchWorkItemById(created.id, project);
-    allItems.push(hydrated || sprintCoerceCreatedGoal(created, project, title, finalPath, sprintTeamFilter));
+    allItems.push(hydrated || sprintCoerceCreatedGoal(created, project, title, finalPath, sprintTeamFilter, areaPath));
     if (!iterationSet) {
       showToast('Goal skapad, men iteration kunde inte sättas automatiskt.');
     }
@@ -11415,13 +11720,14 @@ async function createSprintGoal() {
   const project = projectEl?.value || '';
   const iterationPath = iterEl?.value || '';
   const team = (teamEl?.value || '').trim();
+  const areaPath = await sprintResolveCreationAreaPath(project, team);
 
   if (!title) { showToast('Ange titel för Sprint goal'); return; }
   if (!project) { showToast('Välj projekt'); return; }
 
   const ops = [
     { op: 'add', path: '/fields/System.Title', value: title },
-    { op: 'add', path: '/fields/System.AreaPath', value: project },
+    { op: 'add', path: '/fields/System.AreaPath', value: areaPath },
   ];
   if (team) ops.push({ op: 'add', path: '/fields/Custom.Team', value: team });
 
@@ -11447,7 +11753,7 @@ async function createSprintGoal() {
 
       const finalPath = (created.fields && created.fields['System.IterationPath']) || (iterationPath || '');
       const hydrated = await sprintFetchWorkItemById(created.id, project);
-      allItems.push(hydrated || sprintCoerceCreatedGoal(created, project, title, finalPath, team));
+      allItems.push(hydrated || sprintCoerceCreatedGoal(created, project, title, finalPath, team, areaPath));
       if (titleEl) titleEl.value = '';
       if (projectEl) projectEl.value = '';
       if (iterEl) iterEl.value = '';
@@ -11531,6 +11837,29 @@ function sprintEnterFocus(pathKey) {
   renderSprintGoals();
 }
 
+function sprintToggleHeaderFocus(pathKey) {
+  const targetPath = String(pathKey || '').trim();
+  if (!targetPath) return;
+
+  const isSingleSprintFocus = !sprintFocusPhase && String(sprintFocusPath || '').trim() === targetPath;
+  if (isSingleSprintFocus) {
+    if (sprintFocusRestorePath || sprintFocusRestorePhase) {
+      sprintFocusPath = sprintFocusRestorePath || null;
+      sprintFocusPhase = sprintFocusRestorePhase || null;
+      sprintFocusRestorePath = null;
+      sprintFocusRestorePhase = null;
+      renderSprintGoals();
+      return;
+    }
+    sprintExitFocus();
+    return;
+  }
+
+  sprintFocusRestorePath = sprintFocusPath || null;
+  sprintFocusRestorePhase = sprintFocusPhase || null;
+  sprintEnterFocus(targetPath);
+}
+
 function sprintEnterFocusByPhase(phaseKey, focusPath = '') {
   sprintFocusPhase = String(phaseKey || '').trim() || null;
   sprintFocusPath = String(focusPath || '').trim() || sprintFocusPath || null;
@@ -11542,6 +11871,8 @@ function sprintEnterFocusByPhase(phaseKey, focusPath = '') {
 function sprintExitFocus() {
   sprintFocusPath = null;
   sprintFocusPhase = null;
+  sprintFocusRestorePath = null;
+  sprintFocusRestorePhase = null;
   sprintFocusListOnlyCurrent = false;
   sprintFocusGroupByGoal = false;
   renderSprintGoals();
@@ -11871,8 +12202,15 @@ function sprintBindFocusControls(wrap) {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const focusPath = btn.getAttribute('data-focus-path') || '';
-      const isFocused = sprintFocusPhase === 'Nu';
-      if (isFocused) {
+      const isCurrentFocus = sprintFocusPhase === 'Nu';
+      const canRestoreCurrentSprints = !sprintFocusPhase && !!sprintFocusPath && sprintFocusRestorePhase === 'Nu';
+      if (canRestoreCurrentSprints) {
+        sprintFocusPath = sprintFocusRestorePath || focusPath || null;
+        sprintFocusPhase = 'Nu';
+        sprintFocusRestorePath = null;
+        sprintFocusRestorePhase = null;
+        renderSprintGoals();
+      } else if (isCurrentFocus) {
         sprintExitFocus();
       } else {
         sprintEnterFocusByPhase('Nu', focusPath);
@@ -11926,6 +12264,28 @@ function sprintBindFocusControls(wrap) {
     });
   });
 
+  wrap.querySelectorAll('.sprint-col-focus-target').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pathKey = String(btn.getAttribute('data-focus-path') || '').trim();
+      if (!pathKey) return;
+      if (!(sprintFocusPath || sprintFocusPhase)) return;
+      sprintToggleHeaderFocus(pathKey);
+    });
+  });
+
+  wrap.querySelectorAll('.sprint-col-focus-surface').forEach(header => {
+    header.addEventListener('click', (e) => {
+      const interactive = e.target.closest('button, a, input, select, textarea');
+      if (interactive) return;
+      e.stopPropagation();
+      const pathKey = String(header.getAttribute('data-focus-path') || '').trim();
+      if (!pathKey) return;
+      if (!(sprintFocusPath || sprintFocusPhase)) return;
+      sprintToggleHeaderFocus(pathKey);
+    });
+  });
+
   wrap.querySelectorAll('.sprint-focus-refresh-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -11966,7 +12326,12 @@ function sprintBindSprintMetaActions(wrap) {
 
 function sprintBuildToolbarHtml(teams, goalCount, hasFocusPath, currentSprintFocusPath = '') {
   const isCurrentFocus = sprintFocusPhase === 'Nu';
-  const focusBtnDisabled = !currentSprintFocusPath && !isCurrentFocus;
+  const canRestoreCurrentSprints = !sprintFocusPhase && !!sprintFocusPath && sprintFocusRestorePhase === 'Nu';
+  const focusBtnDisabled = !currentSprintFocusPath && !isCurrentFocus && !canRestoreCurrentSprints;
+  const focusBtnLabel = canRestoreCurrentSprints
+    ? 'Visa alla nuvarande sprintar'
+    : (isCurrentFocus ? 'Avsluta fokus' : 'Fokus på nuvarande sprint');
+  const focusBtnClass = (isCurrentFocus || canRestoreCurrentSprints) ? ' active text-accent-sm' : '';
   return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;flex-wrap:wrap;">
       <span style="font-size:0.71rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;">Team</span>
       <select class="col-filter sprint-team-filter" onchange="sprintTeamFilter=this.value;renderSprintGoals()">
@@ -11974,7 +12339,7 @@ function sprintBuildToolbarHtml(teams, goalCount, hasFocusPath, currentSprintFoc
         ${teams.map(t => `<option value="${escHtml(t)}" ${sprintTeamFilter===t?'selected':''}>${escHtml(t)}</option>`).join('')}
       </select>
 
-      <button class="btn btn-outline sprint-focus-current-btn${isCurrentFocus ? ' active text-accent-sm' : ''}" data-focus-path="${escHtml(currentSprintFocusPath)}" ${focusBtnDisabled ? 'disabled' : ''} style="width:auto;padding:4px 10px;font-size:0.8rem;white-space:nowrap;">${isCurrentFocus ? 'Avsluta fokus' : 'Fokus på nuvarande sprint'}</button>
+      <button class="btn btn-outline sprint-focus-current-btn${focusBtnClass}" data-focus-path="${escHtml(currentSprintFocusPath)}" ${focusBtnDisabled ? 'disabled' : ''} style="width:auto;padding:4px 10px;font-size:0.8rem;white-space:nowrap;">${focusBtnLabel}</button>
 
       <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);">Sprint goal: ${goalCount}</span>
     </div>`;
@@ -12126,9 +12491,10 @@ function sprintEnsureSprintModals() {
 }
 
 function renderSprintGoals() {
-  const wrap = document.getElementById('tableWrap');
-  // ── 1. Data preparation: filter goals, resolve iterations, build phase map ──
-  const sprintGoals = allItems.filter(sprintGoalType);
+  try {
+    const wrap = document.getElementById('tableWrap');
+    // ── 1. Data preparation: filter goals, resolve iterations, build phase map ──
+    const sprintGoals = allItems.filter(sprintGoalType).filter(sprintItemMatchesAllowedAreaPaths);
 
   const teams = [...new Set(sprintGoals.map(sprintTeamValue).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }));
@@ -12138,7 +12504,7 @@ function renderSprintGoals() {
     : sprintGoals;
 
   const pathSet = new Set();
-  sprintIterationsCatalog.forEach(iter => pathSet.add(iter.path));
+  sprintFilterIterationCatalogByScope().forEach(iter => pathSet.add(iter.path));
   filtered.forEach(item => {
     const p = (item.fields['System.IterationPath'] || '').trim();
     if (p) pathSet.add(p);
@@ -12429,7 +12795,6 @@ function renderSprintGoals() {
             <button class="btn btn-outline btn-sm-icon text-sm" title="Ta bort" onclick="sprintDeleteGoal(event, ${item.id})">×</button>
           </div>
         </div>
-        ${isDone ? '<div class="text-label-xs sprint-goal-done-label">Klarmarkerad</div>' : ''}
         ${linkedTicketsHtml}
       </div>`;
     }).join('');
@@ -12441,13 +12806,18 @@ function renderSprintGoals() {
     const cardsListMaxHeight = sprintShowGoalTicketGroups ? 'none' : 'calc(100vh - 320px)';
 
     const html = `<div class="sprint-col-shell" style="${columnStyle}border:1px solid ${isFocused ? 'var(--accent)' : 'var(--border)'};">
-      <div class="sprint-col-header">
+      <div class="sprint-col-header${hasFocusMode ? ' sprint-col-focus-surface' : ''}" ${hasFocusMode ? `data-focus-path="${escHtml(pathKey)}"` : ''}>
         ${columnProject ? `<div class="sprint-col-project">${escHtml(columnProject)}</div>` : ''}
         <div class="sprint-col-title-row">
-          <span class="sprint-col-title-wrap">
-            <span>${meta.name}</span>
-            ${phaseText ? `<span class="sprint-col-phase-pill ${phaseText==='Prev' ? 'prev' : (phaseText==='Nu' ? 'nu' : (phaseText==='Nästa' ? 'nasta' : ''))}">${phaseText}</span>` : ''}
-          </span>
+          ${hasFocusMode
+            ? `<button type="button" class="sprint-col-title-wrap sprint-col-focus-target" data-focus-path="${escHtml(pathKey)}" title="Fokusera på denna sprint">
+                <span>${meta.name}</span>
+                ${phaseText ? `<span class="sprint-col-phase-pill ${phaseText==='Prev' ? 'prev' : (phaseText==='Nu' ? 'nu' : (phaseText==='Nästa' ? 'nasta' : ''))}">${phaseText}</span>` : ''}
+              </button>`
+            : `<span class="sprint-col-title-wrap">
+                <span>${meta.name}</span>
+                ${phaseText ? `<span class="sprint-col-phase-pill ${phaseText==='Prev' ? 'prev' : (phaseText==='Nu' ? 'nu' : (phaseText==='Nästa' ? 'nasta' : ''))}">${phaseText}</span>` : ''}
+              </span>`}
           <div class="sprint-col-actions">
             ${(hasFocusMode && isFocused) ? `<button class="btn btn-outline sprint-goal-group-inline-btn btn-sm-icon${sprintShowGoalTicketGroups ? ' active' : ''}${sprintShowGoalTicketGroups ? ' text-accent2-sm' : ''}" title="Visa eller dölj länkade issues i sprintmål">Visa issues</button>` : ''}
             <span class="sprint-col-count">${(cardsByPath[pathKey] || []).length}</span>
@@ -12546,7 +12916,7 @@ function renderSprintGoals() {
   // Build left panel with hierarchical epics/features when in focus mode (using same layout as Prioritering)
   const leftPanelHtml = hasFocusMode ? (() => {
     let epics = getEpicItems(allItems);
-    const features = getFeatureItems(allItems);
+    const features = getFeatureItems(allItems).filter(f => !EXCLUDED_STATES.some(ex => workItemStateLower(f).includes(ex)));
     
     // Filter out closed/completed epics (same logic as renderPrioritering)
     epics = epics.filter(ep => {
@@ -12557,7 +12927,7 @@ function renderSprintGoals() {
     
     const epicIds = new Set(epics.map(e => e.id));
     
-    const storyItems = getStoryItems(allItems);
+    const storyItems = getStoryItems(allItems).filter(s => !EXCLUDED_STATES.some(ex => workItemStateLower(s).includes(ex)));
     const orphanFeatures = [];
     features.forEach(f => {
       const pid = workItemParentId(f);
@@ -12868,6 +13238,11 @@ function renderSprintGoals() {
   });
 
   sprintEnsureSprintModals();
+  } catch (e) {
+    console.error('renderSprintGoals error:', e);
+    const wrap = document.getElementById('tableWrap');
+    if (wrap) wrap.innerHTML = `<div class="empty-state"><div>Fel vid rendering av Sprint-vyn: ${escHtml(e?.message || e)}</div></div>`;
+  }
 }
 
 // ──────────────────────────────────────────
@@ -19807,7 +20182,7 @@ async function boardRefreshIssueTreeFromDevOps() {
     items.push(...((batchData.value || []).filter(wi => wi && !wi.errorCode && !wi.message && wi.fields)));
   }
 
-  allItems = items;
+  allItems = items.filter(item => !workItemStateLower(item).includes('removed'));
 }
 
 function boardRefreshIssueTree() {
