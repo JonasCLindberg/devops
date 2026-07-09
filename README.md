@@ -9,7 +9,8 @@ Den aktiva appversionen i repot ar `bdo-devops-gui.html`.
 - Läser Work Items via WIQL och visar backlog med filtrering, sokning och gruppering.
 - Visar flera vyer: Backlog, Estimering, Prioritering, Timeline, Roadmap, Sprint, Board, Info, Dashboard, Kalkyl, Analys, Kostnader och Audit.
 - Stödjer enklare redigering av vissa falt direkt i UI (PATCH mot Azure DevOps API).
-- Har en separat "Audit users"-vy for att lista teammedlemmar per projekt.
+- Har en separat "Audit users"-vy för att lista teammedlemmar per projekt (tillgänglig via Settings).
+- Innehaller en "Importer"-vy för att skapa tickets i bulk från CSV/Excel-filer (tillgänglig via Settings).
 - Sparar lokala UI-inställningar i webblasaren (localStorage), t.ex. PAT och kolumnval.
 - Innehaller en native Board-vy med sparad layout, zoom/pan, axlar, tidsaxel och DevOps-synk for board-state.
 - Innehaller en Info-vy dar Debrief-, Scope- och Plan-mallar kan laddas, redigeras och sparas per vald Epic eller Feature.
@@ -132,7 +133,30 @@ Info-vyn ar till for att hantera strukturerad dokumentation kopplad till Epic el
 - Mallens HTML-innehall sparas i `System.Description`.
 - Om en `Info`-post redan finns for vald parent + malltyp uppdateras den, annars skapas en ny.
 
-## Data och sakerhet
+## Importer-verktyget
+
+Importer-vyn tillatar dig att skapa ett stort antal tickets i DevOps utgaende fran en CSV- eller Excel-fil.
+
+### Anvandning
+
+1. Oppna Settings (kugghjuls-ikonen).
+2. Klicka pa "Importer".
+3. Steg 1: Ladda upp CSV/Excel-fil (PAT hämtas automatiskt frân huvudappen).
+4. Steg 2: Välj kolumner för ticket-namn (titel) och beskrivning.
+5. Steg 3: Välj vilka rader som ska importeras (med filtrering och markering).
+6. Steg 4: Välj projekt, Epic (ny eller befintlig) och tickettyp.
+7. Steg 5: Körning - visa ticket-preview, testkör import, eller genomför import.
+
+### Funktioner
+
+- **Temaintegration**: Importer använder samma tema (mörkt/ljust/BDO) som huvudappen.
+- **PAT-delning**: PAT från huvudappen delas automatiskt via `localStorage`.
+- **Formatering**: Stödjer CSV (auto-detect separator) och Excel-filer.
+- **Validering**: Hittar dubbletter och visar validerings-fel innan import.
+- **Logg**: Detaljerad logg över varje ticket som skapas eller misslyckas.
+- **Sparning**: Inställningar och senaste val sparas per session.
+
+
 
 - PAT sparas lokalt i webblasaren via `localStorage` (nyckel: `devops_pat`).
 - Flera andra UI-inställningar sparas ocksa lokalt.
@@ -156,7 +180,8 @@ Testning bor utga fran den aktiva appfilen `bdo-devops-gui.html` och den funktio
 ## Filstruktur
 
 - `bdo-devops-gui.html`: aktiv huvudversion av applikationen.
-- `processmallar.html`: en egen frame för tabben Info
+- `Importer.html`: verktyg för att skapa tickets i bulk från CSV/Excel-filer.
+- `processmallar.html`: egen frame för Info-tabben.
 
 ## Begransningar
 

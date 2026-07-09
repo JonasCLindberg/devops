@@ -1,0 +1,1622 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Importer - DevOps CSV till tickets</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg:       #0d1117;
+      --surface:  #161b22;
+      --surface2: #1c2230;
+      --border:   #21262d;
+      --accent:   #0078d4;
+      --accent2:  #00b4d8;
+      --text:     #e6edf3;
+      --muted:    #9baabb;
+      --success:  #3fb950;
+      --warn:     #d29922;
+      --danger:   #f85149;
+      --radius:   8px;
+    }
+
+    body.light-mode {
+      --bg:       #faf9f7;
+      --surface:  #f0ede8;
+      --surface2: #e8e3dc;
+      --border:   #c8c0b8;
+      --accent:   #7a3410;
+      --accent2:  #a04e1a;
+      --text:     #111009;
+      --muted:    #4a3d37;
+      --success:  #1b5e20;
+      --warn:     #8a6200;
+      --danger:   #b71c1c;
+    }
+
+    body.bdo-mode {
+      --bg:       #ffffff;
+      --surface:  #f5f7fa;
+      --surface2: #eaecf0;
+      --border:   #d0d4db;
+      --accent:   #e81838;
+      --accent2:  #0060b8;
+      --text:     #1a1a1a;
+      --muted:    #647c90;
+      --success:  #1b7a3a;
+      --warn:     #b06000;
+      --danger:   #c40020;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+    }
+
+    .shell {
+      width: min(1280px, 94vw);
+      margin: 20px auto 36px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero {
+      background: linear-gradient(120deg, var(--accent), var(--accent2));
+      border-radius: 14px;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      animation: heroRise .46s ease-out both;
+    }
+
+    @keyframes heroRise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2vw, 2rem);
+      letter-spacing: .01em;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      color: rgba(255,255,255,.9);
+      max-width: 820px;
+      line-height: 1.4;
+    }
+
+    .wizard {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .wizard .step-pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      text-align: center;
+      font-size: .82rem;
+      background: var(--surface);
+      color: var(--muted);
+      transition: all .18s ease;
+    }
+
+    .wizard .step-pill.active {
+      background: color-mix(in srgb, var(--accent2) 16%, transparent);
+      border-color: var(--accent2);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      padding: 14px;
+      animation: panelIn .28s ease-out both;
+    }
+
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .c2 { grid-column: span 2; }
+    .c3 { grid-column: span 3; }
+    .c4 { grid-column: span 4; }
+    .c6 { grid-column: span 6; }
+    .c8 { grid-column: span 8; }
+    .c9 { grid-column: span 9; }
+    .c10 { grid-column: span 10; }
+    .c12 { grid-column: span 12; }
+
+    label {
+      display: block;
+      font-size: .8rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    input[type="text"], input[type="password"], select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 11px;
+      font: inherit;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .84rem;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    textarea { min-height: 72px; resize: vertical; font-family: 'JetBrains Mono', monospace; }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent2);
+    }
+
+    select option { background: var(--surface); }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 9px 12px;
+      cursor: pointer;
+      font: inherit;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: .86rem;
+      transition: opacity .15s ease, transform .1s ease, background .2s ease, border-color .2s ease;
+    }
+
+    button:active { transform: scale(.98); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+
+    .btn-main { background: var(--accent); color: #fff; }
+    .btn-main:hover:not(:disabled) { opacity: .88; }
+
+    .btn-soft {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-soft:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 6%, transparent); }
+
+    .btn-warn {
+      background: color-mix(in srgb, var(--warn) 18%, transparent);
+      border-color: var(--warn);
+      color: var(--warn);
+    }
+
+    .btn-good {
+      background: color-mix(in srgb, var(--success) 18%, transparent);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .muted { color: var(--muted); font-size: .84rem; }
+
+    .table-wrap {
+      max-height: 370px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 7px 8px;
+      text-align: left;
+      vertical-align: top;
+      font-size: .84rem;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--surface2);
+      z-index: 2;
+      font-weight: 600;
+    }
+
+    tr:hover td { background: color-mix(in srgb, var(--accent2) 8%, transparent); }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: .75rem;
+      border: 1px solid;
+    }
+
+    .ok { color: var(--success); border-color: var(--success); background: color-mix(in srgb, var(--success) 12%, transparent); }
+    .bad { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+
+    .log {
+      white-space: pre-wrap;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      min-height: 120px;
+      max-height: 340px;
+      overflow: auto;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: min(900px, 96vw);
+      max-height: 86vh;
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: 0 16px 44px rgba(0,0,0,.35);
+      padding: 14px;
+    }
+
+    .modal h3 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 6px 12px;
+      margin-bottom: 10px;
+      font-size: .86rem;
+    }
+
+    .kv .key { color: var(--muted); }
+
+    .ticket-preview-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      padding: 10px;
+    }
+
+    .ticket-preview-box pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem;
+      line-height: 1.38;
+      color: var(--text);
+    }
+
+    .radio-line { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+    .radio-line label { margin: 0; color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+
+    @media (max-width: 980px) {
+      .wizard { grid-template-columns: 1fr 1fr; }
+      .c4, .c6, .c8 { grid-column: span 12; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <h1>Importer</h1>
+      <p>Skapa tickets i DevOps via csv fil</p>
+    </section>
+
+
+
+    <section class="panel" id="step1">
+      <h2>Steg 1 - Importera och presentera fil</h2>
+      <div class="grid">
+        <div class="c4">
+          <label for="patInput">Personal Access Token</label>
+          <input id="patInput" type="password" placeholder="PAT" />
+          <div id="patStatus" style="display:none;font-size:0.86rem;color:var(--muted);padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);text-align:center;">✓ Ansluten via huvudappen</div>
+        </div>
+        <div class="c12">
+          <label for="csvFile">CSV/Excel-fil</label>
+          <input id="csvFile" type="file" accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xls,application/vnd.ms-excel" />
+        </div>
+        <div class="c4">
+          <label for="delimiterSelect">Separator</label>
+          <select id="delimiterSelect">
+            <option value="auto">Auto</option>
+            <option value=",">Komma (,)</option>
+            <option value=";">Semikolon (;)</option>
+            <option value="\t">Tab</option>
+          </select>
+        </div>
+        <div class="c8 muted" id="fileMeta">Ingen fil laddad ännu.</div>
+        <div class="c12">
+          <div class="table-wrap" id="csvPreviewWrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="step2">
+      <h2>Steg 2 - Välj ticket namn och description</h2>
+      <div class="grid">
+        <div class="c6">
+          <label for="titleColumn">Kolumn för ticket-namn</label>
+          <select id="titleColumn"></select>
+        </div>
+        <div class="c6">
+          <label for="descriptionColumn">Kolumn för description</label>
+          <select id="descriptionColumn"></select>
+        </div>
+        <div class="c12">
+          <label style="display:inline-flex;align-items:center;gap:8px;color:var(--text)">
+            <input id="includeOtherColumns" type="checkbox" />
+            Inkludera övriga kolumner som lista i Description.
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="step3">
+      <h2>Steg 3 - Välj vilka rader som ska inkluderas</h2>
+      <div class="grid">
+        <div class="c12 btn-row">
+          <button class="btn-soft" id="selectAllRowsBtn">Markera alla</button>
+          <button class="btn-soft" id="clearRowsBtn">Avmarkera alla</button>
+          <input id="rowFilter" type="text" placeholder="Filtrera rader (fritext)" style="max-width:340px" />
+          <span class="badge ok" id="rowCountBadge">0 valda</span>
+        </div>
+        <div class="c12">
+          <div class="table-wrap" id="rowSelectionWrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="step4">
+      <h2>Steg 4 - Välj projekt, Epic och tickettyp</h2>
+      <div class="grid">
+        <div class="c3">
+          <label>&nbsp;</label>
+          <button id="loadProjectsBtn" class="btn-soft" style="width:auto;padding:8px 12px;">Hämta</button>
+        </div>
+        <div class="c6">
+          <label for="projectSelect">Projekt</label>
+          <select id="projectSelect">
+            <option value="">-- hämta projekt --</option>
+          </select>
+        </div>
+        <div class="c3">
+          <label>&nbsp;</label>
+          <span class="muted" id="projectInfo" style="display:block;padding-top:29px;">Ingen projektdata laddad.</span>
+        </div>
+        <div class="c12 radio-line">
+          <label><input type="radio" name="epicMode" value="new" checked /> Skapa ny Epic</label>
+          <label><input type="radio" name="epicMode" value="existing" /> Använd befintlig Epic</label>
+        </div>
+        <div class="c6" id="newEpicBox">
+          <label for="newEpicTitle">Namn på ny Epic</label>
+          <input id="newEpicTitle" type="text" placeholder="Ex. CSV Import 2026-07-08" />
+        </div>
+        <div class="c6" id="newEpicDescBox">
+          <label for="newEpicDescription">Beskrivning för ny Epic (valfritt)</label>
+          <textarea id="newEpicDescription" placeholder="Beskrivning"></textarea>
+        </div>
+        <div class="c3" id="existingEpicBtnBox" style="display:none">
+          <label>&nbsp;</label>
+          <button id="loadEpicsBtn" class="btn-soft" style="width:auto;padding:8px 12px;">Hämta</button>
+        </div>
+        <div class="c9" id="existingEpicBox" style="display:none">
+          <label for="epicSelect">Befintlig Epic</label>
+          <select id="epicSelect">
+            <option value="">-- hämta epics --</option>
+          </select>
+        </div>
+        <div class="c3">
+          <label>&nbsp;</label>
+          <button id="loadTypesBtn" class="btn-soft" style="width:auto;padding:8px 12px;">Hämta</button>
+        </div>
+        <div class="c6">
+          <label for="workItemTypeSelect">Tickettyp</label>
+          <select id="workItemTypeSelect">
+            <option value="Feature">Feature</option>
+            <option value="User Story">User Story</option>
+          </select>
+        </div>
+        <div class="c3">
+          <label>&nbsp;</label>
+          <span style="display:block;padding-top:29px;"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="step5">
+      <h2>Steg 5 - Körning och import</h2>
+      <div class="grid">
+        <div class="c12 btn-row">
+          <button id="showTicketBtn" class="btn-soft">Visa ticket</button>
+          <button id="dryRunBtn" class="btn-warn">Testkör import</button>
+          <button id="importBtn" class="btn-good">Importera</button>
+          <span id="importSummary" class="muted">Ingen körning ännu.</span>
+        </div>
+        <div class="c12">
+          <div class="log" id="logBox">Logg startad.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="ticketModalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ticketModalTitle">
+      <h3 id="ticketModalTitle">Förhandsvisning av ticket</h3>
+      <div class="kv">
+        <div class="key">Projekt</div><div id="ticketModalProject">-</div>
+        <div class="key">Tickettyp</div><div id="ticketModalType">-</div>
+        <div class="key">Epic</div><div id="ticketModalEpic">-</div>
+        <div class="key">CSV-rad</div><div id="ticketModalRow">-</div>
+      </div>
+      <div class="ticket-preview-box" style="margin-bottom:10px">
+        <strong style="display:block;margin-bottom:6px">Titel</strong>
+        <pre id="ticketModalTitleValue"></pre>
+      </div>
+      <div class="ticket-preview-box">
+        <strong style="display:block;margin-bottom:6px">Description</strong>
+        <pre id="ticketModalDescriptionValue"></pre>
+      </div>
+      <div class="btn-row" style="justify-content:flex-end;margin-top:12px">
+        <button id="closeTicketModalBtn" class="btn-main">Stäng</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const ORG = "BDO-Sweden";
+    const LS_PAT = "devops_pat";
+    const LS_SETTINGS = "importer_settings_v1";
+    const LS_THEME = "devops_theme";
+
+    function applyTheme(theme) {
+      document.body.classList.remove("light-mode", "bdo-mode");
+      if (theme === "light") document.body.classList.add("light-mode");
+      else if (theme === "bdo") document.body.classList.add("bdo-mode");
+    }
+
+    function loadTheme() {
+      const saved = localStorage.getItem(LS_THEME);
+      applyTheme(saved === "dark" ? "dark" : saved === "bdo" ? "bdo" : "light");
+    }
+
+    loadTheme();
+    window.addEventListener("storage", (ev) => {
+      if (ev.key === LS_THEME) loadTheme();
+    });
+
+    const state = {
+      fileName: "",
+      delimiter: "auto",
+      headers: [],
+      rows: [],
+      selectedRows: new Set(),
+      filteredRows: [],
+      projects: [],
+      epics: [],
+      descriptionFieldCache: new Map(),
+      duplicatesByRow: new Map(),
+      settings: {
+        titleColumn: "",
+        descriptionColumn: "",
+        includeOtherColumns: false,
+        project: "",
+        workItemType: "User Story",
+        epicMode: "new",
+        newEpicTitle: "",
+        newEpicDescription: "",
+        existingEpicId: ""
+      }
+    };
+
+    let xlsxLoaderPromise = null;
+
+    const el = {
+      patInput: document.getElementById("patInput"),
+      csvFile: document.getElementById("csvFile"),
+      delimiterSelect: document.getElementById("delimiterSelect"),
+      fileMeta: document.getElementById("fileMeta"),
+      csvPreviewWrap: document.getElementById("csvPreviewWrap"),
+      titleColumn: document.getElementById("titleColumn"),
+      descriptionColumn: document.getElementById("descriptionColumn"),
+      includeOtherColumns: document.getElementById("includeOtherColumns"),
+      selectAllRowsBtn: document.getElementById("selectAllRowsBtn"),
+      clearRowsBtn: document.getElementById("clearRowsBtn"),
+      rowFilter: document.getElementById("rowFilter"),
+      rowSelectionWrap: document.getElementById("rowSelectionWrap"),
+      rowCountBadge: document.getElementById("rowCountBadge"),
+      loadProjectsBtn: document.getElementById("loadProjectsBtn"),
+      loadTypesBtn: document.getElementById("loadTypesBtn"),
+      projectSelect: document.getElementById("projectSelect"),
+      workItemTypeSelect: document.getElementById("workItemTypeSelect"),
+      projectInfo: document.getElementById("projectInfo"),
+      newEpicBox: document.getElementById("newEpicBox"),
+      newEpicDescBox: document.getElementById("newEpicDescBox"),
+      newEpicTitle: document.getElementById("newEpicTitle"),
+      newEpicDescription: document.getElementById("newEpicDescription"),
+      existingEpicBox: document.getElementById("existingEpicBox"),
+      existingEpicBtnBox: document.getElementById("existingEpicBtnBox"),
+      loadEpicsBtn: document.getElementById("loadEpicsBtn"),
+      epicSelect: document.getElementById("epicSelect"),
+      showTicketBtn: document.getElementById("showTicketBtn"),
+      dryRunBtn: document.getElementById("dryRunBtn"),
+      importBtn: document.getElementById("importBtn"),
+      importSummary: document.getElementById("importSummary"),
+      logBox: document.getElementById("logBox"),
+      wizardPills: [...document.querySelectorAll("#wizardPills .step-pill")],
+      ticketModalBackdrop: document.getElementById("ticketModalBackdrop"),
+      closeTicketModalBtn: document.getElementById("closeTicketModalBtn"),
+      ticketModalProject: document.getElementById("ticketModalProject"),
+      ticketModalType: document.getElementById("ticketModalType"),
+      ticketModalEpic: document.getElementById("ticketModalEpic"),
+      ticketModalRow: document.getElementById("ticketModalRow"),
+      ticketModalTitleValue: document.getElementById("ticketModalTitleValue"),
+      ticketModalDescriptionValue: document.getElementById("ticketModalDescriptionValue")
+    };
+
+    function logLine(message, isError = false) {
+      const ts = new Date().toLocaleTimeString("sv-SE");
+      const prefix = isError ? "ERROR" : "INFO";
+      el.logBox.textContent += `\n[${ts}] [${prefix}] ${String(message)}`;
+      el.logBox.scrollTop = el.logBox.scrollHeight;
+    }
+
+    function escHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function normalizeKey(v) {
+      return String(v || "").trim().toLowerCase();
+    }
+
+    function saveSettings() {
+      state.settings.titleColumn = el.titleColumn.value;
+      state.settings.descriptionColumn = el.descriptionColumn.value;
+      state.settings.includeOtherColumns = !!el.includeOtherColumns.checked;
+      state.settings.project = el.projectSelect.value;
+      state.settings.workItemType = el.workItemTypeSelect.value;
+      state.settings.newEpicTitle = el.newEpicTitle.value;
+      state.settings.newEpicDescription = el.newEpicDescription.value;
+      state.settings.existingEpicId = el.epicSelect.value;
+      state.settings.epicMode = document.querySelector("input[name='epicMode']:checked")?.value || "new";
+
+      try {
+        localStorage.setItem(LS_SETTINGS, JSON.stringify(state.settings));
+      } catch (_) {}
+    }
+
+    function restoreSettings() {
+      const savedPat = localStorage.getItem(LS_PAT);
+      if (savedPat) el.patInput.value = savedPat;
+
+      try {
+        const parsed = JSON.parse(localStorage.getItem(LS_SETTINGS) || "{}");
+        if (parsed && typeof parsed === "object") {
+          state.settings = { ...state.settings, ...parsed };
+        }
+      } catch (_) {}
+
+      el.delimiterSelect.value = state.delimiter;
+      el.includeOtherColumns.checked = !!state.settings.includeOtherColumns;
+      el.newEpicTitle.value = state.settings.newEpicTitle || "";
+      el.newEpicDescription.value = state.settings.newEpicDescription || "";
+      const mode = state.settings.epicMode === "existing" ? "existing" : "new";
+      const modeInput = document.querySelector(`input[name='epicMode'][value='${mode}']`);
+      if (modeInput) modeInput.checked = true;
+      updateEpicModeUI();
+    }
+
+    function updateWizard() {
+      if (!Array.isArray(el.wizardPills) || !el.wizardPills.length) return;
+      const checks = [
+        state.rows.length > 0,
+        Boolean(el.titleColumn.value && el.descriptionColumn.value),
+        state.selectedRows.size > 0,
+        Boolean(el.projectSelect.value),
+        false
+      ];
+      checks.forEach((ok, idx) => {
+        el.wizardPills[idx].classList.toggle("active", ok || idx === checks.findIndex(v => !v));
+      });
+    }
+
+    function readFileAsText(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(reader.error || new Error("Kunde inte läsa filen."));
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.readAsText(file, "utf-8");
+      });
+    }
+
+    function readFileAsArrayBuffer(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(reader.error || new Error("Kunde inte läsa excelfilen."));
+        reader.onload = () => resolve(reader.result);
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function isExcelFile(file) {
+      const name = String(file?.name || "").toLowerCase();
+      return name.endsWith(".xlsx") || name.endsWith(".xls");
+    }
+
+    async function ensureXlsxLibrary() {
+      if (window.XLSX) return window.XLSX;
+      if (xlsxLoaderPromise) return xlsxLoaderPromise;
+
+      xlsxLoaderPromise = new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+        script.async = true;
+        script.onload = () => resolve(window.XLSX);
+        script.onerror = () => reject(new Error("Kunde inte ladda Excel-biblioteket (XLSX). Kontrollera nätverk och försök igen."));
+        document.head.appendChild(script);
+      });
+
+      return xlsxLoaderPromise;
+    }
+
+    function detectDelimiter(headerLine) {
+      const commaCount = (headerLine.match(/,/g) || []).length;
+      const semicolonCount = (headerLine.match(/;/g) || []).length;
+      const tabCount = (headerLine.match(/\t/g) || []).length;
+      if (tabCount > commaCount && tabCount > semicolonCount) return "\t";
+      if (semicolonCount > commaCount) return ";";
+      return ",";
+    }
+
+    function parseCsv(text, delimiter) {
+      const rows = [];
+      let i = 0;
+      let cell = "";
+      let row = [];
+      let inQuotes = false;
+
+      while (i < text.length) {
+        const c = text[i];
+        const next = text[i + 1];
+
+        if (inQuotes) {
+          if (c === '"' && next === '"') {
+            cell += '"';
+            i += 2;
+            continue;
+          }
+          if (c === '"') {
+            inQuotes = false;
+            i += 1;
+            continue;
+          }
+          cell += c;
+          i += 1;
+          continue;
+        }
+
+        if (c === '"') {
+          inQuotes = true;
+          i += 1;
+          continue;
+        }
+
+        if (c === delimiter) {
+          row.push(cell);
+          cell = "";
+          i += 1;
+          continue;
+        }
+
+        if (c === "\n") {
+          row.push(cell);
+          rows.push(row);
+          row = [];
+          cell = "";
+          i += 1;
+          continue;
+        }
+
+        if (c === "\r") {
+          i += 1;
+          continue;
+        }
+
+        cell += c;
+        i += 1;
+      }
+
+      row.push(cell);
+      if (row.length > 1 || row[0] !== "") {
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function normalizeRows(matrix) {
+      if (!matrix.length) return { headers: [], rows: [] };
+      const headers = matrix[0].map(v => String(v || "").trim());
+      const width = headers.length;
+      const rows = matrix.slice(1).map((r, index) => {
+        const padded = [...r];
+        while (padded.length < width) padded.push("");
+        if (padded.length > width) padded.length = width;
+        const item = { __index: index, __selected: true };
+        headers.forEach((h, i) => { item[h] = padded[i] || ""; });
+        return item;
+      });
+      return { headers, rows };
+    }
+
+    async function parseExcelToMatrix(file) {
+      const XLSX = await ensureXlsxLibrary();
+      const arrayBuffer = await readFileAsArrayBuffer(file);
+      const wb = XLSX.read(arrayBuffer, { type: "array" });
+      const firstSheetName = String(wb.SheetNames?.[0] || "").trim();
+      if (!firstSheetName) throw new Error("Excelfilen saknar blad.");
+
+      const sheet = wb.Sheets[firstSheetName];
+      const fullMatrix = XLSX.utils.sheet_to_json(sheet, { 
+        header: 1, 
+        blankrows: false,
+        defval: "",
+        raw: false
+      });
+
+      if (!Array.isArray(fullMatrix) || !fullMatrix.length) {
+        throw new Error("Excelfilen innehåller ingen data.");
+      }
+
+      // Hitta den faktiska headern genom att leta efter en rad med många icke-tomma celler
+      let headerRowIndex = 0;
+      for (let i = 0; i < Math.min(10, fullMatrix.length); i++) {
+        const row = fullMatrix[i] || [];
+        const nonEmptyCells = row.filter(cell => String(cell || "").trim().length > 0).length;
+        // Om raden har många celler (säg 3+) och inte är helt blank, antar vi att det är headern
+        if (nonEmptyCells >= 3) {
+          headerRowIndex = i;
+          logLine(`Hitta rubrikrad på rad ${i + 1}`);
+          break;
+        }
+      }
+
+      const matrix = fullMatrix.slice(headerRowIndex);
+      
+      logLine(`Laddad Excel: ${matrix.length} datarader (efter rubrik)`);
+      return { matrix, sheetName: firstSheetName };
+    }
+
+    function renderCsvPreview() {
+      if (!state.headers.length) {
+        el.csvPreviewWrap.innerHTML = "<div class='muted' style='padding:8px'>Ingen förhandsvisning ännu.</div>";
+        return;
+      }
+      const head = state.headers.map(h => `<th>${escHtml(h)}</th>`).join("");
+      const body = state.rows.slice(0, 20).map(r => {
+        const cols = state.headers.map(h => `<td>${escHtml(r[h])}</td>`).join("");
+        return `<tr>${cols}</tr>`;
+      }).join("");
+
+      el.csvPreviewWrap.innerHTML = `
+        <table>
+          <thead><tr>${head}</tr></thead>
+          <tbody>${body || "<tr><td colspan='99'>Inga rader</td></tr>"}</tbody>
+        </table>
+      `;
+    }
+
+    function repopulateMappingSelects() {
+      const options = state.headers.map(h => `<option value="${escHtml(h)}">${escHtml(h)}</option>`).join("");
+      el.titleColumn.innerHTML = `<option value="">-- välj kolumn --</option>${options}`;
+      el.descriptionColumn.innerHTML = `<option value="">-- välj kolumn --</option>${options}`;
+
+      const pickTitle = state.settings.titleColumn && state.headers.includes(state.settings.titleColumn)
+        ? state.settings.titleColumn
+        : guessColumn(["rubrik", "title", "namn"]);
+      const pickDescription = state.settings.descriptionColumn && state.headers.includes(state.settings.descriptionColumn)
+        ? state.settings.descriptionColumn
+        : guessColumn(["beskrivning", "description"]);
+
+      if (pickTitle) el.titleColumn.value = pickTitle;
+      if (pickDescription) el.descriptionColumn.value = pickDescription;
+
+      saveSettings();
+    }
+
+    function guessColumn(candidates) {
+      const byNorm = new Map(state.headers.map(h => [normalizeKey(h), h]));
+      for (const c of candidates) {
+        if (byNorm.has(c)) return byNorm.get(c);
+      }
+      for (const h of state.headers) {
+        const norm = normalizeKey(h);
+        if (candidates.some(c => norm.includes(c))) return h;
+      }
+      return "";
+    }
+
+    function updateSelectedBadge() {
+      el.rowCountBadge.textContent = `${state.selectedRows.size} valda`;
+    }
+
+    function filteredIndices() {
+      const q = normalizeKey(el.rowFilter.value);
+      if (!q) return state.rows.map(r => r.__index);
+      return state.rows
+        .filter(r => state.headers.some(h => normalizeKey(r[h]).includes(q)))
+        .map(r => r.__index);
+    }
+
+    function renderRowSelectionTable() {
+      if (!state.headers.length) {
+        el.rowSelectionWrap.innerHTML = "<div class='muted' style='padding:8px'>Ladda CSV först.</div>";
+        updateSelectedBadge();
+        return;
+      }
+
+      const indices = filteredIndices();
+      state.filteredRows = indices;
+      const displayHeaders = state.headers.slice(0, 8);
+
+      const rowsHtml = indices.map(rowIndex => {
+        const row = state.rows[rowIndex];
+        const checked = state.selectedRows.has(rowIndex) ? "checked" : "";
+        const duplicate = state.duplicatesByRow.get(rowIndex);
+        const dupBadge = duplicate ? `<span class='badge bad'>Dubblett: #${duplicate.id}</span>` : "";
+        return `<tr>
+          <td><input type="checkbox" data-row="${rowIndex}" ${checked}></td>
+          <td>${rowIndex + 2}</td>
+          <td>${dupBadge}</td>
+          ${displayHeaders.map(h => `<td>${escHtml(row[h])}</td>`).join("")}
+        </tr>`;
+      }).join("");
+
+      el.rowSelectionWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Inkludera</th>
+              <th>CSV-rad</th>
+              <th>Status</th>
+              ${displayHeaders.map(h => `<th>${escHtml(h)}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>${rowsHtml || `<tr><td colspan="${displayHeaders.length + 3}">Inga matchande rader.</td></tr>`}</tbody>
+        </table>
+      `;
+
+      el.rowSelectionWrap.querySelectorAll("input[type='checkbox'][data-row]").forEach(box => {
+        box.addEventListener("change", (ev) => {
+          const idx = Number(ev.target.getAttribute("data-row"));
+          if (ev.target.checked) state.selectedRows.add(idx);
+          else state.selectedRows.delete(idx);
+          updateSelectedBadge();
+          updateWizard();
+        });
+      });
+
+      updateSelectedBadge();
+      updateWizard();
+    }
+
+    function getHeaders() {
+      const pat = (localStorage.getItem(LS_PAT) || el.patInput.value || "").trim();
+      const token = btoa(`:${pat}`);
+      return {
+        "Authorization": `Basic ${token}`,
+        "Content-Type": "application/json"
+      };
+    }
+
+    async function apiRequest(url, options = {}) {
+      return fetch(url, {
+        headers: getHeaders(),
+        ...options
+      });
+    }
+
+    function apiGet(url) { return apiRequest(url); }
+    function apiPost(url, body) { return apiRequest(url, { method: "POST", body: JSON.stringify(body) }); }
+
+    function witCreate(url, ops) {
+      return apiRequest(url, {
+        method: "POST",
+        headers: { ...getHeaders(), "Content-Type": "application/json-patch+json" },
+        body: JSON.stringify(ops)
+      });
+    }
+
+    async function fetchProjectNames() {
+      const projects = [];
+      let continuationToken = "";
+
+      do {
+        const url = `https://dev.azure.com/${ORG}/_apis/projects?api-version=7.1&$top=200${continuationToken ? `&continuationToken=${encodeURIComponent(continuationToken)}` : ""}`;
+        const res = await apiGet(url);
+        if (!res.ok) {
+          const body = await res.text().catch(() => "");
+          throw new Error(`HTTP ${res.status}: ${res.statusText}. ${body.slice(0, 200)}`);
+        }
+        const data = await res.json();
+        projects.push(...(data.value || []).map(p => p.name).filter(Boolean));
+        continuationToken = res.headers.get("x-ms-continuationtoken") || "";
+      } while (continuationToken);
+
+      return [...new Set(projects)].sort((a, b) => a.localeCompare(b));
+    }
+
+    async function fetchWorkItemTypes(project) {
+      if (!project) return [];
+      const res = await apiGet(`https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/workitemtypes?api-version=7.1`);
+      if (!res.ok) throw new Error(`Kunde inte läsa tickettyper (${res.status}).`);
+      const data = await res.json();
+      return (data.value || []).map(x => String(x.name || "").trim()).filter(Boolean);
+    }
+
+    function formatDescriptionForAdo(text) {
+      const raw = String(text || "").trim();
+      if (!raw) return "";
+      const escaped = escHtml(raw);
+      return escaped.replace(/\r?\n/g, "<br>");
+    }
+
+    async function resolveDescriptionFieldRef(project, typeName) {
+      const proj = String(project || "").trim();
+      const type = String(typeName || "").trim();
+      if (!proj || !type) return "System.Description";
+
+      const cacheKey = `${proj}::${type}`;
+      if (state.descriptionFieldCache.has(cacheKey)) {
+        return state.descriptionFieldCache.get(cacheKey);
+      }
+
+      const url = `https://dev.azure.com/${ORG}/${encodeURIComponent(proj)}/_apis/wit/workitemtypes/${encodeURIComponent(type)}/fields?api-version=7.1`;
+      const candidates = ["System.Description", "Microsoft.VSTS.TCM.ReproSteps", "System.History"];
+
+      try {
+        const res = await apiGet(url);
+        if (!res.ok) {
+          state.descriptionFieldCache.set(cacheKey, "System.Description");
+          return "System.Description";
+        }
+
+        const data = await res.json();
+        const refs = new Set((data.value || []).map(f => String(f?.referenceName || "").trim()).filter(Boolean));
+        const picked = candidates.find(c => refs.has(c)) || "";
+        state.descriptionFieldCache.set(cacheKey, picked);
+        return picked;
+      } catch (_) {
+        state.descriptionFieldCache.set(cacheKey, "System.Description");
+        return "System.Description";
+      }
+    }
+
+    async function fetchEpics(project) {
+      const escProject = String(project).replace(/'/g, "''");
+      const wiqlUrl = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/wiql?api-version=7.1`;
+      const wiql = {
+        query: `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' AND [System.WorkItemType] = 'Epic' ORDER BY [System.ChangedDate] DESC`
+      };
+
+      const wiqlRes = await apiPost(wiqlUrl, wiql);
+      if (!wiqlRes.ok) {
+        const err = await wiqlRes.text().catch(() => "");
+        throw new Error(`Kunde inte läsa epics: HTTP ${wiqlRes.status}. ${err.slice(0, 180)}`);
+      }
+
+      const wiqlData = await wiqlRes.json();
+      const ids = (wiqlData.workItems || []).map(w => Number(w.id)).filter(Number.isFinite);
+      if (!ids.length) return [];
+
+      const batchRes = await apiPost(
+        `https://dev.azure.com/${ORG}/_apis/wit/workitemsbatch?api-version=7.1`,
+        { ids, fields: ["System.Id", "System.Title", "System.State"] }
+      );
+      if (!batchRes.ok) throw new Error(`Kunde inte läsa epic-detaljer (${batchRes.status}).`);
+      const data = await batchRes.json();
+
+      return (data.value || []).map(item => ({
+        id: Number(item.id),
+        title: String(item.fields?.["System.Title"] || "").trim(),
+        state: String(item.fields?.["System.State"] || "")
+      }));
+    }
+
+    async function findDuplicateTitles(project, titles) {
+      const normalized = [...new Set(titles.map(t => String(t || "").trim()).filter(Boolean))];
+      const duplicates = new Map();
+      if (!normalized.length) return duplicates;
+
+      const chunks = [];
+      for (let i = 0; i < normalized.length; i += 40) chunks.push(normalized.slice(i, i + 40));
+
+      for (const chunk of chunks) {
+        const escProject = String(project).replace(/'/g, "''");
+        const titleIn = chunk.map(t => `'${t.replace(/'/g, "''")}'`).join(", ");
+        const query = `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '${escProject}' AND [System.Title] IN (${titleIn})`;
+        const wiqlRes = await apiPost(
+          `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/wiql?api-version=7.1`,
+          { query }
+        );
+        if (!wiqlRes.ok) continue;
+        const wiqlData = await wiqlRes.json();
+        const ids = (wiqlData.workItems || []).map(w => Number(w.id)).filter(Number.isFinite);
+        if (!ids.length) continue;
+
+        const batchRes = await apiPost(
+          `https://dev.azure.com/${ORG}/_apis/wit/workitemsbatch?api-version=7.1`,
+          { ids, fields: ["System.Id", "System.Title", "System.WorkItemType"] }
+        );
+        if (!batchRes.ok) continue;
+        const batchData = await batchRes.json();
+        (batchData.value || []).forEach(item => {
+          const title = String(item.fields?.["System.Title"] || "").trim();
+          if (!title) return;
+          duplicates.set(normalizeKey(title), {
+            id: Number(item.id),
+            type: String(item.fields?.["System.WorkItemType"] || "")
+          });
+        });
+      }
+
+      return duplicates;
+    }
+
+    async function createEpic(project, title, description) {
+      const url = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/workitems/$${encodeURIComponent("Epic")}?api-version=7.1`;
+      const ops = [
+        { op: "add", path: "/fields/System.Title", value: title },
+        { op: "add", path: "/fields/System.AreaPath", value: project }
+      ];
+      if (description) {
+        ops.push({ op: "add", path: "/fields/System.Description", value: formatDescriptionForAdo(description) });
+      }
+      const res = await witCreate(url, ops);
+      if (!res.ok) {
+        const err = await res.text().catch(() => "");
+        throw new Error(`Epic-skapande misslyckades (${res.status}): ${err.slice(0, 200)}`);
+      }
+      return res.json();
+    }
+
+    async function createTicket(project, typeName, title, description, epicId) {
+      const url = `https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/workitems/$${encodeURIComponent(typeName)}?api-version=7.1`;
+      const ops = [{ op: "add", path: "/fields/System.Title", value: title }];
+      if (description) {
+        const descriptionFieldRef = await resolveDescriptionFieldRef(project, typeName);
+        if (descriptionFieldRef) {
+          ops.push({ op: "add", path: `/fields/${descriptionFieldRef}`, value: formatDescriptionForAdo(description) });
+        } else {
+          logLine(`Ingen kompatibel beskrivningsfield hittades för ${typeName}. Description hoppas över.`, true);
+        }
+      }
+      if (epicId) {
+        ops.push({
+          op: "add",
+          path: "/relations/-",
+          value: {
+            rel: "System.LinkTypes.Hierarchy-Reverse",
+            url: `https://dev.azure.com/${ORG}/_apis/wit/workItems/${epicId}`
+          }
+        });
+      }
+
+      const res = await witCreate(url, ops);
+      if (!res.ok) {
+        const err = await res.text().catch(() => "");
+        throw new Error(`Ticket '${title}' misslyckades (${res.status}): ${err.slice(0, 220)}`);
+      }
+      return res.json();
+    }
+
+    function currentEpicMode() {
+      return document.querySelector("input[name='epicMode']:checked")?.value || "new";
+    }
+
+    function updateEpicModeUI() {
+      const mode = currentEpicMode();
+      const isNew = mode === "new";
+      el.newEpicBox.style.display = isNew ? "block" : "none";
+      el.newEpicDescBox.style.display = isNew ? "block" : "none";
+      el.existingEpicBox.style.display = isNew ? "none" : "block";
+      el.existingEpicBtnBox.style.display = isNew ? "none" : "block";
+      saveSettings();
+    }
+
+    function validateBase() {
+      if (!el.patInput.value.trim()) throw new Error("PAT saknas.");
+      if (!state.rows.length) throw new Error("CSV saknas eller kunde inte tolkas.");
+      if (!el.titleColumn.value || !el.descriptionColumn.value) throw new Error("Välj både title- och description-kolumn.");
+      if (!state.selectedRows.size) throw new Error("Välj minst en rad.");
+      if (!el.projectSelect.value) throw new Error("Välj projekt.");
+      if (!el.workItemTypeSelect.value) throw new Error("Välj tickettyp.");
+      if (currentEpicMode() === "new" && !el.newEpicTitle.value.trim()) throw new Error("Ange namn på ny Epic.");
+      if (currentEpicMode() === "existing" && !el.epicSelect.value) throw new Error("Välj befintlig Epic.");
+    }
+
+    function buildDescriptionWithOtherColumns(row, descriptionText, titleCol, descCol) {
+      if (!el.includeOtherColumns.checked) return descriptionText;
+
+      const lines = [];
+      state.headers.forEach((header, index) => {
+        if (header === titleCol || header === descCol) return;
+        const value = String(row?.[header] || "");
+        lines.push(`${header}: ${value}`);
+      });
+
+      if (!lines.length) return descriptionText;
+      const base = String(descriptionText || "").trim();
+      if (!base) return `---\n${lines.join("\n")}`;
+      return `${base}\n\n---\n${lines.join("\n")}`;
+    }
+
+    function buildSelectedItemsWithoutDuplicateCheck() {
+      validateBase();
+      const titleCol = el.titleColumn.value;
+      const descCol = el.descriptionColumn.value;
+      const selected = [...state.selectedRows]
+        .map(i => {
+          const row = state.rows[i] || {};
+          const baseDescription = String(row?.[descCol] || "").trim();
+          return {
+            rowIndex: i,
+            title: String(row?.[titleCol] || "").trim(),
+            description: buildDescriptionWithOtherColumns(row, baseDescription, titleCol, descCol)
+          };
+        })
+        .filter(x => x.title);
+
+      if (!selected.length) throw new Error("Inga valda rader innehåller ticket-namn.");
+      return selected;
+    }
+
+    function openTicketModal(preview) {
+      el.ticketModalProject.textContent = preview.project || "-";
+      el.ticketModalType.textContent = preview.typeName || "-";
+      el.ticketModalEpic.textContent = preview.epicLabel || "-";
+      el.ticketModalRow.textContent = preview.csvRowLabel || "-";
+      el.ticketModalTitleValue.textContent = preview.title || "";
+      el.ticketModalDescriptionValue.textContent = preview.description || "";
+      el.ticketModalBackdrop.classList.add("open");
+      el.ticketModalBackdrop.setAttribute("aria-hidden", "false");
+    }
+
+    function closeTicketModal() {
+      el.ticketModalBackdrop.classList.remove("open");
+      el.ticketModalBackdrop.setAttribute("aria-hidden", "true");
+    }
+
+    function showTicketPreview() {
+      const selectedItems = buildSelectedItemsWithoutDuplicateCheck();
+      const first = selectedItems[0];
+      const mode = currentEpicMode();
+      const epicLabel = mode === "new"
+        ? `Ny Epic: ${el.newEpicTitle.value.trim() || "(namn saknas)"}`
+        : `Befintlig Epic: #${el.epicSelect.value || "?"}`;
+
+      openTicketModal({
+        project: el.projectSelect.value,
+        typeName: el.workItemTypeSelect.value,
+        epicLabel,
+        csvRowLabel: `Rad ${Number(first.rowIndex) + 2}`,
+        title: first.title,
+        description: first.description
+      });
+    }
+
+    async function buildRunPlan() {
+      validateBase();
+      state.duplicatesByRow.clear();
+      const selected = buildSelectedItemsWithoutDuplicateCheck();
+
+      const duplicateMap = await findDuplicateTitles(el.projectSelect.value, selected.map(x => x.title));
+      let duplicateCount = 0;
+      selected.forEach(item => {
+        const d = duplicateMap.get(normalizeKey(item.title));
+        if (d) {
+          state.duplicatesByRow.set(item.rowIndex, d);
+          duplicateCount += 1;
+        }
+      });
+
+      renderRowSelectionTable();
+
+      if (duplicateCount) {
+        throw new Error(`${duplicateCount} dubbletter hittades i projektet. Avmarkera eller ändra dessa rader innan import.`);
+      }
+
+      const epicMode = currentEpicMode();
+      return {
+        project: el.projectSelect.value,
+        typeName: el.workItemTypeSelect.value,
+        epicMode,
+        newEpicTitle: el.newEpicTitle.value.trim(),
+        newEpicDescription: el.newEpicDescription.value.trim(),
+        existingEpicId: epicMode === "existing" ? Number(el.epicSelect.value) : null,
+        items: selected
+      };
+    }
+
+    async function dryRun() {
+      logLine("Startar testkörning...");
+      el.importSummary.textContent = "Testkörning pågår...";
+      const plan = await buildRunPlan();
+
+      logLine(`Projekt: ${plan.project}`);
+      logLine(`Tickettyp: ${plan.typeName}`);
+      if (plan.epicMode === "new") logLine(`Ny Epic kommer skapas: ${plan.newEpicTitle}`);
+      else logLine(`Befintlig Epic: #${plan.existingEpicId}`);
+      logLine(`Antal tickets som skulle skapas: ${plan.items.length}`);
+
+      el.importSummary.textContent = `Testkörning klar: ${plan.items.length} tickets, inga dubbletter.`;
+      return plan;
+    }
+
+    async function runImport() {
+      logLine("Import startad.");
+      el.importBtn.disabled = true;
+      el.dryRunBtn.disabled = true;
+
+      try {
+        const plan = await dryRun();
+
+        let epicId = plan.existingEpicId;
+        if (plan.epicMode === "new") {
+          logLine("Skapar ny Epic...");
+          const epic = await createEpic(plan.project, plan.newEpicTitle, plan.newEpicDescription);
+          epicId = Number(epic.id);
+          logLine(`Epic skapad: #${epicId}`, false);
+        }
+
+        let success = 0;
+        let failed = 0;
+        for (let i = 0; i < plan.items.length; i += 1) {
+          const item = plan.items[i];
+          try {
+            const created = await createTicket(plan.project, plan.typeName, item.title, item.description, epicId);
+            success += 1;
+            logLine(`(${i + 1}/${plan.items.length}) Skapad #${created.id}: ${item.title}`);
+          } catch (e) {
+            failed += 1;
+            logLine(`(${i + 1}/${plan.items.length}) ${e.message || e}`, true);
+          }
+        }
+
+        el.importSummary.textContent = `Import klar. Skapade: ${success}, fel: ${failed}.`;
+        logLine(`Import slutförd. Skapade ${success}, fel ${failed}.`);
+      } catch (e) {
+        const msg = String(e.message || e);
+        logLine(msg, true);
+        el.importSummary.textContent = `Import avbruten: ${msg}`;
+      } finally {
+        el.importBtn.disabled = false;
+        el.dryRunBtn.disabled = false;
+      }
+    }
+
+    async function handleCsvFile(file) {
+      if (!file) return;
+      state.fileName = file.name;
+      const text = await readFileAsText(file);
+      const firstLine = text.split(/\r?\n/, 1)[0] || "";
+      const delim = el.delimiterSelect.value === "auto" ? detectDelimiter(firstLine) : el.delimiterSelect.value;
+      const matrix = parseCsv(text, delim === "\\t" ? "\t" : delim);
+      const normalized = normalizeRows(matrix);
+
+      state.delimiter = el.delimiterSelect.value;
+      state.headers = normalized.headers;
+      state.rows = normalized.rows;
+      state.selectedRows = new Set(state.rows.map(r => r.__index));
+      state.duplicatesByRow.clear();
+
+      renderCsvPreview();
+      repopulateMappingSelects();
+      renderRowSelectionTable();
+      updateWizard();
+    }
+
+    async function handleExcelFile(file) {
+      if (!file) return;
+      state.fileName = file.name;
+      const { matrix, sheetName } = await parseExcelToMatrix(file);
+      const normalized = normalizeRows(matrix);
+
+      state.headers = normalized.headers;
+      state.rows = normalized.rows;
+      state.selectedRows = new Set(state.rows.map(r => r.__index));
+      state.duplicatesByRow.clear();
+
+      renderCsvPreview();
+      repopulateMappingSelects();
+      renderRowSelectionTable();
+      updateWizard();
+    }
+
+    async function handleImportedFile(file) {
+      if (isExcelFile(file)) {
+        await handleExcelFile(file);
+        const { matrix, sheetName } = await parseExcelToMatrix(file);
+        el.fileMeta.textContent = `Fil: ${state.fileName} (blad: ${sheetName}). Kolumner: ${state.headers.length}. Rader: ${state.rows.length}.`;
+        logLine(`Excel laddad: ${state.fileName}, blad ${sheetName} (${state.rows.length} rader)`);
+      } else {
+        await handleCsvFile(file);
+        el.fileMeta.textContent = `Fil: ${state.fileName}. Kolumner: ${state.headers.length}. Rader: ${state.rows.length}.`;
+        logLine(`CSV laddad: ${state.fileName} (${state.rows.length} rader)`);
+      }
+    }
+
+    function setSelectOptions(selectEl, values, placeholder) {
+      const opts = values.map(v => `<option value="${escHtml(v)}">${escHtml(v)}</option>`).join("");
+      selectEl.innerHTML = `<option value="">${placeholder}</option>${opts}`;
+    }
+
+    async function loadProjects() {
+      const pat = el.patInput.value.trim();
+      if (!pat) {
+        logLine("PAT saknas. Ange token först.", true);
+        return;
+      }
+
+      el.loadProjectsBtn.disabled = true;
+      el.projectInfo.textContent = "Hämtar projekt...";
+      try {
+        state.projects = await fetchProjectNames();
+        setSelectOptions(el.projectSelect, state.projects, "-- välj projekt --");
+
+        if (state.settings.project && state.projects.includes(state.settings.project)) {
+          el.projectSelect.value = state.settings.project;
+        }
+
+        el.projectInfo.textContent = `${state.projects.length} projekt laddade.`;
+        logLine(`Projekt laddade: ${state.projects.length}`);
+        updateWizard();
+      } catch (e) {
+        logLine(e.message || e, true);
+        el.projectInfo.textContent = "Kunde inte hämta projekt.";
+      } finally {
+        el.loadProjectsBtn.disabled = false;
+      }
+    }
+
+    async function loadTypesForProject() {
+      const project = el.projectSelect.value;
+      if (!project) {
+        logLine("Välj projekt innan tickettyper hämtas.", true);
+        return;
+      }
+      el.loadTypesBtn.disabled = true;
+      try {
+        const typeNames = await fetchWorkItemTypes(project);
+        setSelectOptions(el.workItemTypeSelect, typeNames, "-- välj tickettyp --");
+
+        const preferred = state.settings.workItemType && typeNames.includes(state.settings.workItemType)
+          ? state.settings.workItemType
+          : (typeNames.includes("User Story") ? "User Story" : typeNames[0] || "");
+
+        if (preferred) el.workItemTypeSelect.value = preferred;
+        logLine(`Tickettyper hämtade för ${project}.`);
+      } catch (e) {
+        logLine(e.message || e, true);
+      } finally {
+        el.loadTypesBtn.disabled = false;
+        saveSettings();
+      }
+    }
+
+    async function loadEpicsForProject() {
+      const project = el.projectSelect.value;
+      if (!project) {
+        logLine("Välj projekt innan epics hämtas.", true);
+        return;
+      }
+
+      el.loadEpicsBtn.disabled = true;
+      try {
+        state.epics = await fetchEpics(project);
+        const options = state.epics.map(epic => ({
+          value: String(epic.id),
+          label: `#${epic.id} - ${epic.title} (${epic.state})`
+        }));
+        el.epicSelect.innerHTML = `<option value="">-- välj epic --</option>${options.map(o => `<option value="${escHtml(o.value)}">${escHtml(o.label)}</option>`).join("")}`;
+        if (state.settings.existingEpicId && options.some(o => o.value === String(state.settings.existingEpicId))) {
+          el.epicSelect.value = String(state.settings.existingEpicId);
+        }
+        logLine(`Epics hämtade: ${state.epics.length}`);
+      } catch (e) {
+        logLine(e.message || e, true);
+      } finally {
+        el.loadEpicsBtn.disabled = false;
+        saveSettings();
+      }
+    }
+
+    function bindEvents() {
+      el.patInput.addEventListener("change", () => {
+        try { localStorage.setItem(LS_PAT, el.patInput.value); } catch (_) {}
+      });
+
+      el.csvFile.addEventListener("change", async (ev) => {
+        const file = ev.target.files?.[0];
+        if (!file) return;
+        try {
+          await handleImportedFile(file);
+          saveSettings();
+        } catch (e) {
+          logLine(e.message || e, true);
+        }
+      });
+
+      el.delimiterSelect.addEventListener("change", async () => {
+        const file = el.csvFile.files?.[0];
+        if (!file) return;
+        if (isExcelFile(file)) return;
+        try {
+          await handleCsvFile(file);
+          saveSettings();
+        } catch (e) {
+          logLine(e.message || e, true);
+        }
+      });
+
+      el.titleColumn.addEventListener("change", () => { saveSettings(); updateWizard(); });
+      el.descriptionColumn.addEventListener("change", () => { saveSettings(); updateWizard(); });
+      el.includeOtherColumns.addEventListener("change", saveSettings);
+
+      el.rowFilter.addEventListener("input", () => renderRowSelectionTable());
+
+      el.selectAllRowsBtn.addEventListener("click", () => {
+        state.filteredRows.forEach(i => state.selectedRows.add(i));
+        renderRowSelectionTable();
+      });
+
+      el.clearRowsBtn.addEventListener("click", () => {
+        state.filteredRows.forEach(i => state.selectedRows.delete(i));
+        renderRowSelectionTable();
+      });
+
+      el.loadProjectsBtn.addEventListener("click", loadProjects);
+      el.loadTypesBtn.addEventListener("click", loadTypesForProject);
+      el.projectSelect.addEventListener("change", () => {
+        saveSettings();
+        updateWizard();
+      });
+      el.workItemTypeSelect.addEventListener("change", saveSettings);
+
+      document.querySelectorAll("input[name='epicMode']").forEach(r => {
+        r.addEventListener("change", updateEpicModeUI);
+      });
+
+      el.newEpicTitle.addEventListener("change", saveSettings);
+      el.newEpicDescription.addEventListener("change", saveSettings);
+      el.epicSelect.addEventListener("change", saveSettings);
+
+      el.loadEpicsBtn.addEventListener("click", loadEpicsForProject);
+      el.showTicketBtn.addEventListener("click", () => {
+        try {
+          showTicketPreview();
+          saveSettings();
+        } catch (e) {
+          const msg = String(e.message || e);
+          logLine(msg, true);
+          el.importSummary.textContent = `Kan inte visa ticket: ${msg}`;
+        }
+      });
+      el.dryRunBtn.addEventListener("click", async () => {
+        try {
+          await dryRun();
+          saveSettings();
+        } catch (e) {
+          const msg = String(e.message || e);
+          logLine(msg, true);
+          el.importSummary.textContent = `Testkörning misslyckades: ${msg}`;
+        }
+      });
+      el.importBtn.addEventListener("click", runImport);
+
+      el.closeTicketModalBtn.addEventListener("click", closeTicketModal);
+      el.ticketModalBackdrop.addEventListener("click", (ev) => {
+        if (ev.target === el.ticketModalBackdrop) closeTicketModal();
+      });
+      document.addEventListener("keydown", (ev) => {
+        if (ev.key === "Escape" && el.ticketModalBackdrop.classList.contains("open")) {
+          closeTicketModal();
+        }
+      });
+    }
+
+    async function init() {
+      restoreSettings();
+      bindEvents();
+      updatePatUIVisibility();
+      renderCsvPreview();
+      renderRowSelectionTable();
+      updateWizard();
+
+      if (el.patInput.value.trim()) {
+        logLine("PAT återläst från localStorage.");
+      }
+      if (state.settings.project) {
+        logLine(`Senaste projekt i inställningar: ${state.settings.project}`);
+      }
+    }
+
+    function updatePatUIVisibility() {
+      const hasSavedPat = localStorage.getItem(LS_PAT);
+      const patInput = document.getElementById("patInput");
+      const patStatus = document.getElementById("patStatus");
+      if (hasSavedPat) {
+        if (patInput) patInput.style.display = "none";
+        if (patStatus) patStatus.style.display = "block";
+      } else {
+        if (patInput) patInput.style.display = "";
+        if (patStatus) patStatus.style.display = "none";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
