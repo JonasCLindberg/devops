@@ -750,6 +750,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 8px;
     padding: 8px 10px;
     border-bottom: 1px solid var(--border);
@@ -758,6 +759,39 @@
     letter-spacing: 0.05em;
     text-transform: uppercase;
     color: var(--muted);
+  }
+  .board-pane-head-title {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .board-pane-head-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-left: auto;
+    min-width: 0;
+  }
+  .board-pane-head-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .72rem;
+    color: var(--muted);
+    padding: 0 4px;
+    white-space: nowrap;
+  }
+  .board-left .board-pane-head {
+    align-items: flex-start;
+  }
+  .board-left .board-pane-head-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+  .board-left .board-pane-head-actions .btn {
+    flex: 0 0 auto;
   }
   .board-pane-list {
     min-height: 0;
@@ -789,6 +823,41 @@
   .board-item-btn.active {
     border-color: var(--accent2);
     box-shadow: 0 0 0 1px rgba(121, 192, 255, 0.22) inset;
+  }
+  .board-ticket-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .board-ticket-project {
+    color: var(--muted);
+    flex: 0 1 90px;
+    min-width: 44px;
+    max-width: 90px;
+    font-size: 0.72rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: right;
+  }
+  .board-ticket-delete {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 0.88rem;
+    padding: 2px 4px;
+    opacity: 0.7;
+    line-height: 1;
+  }
+  @media (max-width: 1360px) {
+    .board-ticket-project {
+      display: none;
+    }
   }
   .board-right {
     display: flex;
@@ -2850,6 +2919,211 @@
   }
   .wi-modal-save-btn:hover { background: rgba(88,166,255,.2); }
   .wi-modal-save-status { color: var(--muted); font-size: 0.78rem; }
+  #wiOverlay .descr-popup {
+    width: min(1120px, 96vw);
+    max-height: 88vh;
+    padding: 0;
+    border-radius: 14px;
+  }
+  #wiOverlay #wiTitle {
+    margin: 0;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  #wiOverlay #wiBody {
+    padding: 14px 18px 12px;
+  }
+  #wiOverlay .wi-modal-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  #wiOverlay .wi-modal-title-kicker {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  #wiOverlay .wi-modal-title-input {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 1.08rem;
+    line-height: 1.2;
+    padding: 7px 10px;
+    min-height: 38px;
+    width: min(520px, 56vw);
+    font-weight: 600;
+    outline: none;
+  }
+  #wiOverlay .wi-modal-title-input:focus {
+    border-color: var(--accent2);
+  }
+  #wiOverlay .wi-modal-title-text {
+    font-size: 1.7rem;
+    line-height: 1.15;
+    color: var(--text);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #wiOverlay .wi-modal-head-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  #wiOverlay .wi-modal-head-controls button {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 1.1rem;
+    color: var(--muted);
+    background: var(--surface2);
+  }
+  #wiOverlay .wi-modal-header-state {
+    min-width: 148px;
+    max-width: 220px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface2);
+    color: var(--text);
+    padding: 7px 11px;
+    font-size: 0.96rem;
+    font-family: inherit;
+  }
+  #wiOverlay .wi-modal-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  #wiOverlay .wi-modal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #wiOverlay .wi-modal-section-title {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.94rem;
+    font-weight: 700;
+  }
+  #wiOverlay .wi-modal-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px 11px;
+    margin-bottom: 0;
+  }
+  #wiOverlay .wi-modal-row {
+    display: block;
+  }
+  #wiOverlay .wi-modal-label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 0.86rem;
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: normal;
+  }
+  #wiOverlay .wi-modal-input,
+  #wiOverlay .wi-modal-textarea {
+    border-radius: 10px;
+    min-height: 38px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    background: var(--surface2);
+  }
+  #wiOverlay .wi-modal-textarea {
+    min-height: 96px;
+  }
+  #wiOverlay .wi-modal-desc {
+    border-top: 0;
+    padding-top: 0;
+  }
+  #wiOverlay .wi-modal-actions {
+    margin-top: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  #wiOverlay .wi-modal-save-status {
+    margin-right: auto;
+  }
+  #wiOverlay .wi-modal-action-buttons {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  #wiOverlay .wi-modal-save-btn {
+    border-radius: 12px;
+    padding: 7px 12px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border);
+  }
+  #wiOverlay .wi-modal-save-btn:hover {
+    background: rgba(148, 163, 184, 0.12);
+  }
+  #wiOverlay .wi-modal-save-btn.wi-btn-danger {
+    border-color: rgba(239, 68, 68, 0.55);
+    color: #dc2626;
+    background: rgba(239, 68, 68, 0.08);
+  }
+  #wiOverlay .wi-modal-save-btn.wi-btn-primary {
+    border-color: #2563eb;
+    color: #fff;
+    background: #2563eb;
+  }
+  #wiOverlay .wi-modal-save-btn.wi-btn-primary:hover {
+    background: #1d4ed8;
+  }
+  #wiOverlay .wi-modal-link {
+    margin-top: 0;
+    font-family: inherit;
+    font-size: 0.84rem;
+  }
+  @media (max-width: 1040px) {
+    #wiOverlay .wi-modal-meta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 760px) {
+    #wiOverlay #wiTitle {
+      padding: 12px 12px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    #wiOverlay #wiBody {
+      padding: 12px;
+    }
+    #wiOverlay .wi-modal-title-input {
+      width: 100%;
+      font-size: 0.98rem;
+    }
+    #wiOverlay .wi-modal-head-controls {
+      width: 100%;
+    }
+    #wiOverlay .wi-modal-header-state {
+      max-width: none;
+      flex: 1;
+    }
+    #wiOverlay .wi-modal-meta {
+      grid-template-columns: 1fr;
+    }
+  }
   /* ── Sprint cell ── */
   .sprint-label {
     font-family: 'JetBrains Mono', monospace;
@@ -4535,24 +4809,22 @@ function openWorkItemModal(itemId) {
   const descriptionText = htmlToPlainText(description);
   const devopsUrl = getWorkItemUrl(item);
 
-  const row = (label, value) =>
-    `<div class="wi-modal-row"><span class="wi-modal-label">${label}</span><span class="wi-modal-value" title="${escHtml(value)}">${escHtml(value)}</span></div>`;
   const selectRow = (label, id, value, options, allowEmpty = true) =>
-    `<div class="wi-modal-row" style="display:block;">
-      <div class="wi-modal-label" style="margin-bottom:4px;">${label}</div>
+    `<div class="wi-modal-row">
+      <div class="wi-modal-label">${label}</div>
       <select class="wi-modal-input" id="${id}">
         ${allowEmpty ? `<option value="" ${!value ? 'selected' : ''}>–</option>` : ''}
         ${options.map(v => `<option value="${escHtml(v)}" ${value===v?'selected':''}>${escHtml(v)}</option>`).join('')}
       </select>
     </div>`;
   const inputRow = (label, id, value, placeholder='') =>
-    `<div class="wi-modal-row" style="display:block;">
-      <div class="wi-modal-label" style="margin-bottom:4px;">${label}</div>
+    `<div class="wi-modal-row">
+      <div class="wi-modal-label">${label}</div>
       <input class="wi-modal-input" id="${id}" value="${escHtml(value || '')}" placeholder="${escHtml(placeholder)}" />
     </div>`;
   const linkInputRow = (label, id, value, placeholder='', buttonId='wiOpenLinkBtn', openFn='openWikiPageFromInput') =>
-    `<div class="wi-modal-row" style="display:block;">
-      <div class="wi-modal-label" style="margin-bottom:4px;">${label}</div>
+    `<div class="wi-modal-row">
+      <div class="wi-modal-label">${label}</div>
       <div style="display:flex;align-items:center;gap:8px;">
         <input class="wi-modal-input" id="${id}" value="${escHtml(value || '')}" placeholder="${escHtml(placeholder)}" oninput="toggleWikiOpenButton('${id}','${buttonId}')" />
         <button class="wi-modal-save-btn" id="${buttonId}" type="button" onclick="${openFn}('${id}')" title="Öppna ${escHtml(label)} i ny flik" style="padding:5px 8px;${String(value || '').trim() ? '' : 'display:none;'}">↗</button>
@@ -4563,41 +4835,66 @@ function openWorkItemModal(itemId) {
     ...allItems.map(i => String(i.fields?.['System.IterationPath'] || '').trim())
   ].filter(Boolean))].sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }));
   const sprintInputRow = (label, id, value) =>
-    `<div class="wi-modal-row" style="display:block;">
-      <div class="wi-modal-label" style="margin-bottom:4px;">${label}</div>
+    `<div class="wi-modal-row">
+      <div class="wi-modal-label">${label}</div>
       <input class="wi-modal-input" id="${id}" list="wiSprintOptions" value="${escHtml(value || '')}" placeholder="Projekt\\Sprint X" />
       <datalist id="wiSprintOptions">${sprintOptions.map(v => `<option value="${escHtml(v)}"></option>`).join('')}</datalist>
     </div>`;
 
-  document.getElementById('wiTitle').innerHTML = `<span>${escHtml(title)} <span style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.74rem;">#${item.id}</span></span><button onclick="closeWorkItemModal()">✕</button>`;
-  document.getElementById('wiBody').innerHTML =
-    `<div class="wi-modal-meta">` +
-      inputRow('Titel', 'wiEditTitle', title, 'Titel') +
-      row('Typ', type) +
-      selectRow('Status', 'wiEditState', state, stateOptions, false) +
-      sprintInputRow('Sprint', 'wiEditSprintPath', sprintPath) +
-      inputRow('Effort', 'wiEditEffort', effort, 'Effort') +
-      selectRow('Typ', 'wiEditCustomTyp', customType, mergeOptions(CUSTOM_TYP_OPTIONS, customType)) +
-      selectRow('Affärsområde', 'wiEditAo', ao, mergeOptions(AFFARSOM_OPTIONS, ao)) +
-      inputRow('Super Epic', 'wiEditSuperEpic', superEpic, 'Super Epic') +
-      selectRow('Roadmap', 'wiEditRoadmap', roadmap, mergeOptions(ROADMAP_OPTIONS, roadmap)) +
-      selectRow('T-shirt', 'wiEditTshirt', tshirt, mergeOptions(TSHIRT_OPTIONS, tshirt)) +
-      inputRow('Milestone', 'wiEditMilestone', milestone, 'Milestone') +
-      inputRow('Target Apps', 'wiEditTargetApps', targetApps, 'Target Apps') +
-      inputRow('Maconomy', 'wiEditMaconomy', maconomy, 'Maconomy') +
-      linkInputRow('Wikipage', 'wiEditWikiPage', wikiPage, 'Wikipage', 'wiOpenWikiBtn', 'openWikiPageFromInput') +
-      linkInputRow('Loop page', 'wiEditLoopPage', loopPage, 'Loop page', 'wiOpenLoopBtn', 'openLoopPageFromInput') +
+  document.getElementById('wiTitle').innerHTML =
+    `<div class="wi-modal-title-block">` +
+      `<div class="wi-modal-title-kicker">${escHtml(type)} #${item.id}</div>` +
+      `<input class="wi-modal-title-input" id="wiEditTitle" value="${escHtml(title)}" placeholder="Titel" />` +
     `</div>` +
-    `<div class="wi-modal-desc">` +
-      `<div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;">Description</div>` +
+    `<div class="wi-modal-head-controls">` +
+      `<select class="wi-modal-header-state" id="wiEditState">${stateOptions.map(v => `<option value="${escHtml(v)}" ${state===v?'selected':''}>${escHtml(v)}</option>`).join('')}</select>` +
+      `<button onclick="closeWorkItemModal()" title="Stäng" aria-label="Stäng">✕</button>` +
+    `</div>`;
+  document.getElementById('wiBody').innerHTML =
+    `<div class="wi-modal-layout">` +
+      `<div class="wi-modal-section">` +
+        `<h4 class="wi-modal-section-title">Klassificering</h4>` +
+        `<div class="wi-modal-meta">` +
+          selectRow('Typ', 'wiEditCustomTyp', customType, mergeOptions(CUSTOM_TYP_OPTIONS, customType)) +
+          selectRow('Affärsområde', 'wiEditAo', ao, mergeOptions(AFFARSOM_OPTIONS, ao)) +
+          selectRow('T-shirt', 'wiEditTshirt', tshirt, mergeOptions(TSHIRT_OPTIONS, tshirt)) +
+        `</div>` +
+      `</div>` +
+      `<div class="wi-modal-section">` +
+        `<h4 class="wi-modal-section-title">Planering</h4>` +
+        `<div class="wi-modal-meta">` +
+          sprintInputRow('Sprint', 'wiEditSprintPath', sprintPath) +
+          selectRow('Roadmap', 'wiEditRoadmap', roadmap, mergeOptions(ROADMAP_OPTIONS, roadmap)) +
+          inputRow('Effort', 'wiEditEffort', effort, 'Effort') +
+        `</div>` +
+      `</div>` +
+      `<div class="wi-modal-section">` +
+        `<h4 class="wi-modal-section-title">Relationer</h4>` +
+        `<div class="wi-modal-meta">` +
+          inputRow('Super epic', 'wiEditSuperEpic', superEpic, 'Super epic') +
+          inputRow('Milestone', 'wiEditMilestone', milestone, 'Milestone') +
+          inputRow('Maconomy', 'wiEditMaconomy', maconomy, 'Maconomy') +
+        `</div>` +
+      `</div>` +
+      `<div class="wi-modal-section wi-modal-desc">` +
+        `<h4 class="wi-modal-section-title">Beskrivning</h4>` +
       `<textarea class="wi-modal-textarea" id="wiEditDescription" placeholder="Beskrivning...">${escHtml(descriptionText)}</textarea>` +
+      `</div>` +
+      `<div class="wi-modal-section">` +
+        `<h4 class="wi-modal-section-title">Mer info</h4>` +
+        `<div class="wi-modal-meta">` +
+          linkInputRow('Wikipage', 'wiEditWikiPage', wikiPage, 'Wikipage', 'wiOpenWikiBtn', 'openWikiPageFromInput') +
+          linkInputRow('Loop page', 'wiEditLoopPage', loopPage, 'Loop page', 'wiOpenLoopBtn', 'openLoopPageFromInput') +
+          inputRow('Target apps', 'wiEditTargetApps', targetApps, 'Target apps') +
+        `</div>` +
+      `</div>` +
       `<div class="wi-modal-actions">` +
         `<span class="wi-modal-save-status" id="wiSaveStatus"></span>` +
         `<div class="wi-modal-action-buttons">` +
-          `<button class="wi-modal-save-btn" id="wiDeleteBtn" style="border-color:var(--danger);color:var(--danger);" onclick="deleteWorkItemModal(${item.id})">Ta bort</button>` +
-          `<button class="wi-modal-save-btn" style="border-color:var(--accent);color:var(--accent);" onclick="openCreateChildModal(${item.id})">+ Skapa child</button>` +
-          (isWorkItemType(item, WI_TYPE_EPIC) ? `<button class="wi-modal-save-btn" style="border-color:#10b981;color:#10b981;" onclick="exportEpicToPDF(${item.id})" title="Exportera Epic med hierarki till PDF">Export PDF</button><button class="wi-modal-save-btn" style="border-color:#f59e0b;color:#f59e0b;" onclick="exportEpicToExcel(${item.id})" title="Exportera Epic med hierarki till Excel">Export Excel</button>` : '') +
-          `<button class="wi-modal-save-btn" id="wiSaveBtn" onclick="saveWorkItemModal(${item.id})">Spara ändringar</button>` +
+          `<button class="wi-modal-save-btn wi-btn-danger" id="wiDeleteBtn" onclick="deleteWorkItemModal(${item.id})">Ta bort</button>` +
+          `<button class="wi-modal-save-btn" onclick="openCreateChildModal(${item.id})">Skapa child</button>` +
+          (isWorkItemType(item, WI_TYPE_EPIC) ? `<button class="wi-modal-save-btn" onclick="exportEpicToPDF(${item.id})" title="Exportera Epic med hierarki till PDF">Export PDF</button><button class="wi-modal-save-btn" onclick="exportEpicToExcel(${item.id})" title="Exportera Epic med hierarki till Excel">Export Excel</button>` : '') +
+          `<button class="wi-modal-save-btn wi-btn-primary" id="wiSaveBtn" onclick="saveWorkItemModal(${item.id})">Spara ändringar</button>` +
         `</div>` +
       `</div>` +
       `<a class="wi-modal-link" href="${devopsUrl}" target="_blank" rel="noopener noreferrer">Öppna i DevOps ↗</a>` +
@@ -5507,6 +5804,8 @@ function statusBurndownSvg(series, options = {}) {
   const barMaxH = innerH * 0.38; // bars occupy up to 38% of chart height, from bottom
   const baselineY = padT + innerH;
   const yBar = delta => baselineY - ((Math.max(0, delta) / maxDelta) * barMaxH);
+  const minLabelSpacing = 34;
+  const labelStep = Math.max(1, Math.ceil(minLabelSpacing / Math.max(daySlotW, 1)));
 
   // Draw bars centered on the actual day index (i), where delta[i] is burn for that day.
   let barsHtml = '';
@@ -5522,9 +5821,12 @@ function statusBurndownSvg(series, options = {}) {
     const deltaLabel = (Math.round(delta * 100) / 100).toString();
     const deltaLabelY = Math.max(padT + 9, y - 3);
     const fill = delta > 0 ? 'rgb(22,163,74)' : 'rgba(125,133,144,.18)';
+    const showLabel = i === 0 || i === series.length - 1 || (i % labelStep) === 0;
     barsHtml += `<rect x="${barX.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${barH.toFixed(2)}" fill="${fill}" rx="2"></rect>`;
     barValueLabelsHtml += `<text x="${cx.toFixed(2)}" y="${deltaLabelY.toFixed(2)}" text-anchor="middle" fill="${delta > 0 ? 'rgb(22,163,74)' : 'var(--muted)'}" font-size="9" font-family="JetBrains Mono,monospace">${escHtml(deltaLabel)}</text>`;
-    barLabelsHtml += `<text x="${cx.toFixed(2)}" y="${(height - 8).toFixed(2)}" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="JetBrains Mono,monospace">${escHtml(label)}</text>`;
+    if (showLabel) {
+      barLabelsHtml += `<text x="${cx.toFixed(2)}" y="${(height - 8).toFixed(2)}" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="JetBrains Mono,monospace">${escHtml(label)}</text>`;
+    }
   });
 
   const actualPath = series.map((p, i) => `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(2)} ${yFor(p.remaining).toFixed(2)}`).join(' ');
@@ -5583,7 +5885,8 @@ function statusRenderBurndownPanel(targetEl, revisionResults, from, to, hasActiv
   const debugRows = statusBurndownDebugRows(revisionResults, series, deltas, mode);
   const grossDeltas = debugRows.map(row => Math.max(0, Number(row.grossBurn) || 0));
   const done = Math.round(grossDeltas.reduce((sum, value) => sum + value, 0) * 100) / 100;
-  const donePct = totalValue > 0 ? Math.max(0, Math.min(100, Math.round((done / totalValue) * 100))) : 0;
+  const totalCompleted = Math.max(0, Math.round((totalValue - end) * 100) / 100);
+  const donePct = totalValue > 0 ? Math.max(0, Math.min(100, Math.round((totalCompleted / totalValue) * 100))) : 0;
 
   targetEl.innerHTML = `
     <div class="status-burndown-head">
@@ -7257,11 +7560,16 @@ function isTeamdefUnavailableError(error) {
 }
 
 let storageProjectPickerResolve = null;
+let storageProjectPickerFavoriteId = '';
 let epicProjectPickerResolve = null;
 
 function closeStorageProjectPicker() {
   const modal = document.getElementById('storageProjectModal');
-  if (modal) modal.classList.remove('open');
+  if (modal) {
+    modal.classList.remove('open');
+    delete modal.dataset.favoriteId;
+  }
+  storageProjectPickerFavoriteId = '';
   if (storageProjectPickerResolve) {
     const resolve = storageProjectPickerResolve;
     storageProjectPickerResolve = null;
@@ -7269,15 +7577,67 @@ function closeStorageProjectPicker() {
   }
 }
 
-function pickStorageProject(projectName) {
+function pickStorageProject(projectName, favoriteId = '') {
+  const modal = document.getElementById('storageProjectModal');
+  const targetFavoriteId = String(favoriteId || modal?.dataset?.favoriteId || storageProjectPickerFavoriteId || '');
+  const targetFavorite = targetFavoriteId ? getFavoriteById(targetFavoriteId) : null;
+
   if (!projectName) return;
+
+  const oldStorageProject = favoritesStorageProject;
   favoritesStorageProject = String(projectName);
+
+  // Starta flyttning i bakgrunden (async, men låt onclick returnera direkt)
+  if (targetFavorite && targetFavorite.wiProject !== projectName) {
+    let teamsToMove = [targetFavorite];
+
+    if (teamsToMove.length > 0) {
+      showToast('Flyttar team till nytt lagringsprojekt...');
+
+      // Kör operationen asynkront utan att vänta
+      (async () => {
+        for (const team of teamsToMove) {
+          try {
+            const sourceProject = team.wiProject || oldStorageProject;
+
+            // Create new team in the new storage project
+            const newTeam = await createFavoriteInDevOps(team.name, team.keys || []);
+
+            // Delete old team from the old storage project
+            await deleteFavoriteInDevOps(team);
+
+            // Update the team in projectFavorites with new project location
+            const idx = projectFavorites.findIndex(f => f.id === team.id);
+            if (idx >= 0) {
+              projectFavorites[idx] = {
+                ...projectFavorites[idx],
+                wiProject: newTeam.wiProject,
+                wiId: newTeam.wiId,
+                id: newTeam.id,
+              };
+            }
+          } catch (err) {
+            console.error(`Kunde inte flytta team "${team.name}":`, err);
+            showToast(`Varning: Kunde inte flytta team "${team.name}": ${err.message || err}`);
+          }
+        }
+
+        saveProjectFavorites();
+        showToast(`${teamsToMove.length} team flyttade till ${projectName}.`);
+      })().catch(err => {
+        console.error('Error in team migration:', err);
+        showToast(`Fel vid flyttning av team: ${err.message || err}`);
+      });
+    }
+  }
+
   saveProjectFavorites();
   renderProjectCheckboxes(window._allProjects || []);
   showToast(`Team lagras nu i ${projectName}.`);
 
-  const modal = document.getElementById('storageProjectModal');
   if (modal) modal.classList.remove('open');
+  if (modal) delete modal.dataset.favoriteId;
+  storageProjectPickerFavoriteId = '';
   if (storageProjectPickerResolve) {
     const resolve = storageProjectPickerResolve;
     storageProjectPickerResolve = null;
@@ -7285,22 +7645,26 @@ function pickStorageProject(projectName) {
   }
 }
 
-async function chooseFavoritesStorageProject() {
+async function chooseFavoritesStorageProject(favoriteId = '') {
   const names = [...new Set((window._allProjects || []).map(n => String(n || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   if (!names.length) {
     showToast('Ladda projekt först så du kan välja lagringsprojekt.');
     return false;
   }
 
-  const current = defaultFavoritesStorageProject(names);
+  const targetFavorite = favoriteId ? getFavoriteById(favoriteId) : null;
+  const current = targetFavorite?.wiProject || defaultFavoritesStorageProject(names);
   const body = document.getElementById('storageProjectBody');
   const modal = document.getElementById('storageProjectModal');
   if (!body || !modal) return false;
+  storageProjectPickerFavoriteId = targetFavorite?.id || '';
+  modal.dataset.favoriteId = targetFavorite?.id || '';
+  const favoriteArg = (targetFavorite?.id || '').replace(/'/g, "\\'");
 
   body.innerHTML = `
-    <p style="margin-bottom:6px;color:var(--muted)">Välj projekt för teamlagring (${escHtml(activeFavoritesWiType())}).</p>
+    <p style="margin-bottom:6px;color:var(--muted)">${targetFavorite ? `Flytta teamet ${escHtml(targetFavorite.name)} till projekt (${escHtml(activeFavoritesWiType())}).` : `Välj projekt för teamlagring (${escHtml(activeFavoritesWiType())}).`}</p>
     <div class="storage-project-list">
-      ${names.map(name => `<button class="btn btn-outline storage-project-btn ${name === current ? 'active' : ''}" onclick="pickStorageProject('${name.replace(/'/g,"\\'")}')">${escHtml(name)}</button>`).join('')}
+      ${names.map(name => `<button class="btn btn-outline storage-project-btn ${name === current ? 'active' : ''}" onclick="pickStorageProject('${name.replace(/'/g,"\\'")}', '${favoriteArg}')">${escHtml(name)}</button>`).join('')}
     </div>
     <div style="display:flex;justify-content:flex-end;margin-top:10px;">
       <button class="btn btn-outline" style="width:auto;padding:6px 10px;font-size:0.78rem;" onclick="closeStorageProjectPicker()">Avbryt</button>
@@ -7971,7 +8335,7 @@ function renderProjectCheckboxes(projects) {
           menu.className = 'favorite-settings-menu';
           menu.innerHTML = `
             <button class="btn btn-outline favorite-settings-btn" onclick="startManageFavorite('${fav.id.replace(/'/g,"\\'")}')" title="Välj projekt" aria-label="Välj projekt">📋</button>
-            <button class="btn btn-outline favorite-settings-btn" onclick="chooseFavoritesStorageProject()" title="Lagringsprojekt" aria-label="Lagringsprojekt">🗂</button>
+            <button class="btn btn-outline favorite-settings-btn" onclick="chooseFavoritesStorageProject('${fav.id.replace(/'/g,"\\'")}')" title="Lagringsprojekt" aria-label="Lagringsprojekt">🗂</button>
             <button class="btn btn-outline favorite-settings-btn" onclick="renameFavorite('${fav.id.replace(/'/g,"\\'")}')" title="Byt namn" aria-label="Byt namn">✎</button>
             <button class="btn btn-outline favorite-settings-btn" onclick="deleteFavorite('${fav.id.replace(/'/g,"\\'")}')" title="Ta bort" aria-label="Ta bort">🗑</button>
             <button class="btn btn-outline favorite-settings-btn" onclick="toggleFavoriteSettings('${fav.id.replace(/'/g,"\\'")}')" title="OK" aria-label="OK">OK</button>`;
@@ -19231,9 +19595,9 @@ function boardTicketRowsHtml(options = {}) {
     const activeClass = ticket.id === activeId ? ' active' : '';
     const title = ticket.fields?.['System.Title'] || `#${ticket.id}`;
     return `<div class="board-item-btn${activeClass}" style="display:flex;align-items:center;gap:6px;overflow:hidden;">
-      <span onclick="${selectHandler}(${ticket.id})" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;">#${ticket.id} ${escHtml(title)}</span>
-      <span style="color:var(--muted);flex-shrink:0;font-size:0.72rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px;">${escHtml(boardProjectForTicket(ticket))}</span>
-      ${showDelete ? `<button style="flex-shrink:0;background:none;border:none;color:var(--danger);cursor:pointer;font-size:0.88rem;padding:2px 4px;opacity:0.7;line-height:1;" onclick="event.stopPropagation();boardDeleteBoardTicket(${ticket.id})" title="Radera Visual board">✕</button>` : ''}
+      <span onclick="${selectHandler}(${ticket.id})" class="board-ticket-title">#${ticket.id} ${escHtml(title)}</span>
+      <span class="board-ticket-project">${escHtml(boardProjectForTicket(ticket))}</span>
+      ${showDelete ? `<button class="board-ticket-delete" onclick="event.stopPropagation();boardDeleteBoardTicket(${ticket.id})" title="Radera Visual board">✕</button>` : ''}
     </div>`;
   }).join('');
 }
@@ -20302,6 +20666,9 @@ function boardIssueTreeRowsHtml(options = {}) {
 
     const item = r.item;
     const type = r.type;
+    const rawTitle = String(item?.fields?.['System.Title'] || `#${item.id}`).trim();
+    const clippedTitle = boardShortLabel(rawTitle, 40);
+    const displayTitle = clippedTitle.length < rawTitle.length ? `${clippedTitle}…` : clippedTitle;
     const hasChildren = hierarchyRowHasChildren(item, type, features, stories);
     const addBtn = showAddButton
       ? `<button class="btn btn-outline" style="width:auto;padding:1px 6px;line-height:1;font-size:0.76rem;flex-shrink:0;" onclick="event.stopPropagation();boardAddIssueToWhiteboard(${item.id})" title="Lägg till i board">+</button>`
@@ -20321,6 +20688,8 @@ function boardIssueTreeRowsHtml(options = {}) {
       borderRight: 'none',
       rowExtraStyle: 'border-bottom:1px solid rgba(125,133,144,.08);',
       hasChildren,
+      titleText: escHtml(displayTitle),
+      titleAttr: rawTitle,
       trailingHtml: `${viewBtn}${addBtn}`
     });
   }).join('');
@@ -20352,11 +20721,11 @@ async function renderBoardTab() {
       <div class="board-left">
         <section class="board-pane">
           <div class="board-pane-head">
-            <span>Visual board</span>
-            <div style="display:flex;gap:6px;">
+            <span class="board-pane-head-title">Visual board</span>
+            <div class="board-pane-head-actions">
               <button class="btn btn-outline" style="width:auto;padding:5px 8px;" onclick="boardCreateTicket()">+ Ny</button>
               <button class="btn btn-outline" style="width:auto;padding:5px 8px;" onclick="boardSaveActiveState()">Spara board</button>
-              <label style="display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted);padding:0 4px;">
+              <label class="board-pane-head-toggle">
                 <input type="checkbox" ${boardAutoSaveEnabled ? 'checked' : ''} onchange="boardToggleAutoSave(this.checked)">
                 <span>Autospara</span>
               </label>
@@ -20366,8 +20735,8 @@ async function renderBoardTab() {
         </section>
         <section class="board-pane">
           <div class="board-pane-head">
-            <span>Epic/Feature/Story</span>
-            <div style="display:flex;gap:6px;">
+            <span class="board-pane-head-title">Epic/Feature/Story</span>
+            <div class="board-pane-head-actions">
               <button class="btn btn-outline" style="width:auto;padding:5px 8px;" onclick="createEpicFromHierarchyList(boardActiveTicketProject())" title="Skapa ny Epic">+ Skapa epic</button>
               <button class="btn btn-outline" style="width:auto;padding:5px 8px;" onclick="boardRefreshTickets()" title="Uppdatera listan">↻</button>
             </div>
@@ -20902,7 +21271,8 @@ async function statusCollectExportSnapshot() {
   const start = burndown.baselineRemaining;
   const end = series.length ? (series[series.length - 1]?.remaining || 0) : 0;
   const burned = Math.round(deltas.reduce((sum, value) => sum + value, 0) * 100) / 100;
-  const donePct = totalValue > 0 ? Math.max(0, Math.min(100, Math.round((burned / totalValue) * 100))) : 0;
+  const totalCompleted = Math.max(0, Math.round((totalValue - end) * 100) / 100);
+  const donePct = totalValue > 0 ? Math.max(0, Math.min(100, Math.round((totalCompleted / totalValue) * 100))) : 0;
 
   return {
     from,
