@@ -5360,7 +5360,8 @@ function statusTreeRowsHtml(rows, features, stories, listWidth) {
 
 function statusLaneItemHtml(item, options = {}) {
   const title = String(item?.fields?.['System.Title'] || `#${item.id}`).trim();
-  const state = workItemState(item);
+  const stateOverride = String(options.stateOverride || '').trim();
+  const state = stateOverride || workItemState(item);
   const type = workItemType(item);
   const forceRemainingZero = !!options.forceRemainingZero;
   const remainingRaw = forceRemainingZero ? 0 : statusRemainingWorkValue(item);
@@ -7373,9 +7374,8 @@ function loadProjectFavorites() {
   } catch (_) {
     activeFavoriteId = '';
   }
-  if (!projectFavorites.some(f => f.id === activeFavoriteId)) {
-    activeFavoriteId = projectFavorites[0]?.id || '';
-  }
+  // Do not auto-select any team on app load; wait for explicit user choice.
+  activeFavoriteId = '';
 }
 
 function getActiveFavorite() {
@@ -7901,7 +7901,7 @@ async function loadProjectFavoritesFromDevOps(projectNames = []) {
     } catch (_) {}
   }
   if (!projectFavorites.some(f => f.id === activeFavoriteId)) {
-    activeFavoriteId = projectFavorites[0]?.id || '';
+    activeFavoriteId = '';
   }
   favoritesStorageProject = preferred || projectFavorites[0]?.wiProject || defaultFavoritesStorageProject(names);
   saveProjectFavorites();
@@ -8045,7 +8045,6 @@ async function setProjectPanelMode(mode) {
     manageProjectsMode = false;
     favoriteManageId = '';
     favoriteSettingsId = '';
-    if (!activeFavoriteId && projectFavorites.length) activeFavoriteId = projectFavorites[0].id;
     applyActiveFavoriteSelection();
   } else {
     favoriteManageId = '';
@@ -8067,7 +8066,7 @@ async function setProjectPanelMode(mode) {
 async function setActiveFavorite(favoriteId, autoLoad = false) {
   activeFavoriteId = String(favoriteId || '');
   if (!projectFavorites.some(f => f.id === activeFavoriteId)) {
-    activeFavoriteId = projectFavorites[0]?.id || '';
+    activeFavoriteId = '';
   }
   favoriteSettingsId = '';
   saveProjectFavorites();
@@ -20711,6 +20710,7 @@ async function renderBoardTab() {
   const selectedTicket = boardTickets.find(t => t.id === activeBoardTicketId) || null;
   const boardTitle = selectedTicket ? (selectedTicket.fields?.['System.Title'] || `#${selectedTicket.id}`) : 'Ingen board vald';
   const stateText = JSON.stringify(boardStateModel || { version: 1 }, null, 2);
+  const boardHeaderStatusText = boardStatusText === 'Inga Visual board hittades.' ? '' : (boardStatusText || '');
 
   const ticketRows = boardTicketRowsHtml();
 
@@ -20751,7 +20751,7 @@ async function renderBoardTab() {
             <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:.72rem;line-height:1.1;flex-shrink:0;" onclick="boardRenameActiveTicket()" title="Byt namn pa board">✎</button>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <span id="boardStatusText" style="color:var(--muted);font-size:0.75rem;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(boardStatusText || '')}</span>
+            <span id="boardStatusText" style="color:var(--muted);font-size:0.75rem;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(boardHeaderStatusText)}</span>
             <label style="display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted);">
               <input type="checkbox" id="boardShowXAxisToggle" onchange="boardToggleAxis('x', this.checked)">
               <span>X-axel</span>
@@ -21871,7 +21871,7 @@ async function renderStatusTab() {
       startedBody.innerHTML = '<div class="status-lane-empty">Välj en epic eller aktivera sprint-filter för att visa tickets.</div>';
     } else {
       startedBody.innerHTML = laneItems.started.length
-        ? laneItems.started.map(row => statusLaneItemHtml(row.item)).join('')
+        ? laneItems.started.map(row => statusLaneItemHtml(row.item, { stateOverride: row.transition?.state })).join('')
         : statusLaneEmptyHtml();
     }
   }
@@ -21884,7 +21884,7 @@ async function renderStatusTab() {
       testingBody.innerHTML = '';
     } else {
       testingBody.innerHTML = laneItems.testing.length
-        ? laneItems.testing.map(row => statusLaneItemHtml(row.item)).join('')
+        ? laneItems.testing.map(row => statusLaneItemHtml(row.item, { stateOverride: row.transition?.state })).join('')
         : statusLaneEmptyHtml();
     }
   }
@@ -21897,7 +21897,7 @@ async function renderStatusTab() {
       doneBody.innerHTML = '';
     } else {
       doneBody.innerHTML = laneItems.done.length
-        ? laneItems.done.map(row => statusLaneItemHtml(row.item)).join('')
+        ? laneItems.done.map(row => statusLaneItemHtml(row.item, { stateOverride: row.transition?.state })).join('')
         : statusLaneEmptyHtml();
     }
   }
