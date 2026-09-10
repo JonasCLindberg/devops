@@ -11785,6 +11785,7 @@ function sprintDragEnd() {
 function sprintFocusChipDragStart(event, itemId) {
   sprintLinkDragTicketId = itemId;
   event.dataTransfer.setData('sprintLinkTicketId', String(itemId));
+  event.dataTransfer.setData('text/plain', `sprint-link-ticket:${itemId}`);
   event.dataTransfer.effectAllowed = 'link';
 }
 
@@ -12106,6 +12107,11 @@ async function sprintDropOnGoalCard(event, goalId) {
   try {
     const data = event.dataTransfer.getData('sprintLinkTicketId');
     if (data) linkTicketId = Number(data);
+    if (!linkTicketId) {
+      const plain = String(event.dataTransfer.getData('text/plain') || '').trim();
+      const match = plain.match(/^sprint-link-ticket:(\d+)$/i);
+      if (match) linkTicketId = Number(match[1]);
+    }
   } catch (e) {
     // dataTransfer might not be accessible
   }
@@ -14135,7 +14141,7 @@ function renderSprintGoals() {
         borderRight: 'none',
         hasChildren,
         rowExtraStyle: 'border-bottom:1px solid rgba(125,133,144,.08);font-size:0.86rem;',
-        trailingHtml: `<span class="sprint-focus-iter-col" draggable="true" data-item-id="${item.id}" data-focus-iter="${escHtml(rowFocusIterPath)}" style="${iterStyle}${isStory && rowFocusIterPath ? '' : 'cursor:inherit;'}position:relative;" title="${iterTitle}">${iterDisplay}${linkMarker}</span>`
+        trailingHtml: `<span class="sprint-focus-iter-col" draggable="true" data-item-id="${item.id}" data-focus-iter="${escHtml(rowFocusIterPath)}" ondragstart="sprintFocusChipDragStart(event, ${item.id})" ondragend="sprintFocusChipDragEnd()" style="${iterStyle}${isStory && rowFocusIterPath ? '' : 'cursor:inherit;'}position:relative;" title="${iterTitle}">${iterDisplay}${linkMarker}</span>`
       });
     };
 
@@ -14299,18 +14305,6 @@ function renderSprintGoals() {
       sprintSetEpicIteration(itemId, focusIter);
     });
 
-    span.addEventListener('dragstart', (e) => {
-      e.stopPropagation();
-      const focusIter = span.getAttribute('data-focus-iter');
-      if (!focusIter) return; // No valid target sprint for drag
-      const itemId = parseInt(span.getAttribute('data-item-id'), 10);
-      sprintFocusChipDragStart(e, itemId);
-    });
-
-    span.addEventListener('dragend', (e) => {
-      e.stopPropagation();
-      sprintFocusChipDragEnd();
-    });
   });
 
   sprintEnsureSprintModals();
