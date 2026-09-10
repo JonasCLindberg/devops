@@ -873,6 +873,546 @@
     padding: 10px 12px;
     border-bottom: 1px solid var(--border);
   }
+    .info-layout .board-right-body {
+      padding: 0;
+    }
+  
+    .kanban-layout {
+      height: 100%;
+      min-height: 560px;
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+    .kanban-layout.kanban-left-collapsed {
+      grid-template-columns: 44px minmax(0, 1fr);
+    }
+    .kanban-left,
+    .kanban-right {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface2);
+      min-width: 0;
+      min-height: 0;
+    }
+    .kanban-left {
+      width: auto;
+      min-width: 0;
+      padding: 0;
+      gap: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .kanban-layout.kanban-left-collapsed .kanban-left {
+      align-items: stretch;
+    }
+    .kanban-left-head,
+    .kanban-right-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .kanban-collapse-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      border-radius: 6px;
+      min-width: 24px;
+      width: 24px;
+      height: 24px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      font-size: 0.84rem;
+      flex-shrink: 0;
+    }
+    .kanban-collapse-btn:hover {
+      color: var(--text);
+      border-color: var(--accent2);
+    }
+    .kanban-expand-btn {
+      display: none;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      border-radius: 6px;
+      min-width: 24px;
+      width: 24px;
+      height: 24px;
+      line-height: 1;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      font-size: 0.84rem;
+      flex-shrink: 0;
+    }
+    .kanban-expand-btn:hover {
+      color: var(--text);
+      border-color: var(--accent2);
+    }
+    .kanban-layout.kanban-left-collapsed .kanban-expand-btn {
+      display: inline-flex;
+    }
+    .kanban-layout.kanban-left-collapsed .kanban-left-head {
+      justify-content: center;
+      padding: 8px 6px;
+    }
+    .kanban-layout.kanban-left-collapsed .kanban-left-head > .kanban-left-head-text,
+    .kanban-layout.kanban-left-collapsed .kanban-left-head > .kanban-left-head-actions,
+    .kanban-layout.kanban-left-collapsed .kanban-left-options,
+    .kanban-layout.kanban-left-collapsed .kanban-left-body {
+      display: none;
+    }
+    .kanban-left-options {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .kanban-left-options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .kanban-left-options input[type="checkbox"] {
+      margin: 0;
+      accent-color: var(--accent2);
+    }
+    .kanban-left-body {
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 8px 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      justify-items: stretch;
+      align-content: start;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .kanban-left-body > * {
+      width: 100%;
+      max-width: none;
+      justify-self: stretch;
+      box-sizing: border-box;
+    }
+    .kanban-project-block {
+      display: block;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--kanban-project-color, var(--border));
+      border-radius: 9px;
+      background: var(--surface);
+      overflow: hidden;
+      box-sizing: border-box;
+      margin: 0 0 8px;
+    }
+    .kanban-project-block:last-child {
+      margin-bottom: 0;
+    }
+    .kanban-project-title {
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.76rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--kanban-project-color, var(--accent2));
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+    }
+    .kanban-project-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .kanban-project-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .kanban-sprint-list {
+      width: 100%;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-sizing: border-box;
+    }
+    .kanban-sprint-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 16px minmax(0, 1fr);
+      gap: 6px;
+      align-items: center;
+      padding: 4px 6px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .kanban-sprint-row:hover {
+      background: rgba(88,166,255,.08);
+      border-color: rgba(88,166,255,.2);
+    }
+    .kanban-sprint-row input {
+      margin: 0;
+      accent-color: var(--accent2);
+    }
+    .kanban-sprint-label {
+      min-width: 0;
+      font-size: 0.78rem;
+      color: var(--text);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .kanban-sprint-label-meta {
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      margin-left: 4px;
+    }
+    .kanban-right {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .kanban-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-wrap: wrap;
+    }
+    .kanban-assignee-filter {
+      width: 340px;
+      min-width: 340px;
+      max-width: 340px;
+      flex: 0 0 340px;
+    }
+    .kanban-type-filters {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .kanban-type-filters label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      user-select: none;
+      cursor: pointer;
+    }
+    .kanban-type-filters input[type="checkbox"] {
+      margin: 0;
+      accent-color: var(--accent2);
+    }
+    .kanban-filter-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .kanban-columns {
+      flex: 1;
+      min-height: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      align-items: stretch;
+      scrollbar-gutter: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .kanban-columns::-webkit-scrollbar {
+      height: 0;
+    }
+    .kanban-fixed-scrollbar {
+      position: fixed;
+      left: 0;
+      bottom: max(8px, env(safe-area-inset-bottom));
+      height: 14px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--surface2) 82%, transparent);
+      border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+      z-index: 120;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(125,133,144,.68) transparent;
+    }
+    .kanban-fixed-scrollbar::-webkit-scrollbar {
+      height: 12px;
+    }
+    .kanban-fixed-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .kanban-fixed-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(125,133,144,.68);
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    .kanban-fixed-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(125,133,144,.88);
+    }
+    .kanban-fixed-scrollbar-inner {
+      height: 1px;
+    }
+    .kanban-selection {
+      position: absolute;
+      inset: 0;
+      z-index: 18;
+      pointer-events: none;
+    }
+    .kanban-selection-rect {
+      position: absolute;
+      border: 1px solid rgba(88,166,255,.85);
+      background: rgba(88,166,255,.14);
+      box-shadow: 0 0 0 1px rgba(88,166,255,.15) inset;
+      border-radius: 8px;
+    }
+    .kanban-col {
+      flex: 0 0 290px;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      min-height: 0;
+    }
+    .kanban-col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .kanban-col-head-main {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .kanban-col-edit-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .kanban-col-move-btn {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface2);
+      color: var(--muted);
+      cursor: pointer;
+      width: 22px;
+      height: 22px;
+      line-height: 1;
+      padding: 0;
+      font-size: 0.75rem;
+    }
+    .kanban-col-move-btn:hover {
+      color: var(--text);
+      border-color: var(--accent2);
+    }
+    .kanban-col-move-btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+    .kanban-col-count {
+      color: var(--accent2);
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .kanban-col-body {
+      min-height: 120px;
+      overflow: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .kanban-col-drop-zone {
+      min-height: 28px;
+      flex: 0 0 28px;
+      border-radius: 8px;
+    }
+    .kanban-col-drop-zone:hover,
+    .kanban-col-drop-zone.drop-target {
+      background: rgba(88,166,255,.08);
+    }
+    .kanban-col-body.drop-target {
+      background: rgba(88,166,255,.08);
+    }
+    .kanban-card {
+      border: 1px solid color-mix(in oklab, var(--kanban-project-color, var(--border)) 64%, var(--border) 36%);
+      border-left: 5px solid var(--kanban-project-color, var(--border));
+      border-radius: 8px;
+      background:
+        linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--kanban-project-color, var(--surface)) 32%, var(--surface) 68%) 0%,
+          color-mix(in oklab, var(--kanban-project-color, var(--surface2)) 18%, var(--surface2) 82%) 52%,
+          color-mix(in oklab, var(--kanban-project-color, var(--surface2)) 8%, var(--surface2) 92%) 100%
+        );
+      padding: 8px;
+      cursor: grab;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--kanban-project-color, var(--border)) 34%, transparent);
+    }
+    .kanban-card:hover {
+      border-color: color-mix(in oklab, var(--kanban-project-color, var(--accent2)) 82%, var(--border) 18%);
+    }
+    .kanban-card:active {
+      cursor: grabbing;
+    }
+    .kanban-card.dragging {
+      opacity: 0.6;
+    }
+    .kanban-card.selected {
+      border-color: var(--accent2);
+      border-left-color: var(--accent2);
+      background: color-mix(in oklab, var(--accent2) 12%, var(--surface2) 88%);
+      box-shadow: 0 0 0 1px rgba(88,166,255,.22), 0 0 0 2px rgba(88,166,255,.12) inset;
+    }
+    .kanban-card.drop-before {
+      border-top: 2px solid var(--accent2);
+    }
+    .kanban-card-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #000;
+      flex-shrink: 0;
+    }
+    .kanban-card.selected .kanban-card-id {
+      color: #000;
+    }
+    .kanban-card-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      min-width: 0;
+    }
+    .kanban-card-type-icon {
+      width: 16px;
+      min-width: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.86rem;
+      line-height: 1;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+    .kanban-card-type-icon-bug { color: #e5484d; }
+    .kanban-card-type-icon-epic { color: #f59e0b; }
+    .kanban-card-type-icon-feature { color: #8b5cf6; }
+    .kanban-card-type-icon-issue { color: #c026d3; }
+    .kanban-card-type-icon-task { color: #b38f00; }
+    .kanban-card-type-icon-story { color: #0ea5e9; }
+    .kanban-card-title {
+      color: var(--text);
+      font-size: 0.82rem;
+      line-height: 1.3;
+      min-width: 0;
+      overflow: hidden;
+      display: -webkit-box;
+      line-clamp: 2;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .kanban-card-assignee {
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .kanban-card-parent {
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .kanban-card-project {
+      color: var(--kanban-project-color, var(--muted));
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .kanban-empty {
+      padding: 10px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    @media (max-width: 1180px) {
+      .kanban-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(180px, auto) minmax(0, 1fr);
+      }
+      .kanban-layout.kanban-left-collapsed {
+        grid-template-columns: 1fr;
+        grid-template-rows: 44px minmax(0, 1fr);
+      }
+    }
   .board-sprint-chips {
     position: relative;
     margin-left: auto;
@@ -3744,7 +4284,6 @@
   </div>
   <div class="top-section-switch" aria-label="Sektioner">
     <button class="top-section-btn active" id="section-backlog" onclick="setTopSection('backlog')">Backlog</button>
-    <button class="top-section-btn" id="section-portfolio" onclick="setTopSection('portfolio')">Portfolio</button>
   </div>
   <button id="globalEditBtn" onclick="toggleEditMode()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;font-weight:400;" onmouseover="if(!globalEditMode){this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'}else{this.style.opacity='0.8'}" onmouseout="if(!globalEditMode){this.style.borderColor='var(--border)';this.style.color='var(--muted)'}else{this.style.opacity='1'}">✎ Editera</button>
   <button id="settingsNavBtn" onclick="showTab('settings')" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Inställningar</button>
@@ -3829,6 +4368,7 @@
   <div class="content">
     <!-- Tab bar -->
     <div class="tab-bar">
+      <button id="portfolioBackBtn" class="tab-btn" onclick="setTopSection('backlog');showTab('settings')" style="display:none;">← Tillbaka</button>
       <button class="tab-btn active" id="tab-backlog" onclick="showTab('backlog')" disabled>📋 Backlog</button>
       <button class="tab-btn" id="tab-estimering" onclick="showTab('estimering')" disabled>📐 Estimering</button>
       <button class="tab-btn" id="tab-prioritering" onclick="showTab('prioritering')" disabled>⚡ Prioritering</button>
@@ -3837,6 +4377,7 @@
       <button class="tab-btn" id="tab-sprint" onclick="showTab('sprint')" disabled>🏁 Sprint</button>
       <button class="tab-btn" id="tab-status" onclick="showTab('status')" disabled>📈 Status</button>
       <button class="tab-btn" id="tab-board" onclick="showTab('board')" disabled>🧩 Board</button>
+      <button class="tab-btn" id="tab-kanban" onclick="showTab('kanban')" disabled>🗂 Kanban</button>
       <button class="tab-btn" id="tab-info" onclick="showTab('info')" disabled>ℹ️ Info</button>
       <button class="tab-btn" id="tab-dashboard" onclick="showTab('dashboard')" disabled>📊 Dashboard</button>
       <button class="tab-btn" id="tab-kalkyl" onclick="showTab('kalkyl')" disabled>🧮 Kalkyl</button>
@@ -4581,6 +5122,15 @@ async function saveWorkItemModal(itemId) {
 
   const AO_FIELD = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
   const EFFORT_FIELD = 'Microsoft.VSTS.Scheduling.Effort';
+  const ASSIGNEE_FIELD = 'System.AssignedTo';
+  const PARENT_FIELD = 'System.Parent';
+  const assigneeNormalize = value => {
+    if (value == null) return '';
+    if (typeof value === 'object') {
+      return String(value.displayName || value.uniqueName || value.name || '').trim();
+    }
+    return String(value).trim();
+  };
   const stateValue = read('wiEditState') || String(item.fields?.['System.State'] || '').trim();
   const effortInputRaw = read('wiEditEffort').replace(',', '.');
   if (effortInputRaw !== '' && isNaN(Number(effortInputRaw))) {
@@ -4589,37 +5139,69 @@ async function saveWorkItemModal(itemId) {
     return;
   }
   const effortValue = effortInputRaw === '' ? '' : String(Number(effortInputRaw));
+  const parentRaw = read('wiEditParent');
+  const parseParentValue = rawValue => {
+    const text = String(rawValue || '').trim();
+    if (!text) return '';
+    if (/^\d+$/.test(text)) return String(Number(text));
 
-  const edits = [
-    { field: 'System.Title', value: read('wiEditTitle') },
-    { field: 'System.State', value: stateValue },
-    { field: 'System.IterationPath', value: read('wiEditSprintPath') },
-    { field: EFFORT_FIELD, value: effortValue },
-    { field: 'Custom.Typ', value: read('wiEditCustomTyp') },
-    { field: AO_FIELD, value: read('wiEditAo') },
-    { field: 'Custom.SuperEpic', value: read('wiEditSuperEpic') },
-    { field: 'Custom.Roadmap', value: read('wiEditRoadmap') },
-    { field: 'Custom.Tshirt', value: read('wiEditTshirt') },
-    { field: 'Custom.Milestone', value: read('wiEditMilestone') },
-    { field: 'Custom.Targetapps', value: read('wiEditTargetApps') },
-    { field: 'Custom.Maconomy', value: read('wiEditMaconomy') },
-    { field: 'Custom.wikipage', value: read('wiEditWikiPage') },
-    { field: 'Custom.Looppage', value: read('wiEditLoopPage') },
-  ];
+    const idMatch = text.match(/^#?\s*(\d+)\b/);
+    if (idMatch) return String(Number(idMatch[1]));
+
+    const byExactTitle = allItems.find(i => String(i?.fields?.['System.Title'] || '').trim().toLowerCase() === text.toLowerCase());
+    if (byExactTitle) return String(Number(byExactTitle.id));
+
+    return null;
+  };
+  const parentValue = parseParentValue(parentRaw);
+  if (parentValue === null) {
+    if (statusEl) statusEl.textContent = 'Parent måste vara ett giltigt ID eller ett val ur listan';
+    if (saveBtn) saveBtn.disabled = false;
+    return;
+  }
+  const hasAssigneeEditor = !!document.getElementById('wiEditAssignee');
+
+  const edits = [];
+  const pushEditIfPresent = (editorId, field, value) => {
+    if (!document.getElementById(editorId)) return;
+    edits.push({ field, value });
+  };
+
+  pushEditIfPresent('wiEditTitle', 'System.Title', read('wiEditTitle'));
+  pushEditIfPresent('wiEditState', 'System.State', stateValue);
+  if (hasAssigneeEditor) pushEditIfPresent('wiEditAssignee', ASSIGNEE_FIELD, read('wiEditAssignee'));
+  pushEditIfPresent('wiEditSprintPath', 'System.IterationPath', read('wiEditSprintPath'));
+  pushEditIfPresent('wiEditEffort', EFFORT_FIELD, effortValue);
+  pushEditIfPresent('wiEditCustomTyp', 'Custom.Typ', read('wiEditCustomTyp'));
+  pushEditIfPresent('wiEditAo', AO_FIELD, read('wiEditAo'));
+  pushEditIfPresent('wiEditSuperEpic', 'Custom.SuperEpic', read('wiEditSuperEpic'));
+  pushEditIfPresent('wiEditRoadmap', 'Custom.Roadmap', read('wiEditRoadmap'));
+  pushEditIfPresent('wiEditTshirt', 'Custom.Tshirt', read('wiEditTshirt'));
+  pushEditIfPresent('wiEditMilestone', 'Custom.Milestone', read('wiEditMilestone'));
+  pushEditIfPresent('wiEditTargetApps', 'Custom.Targetapps', read('wiEditTargetApps'));
+  pushEditIfPresent('wiEditMaconomy', 'Custom.Maconomy', read('wiEditMaconomy'));
+  pushEditIfPresent('wiEditWikiPage', 'Custom.wikipage', read('wiEditWikiPage'));
+  pushEditIfPresent('wiEditLoopPage', 'Custom.Looppage', read('wiEditLoopPage'));
+  pushEditIfPresent('wiEditParent', PARENT_FIELD, parentValue);
 
   const descText = read('wiEditDescription');
   const descHtml = descText ? plainTextToHtml(descText) : '';
-  edits.push({ field: 'System.Description', value: descHtml });
+  pushEditIfPresent('wiEditDescription', 'System.Description', descHtml);
 
   const ops = [];
   edits.forEach(({ field, value }) => {
     const currentRaw = item.fields[field];
     const current = field === EFFORT_FIELD
       ? (currentRaw == null ? '' : String(Number(currentRaw)))
+      : field === ASSIGNEE_FIELD
+        ? assigneeNormalize(currentRaw)
       : (currentRaw == null ? '' : String(currentRaw));
     if (current === value) return;
     if (!value) ops.push({ op: 'remove', path: `/fields/${field}` });
-    else ops.push({ op: 'add', path: `/fields/${field}`, value: field === EFFORT_FIELD ? Number(value) : value });
+    else {
+      const devopsValue = field === EFFORT_FIELD || field === PARENT_FIELD ? Number(value) : value;
+      ops.push({ op: 'add', path: `/fields/${field}`, value: devopsValue });
+    }
   });
 
   if (!ops.length) {
@@ -4633,7 +5215,7 @@ async function saveWorkItemModal(itemId) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     edits.forEach(({ field, value }) => {
-      if (field === EFFORT_FIELD) item.fields[field] = value ? Number(value) : null;
+      if (field === EFFORT_FIELD || field === PARENT_FIELD) item.fields[field] = value ? Number(value) : null;
       else item.fields[field] = value || null;
     });
 
@@ -4784,6 +5366,10 @@ function openWorkItemModal(itemId) {
 
   const title = f['System.Title'] || `#${itemId}`;
   const type = f['System.WorkItemType'] || '–';
+  const isUserStory = String(type || '').trim().toLowerCase() === 'user story';
+  const assignee = typeof f['System.AssignedTo'] === 'object'
+    ? String(f['System.AssignedTo']?.displayName || f['System.AssignedTo']?.uniqueName || f['System.AssignedTo']?.name || '').trim()
+    : String(f['System.AssignedTo'] || '').trim();
   const customType = f['Custom.Typ'] || '';
   const ao = f[AO_FIELD] || '';
   const superEpic = f['Custom.SuperEpic'] || '';
@@ -4797,6 +5383,7 @@ function openWorkItemModal(itemId) {
   if (state && !stateOptions.includes(state)) stateOptions.push(state);
   if (!stateOptions.length) stateOptions.push('New');
   const sprintPath = f['System.IterationPath'] || '';
+  const parent = f['System.Parent'] == null ? '' : String(f['System.Parent']).trim();
   const effort = workItemEffort(item) ?? '';
   const roadmap = normalizeRoadmapValue(f['Custom.Roadmap'], '');
   const tshirt = f['Custom.Tshirt'] || '';
@@ -4840,6 +5427,45 @@ function openWorkItemModal(itemId) {
       <input class="wi-modal-input" id="${id}" list="wiSprintOptions" value="${escHtml(value || '')}" placeholder="Projekt\\Sprint X" />
       <datalist id="wiSprintOptions">${sprintOptions.map(v => `<option value="${escHtml(v)}"></option>`).join('')}</datalist>
     </div>`;
+  const parentInputRow = (label, id, value, options) =>
+    `<div class="wi-modal-row">
+      <div class="wi-modal-label">${label}</div>
+      <input class="wi-modal-input" id="${id}" list="wiParentOptions" value="${escHtml(value || '')}" placeholder="ID eller namn" />
+      <datalist id="wiParentOptions">${(options || []).map(v => `<option value="${escHtml(v)}"></option>`).join('')}</datalist>
+    </div>`;
+  const classificationStandardHtml =
+    selectRow('Typ', 'wiEditCustomTyp', customType, mergeOptions(CUSTOM_TYP_OPTIONS, customType)) +
+    selectRow('Affärsområde', 'wiEditAo', ao, mergeOptions(AFFARSOM_OPTIONS, ao)) +
+    selectRow('T-shirt', 'wiEditTshirt', tshirt, mergeOptions(TSHIRT_OPTIONS, tshirt));
+  const classificationUserStoryHtml =
+    inputRow('Assignee', 'wiEditAssignee', assignee, 'Assignee') +
+    selectRow('T-shirt', 'wiEditTshirt', tshirt, mergeOptions(TSHIRT_OPTIONS, tshirt));
+  const classificationHtml = isUserStory ? classificationUserStoryHtml : classificationStandardHtml;
+  const planningStandardHtml =
+    sprintInputRow('Sprint', 'wiEditSprintPath', sprintPath) +
+    selectRow('Roadmap', 'wiEditRoadmap', roadmap, mergeOptions(ROADMAP_OPTIONS, roadmap)) +
+    inputRow('Effort', 'wiEditEffort', effort, 'Effort');
+  const planningUserStoryHtml =
+    sprintInputRow('Sprint', 'wiEditSprintPath', sprintPath) +
+    inputRow('Effort', 'wiEditEffort', effort, 'Effort');
+  const planningHtml = isUserStory ? planningUserStoryHtml : planningStandardHtml;
+  const relationStandardHtml =
+    inputRow('Super epic', 'wiEditSuperEpic', superEpic, 'Super epic') +
+    inputRow('Milestone', 'wiEditMilestone', milestone, 'Milestone') +
+    inputRow('Maconomy', 'wiEditMaconomy', maconomy, 'Maconomy');
+  const parentItem = allItems.find(i => Number(i?.id || 0) === Number(parent || 0));
+  const parentTitle = String(parentItem?.fields?.['System.Title'] || '').trim();
+  const parentDisplay = parent && parentTitle ? `${parent} - ${parentTitle}` : parent;
+  const parentOptions = allItems
+    .filter(i => Number(i?.id || 0) !== Number(item.id))
+    .map(i => {
+      const pTitle = String(i?.fields?.['System.Title'] || '').trim() || `#${i.id}`;
+      return `${i.id} - ${pTitle}`;
+    })
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }));
+  const relationUserStoryHtml =
+    parentInputRow('Parent', 'wiEditParent', parentDisplay, parentOptions);
+  const relationHtml = isUserStory ? relationUserStoryHtml : relationStandardHtml;
 
   document.getElementById('wiTitle').innerHTML =
     `<div class="wi-modal-title-block">` +
@@ -4855,25 +5481,19 @@ function openWorkItemModal(itemId) {
       `<div class="wi-modal-section">` +
         `<h4 class="wi-modal-section-title">Klassificering</h4>` +
         `<div class="wi-modal-meta">` +
-          selectRow('Typ', 'wiEditCustomTyp', customType, mergeOptions(CUSTOM_TYP_OPTIONS, customType)) +
-          selectRow('Affärsområde', 'wiEditAo', ao, mergeOptions(AFFARSOM_OPTIONS, ao)) +
-          selectRow('T-shirt', 'wiEditTshirt', tshirt, mergeOptions(TSHIRT_OPTIONS, tshirt)) +
+          classificationHtml +
         `</div>` +
       `</div>` +
       `<div class="wi-modal-section">` +
         `<h4 class="wi-modal-section-title">Planering</h4>` +
         `<div class="wi-modal-meta">` +
-          sprintInputRow('Sprint', 'wiEditSprintPath', sprintPath) +
-          selectRow('Roadmap', 'wiEditRoadmap', roadmap, mergeOptions(ROADMAP_OPTIONS, roadmap)) +
-          inputRow('Effort', 'wiEditEffort', effort, 'Effort') +
+          planningHtml +
         `</div>` +
       `</div>` +
       `<div class="wi-modal-section">` +
         `<h4 class="wi-modal-section-title">Relationer</h4>` +
         `<div class="wi-modal-meta">` +
-          inputRow('Super epic', 'wiEditSuperEpic', superEpic, 'Super epic') +
-          inputRow('Milestone', 'wiEditMilestone', milestone, 'Milestone') +
-          inputRow('Maconomy', 'wiEditMaconomy', maconomy, 'Maconomy') +
+          relationHtml +
         `</div>` +
       `</div>` +
       `<div class="wi-modal-section wi-modal-desc">` +
@@ -5092,6 +5712,11 @@ function statusLaneClass(key) {
 function statusEligibleItemType(item) {
   const type = workItemType(item);
   return !['Epic', 'Sprint Goal', 'Info', 'Visual board'].includes(type);
+}
+
+function kanbanEligibleItemType(item) {
+  const type = workItemType(item);
+  return !['Sprint Goal', 'Info', 'Visual board'].includes(type);
 }
 
 function statusEpicFilterTypeAllowed(item) {
@@ -6153,6 +6778,38 @@ let boardAutoSaveEnabled = false;
 let boardAutoSaveTimer = null;
 let boardAutoSaveInFlight = false;
 let boardLastSavedSignature = '';
+let kanbanSelectedSprintPaths = new Set();
+let kanbanAssigneeFilter = '';
+let kanbanDragItemId = null;
+let kanbanDropBeforeItemId = null;
+let kanbanDropTargetState = '';
+let kanbanSprintSelectionInitialized = false;
+let kanbanHideCompletedSprints = true;
+let kanbanTypeFilter = { epic: true, feature: true, storyBug: true };
+let kanbanShowEmptyColumns = false;
+let kanbanSelectedCardIds = new Set();
+let kanbanSelectionBaseIds = new Set();
+let kanbanSelecting = null;
+let kanbanSelectionAnchorId = null;
+let kanbanFixedScrollbarSyncing = false;
+let kanbanFixedScrollbarResizeObserver = null;
+const LS_KANBAN_STATE_ORDER = 'devops_kanban_state_order_v1';
+const LS_KANBAN_LEFT_COLLAPSED = 'devops_kanban_left_collapsed_v1';
+let kanbanStateOrder = [];
+let kanbanLeftCollapsed = false;
+try {
+  const parsed = JSON.parse(localStorage.getItem(LS_KANBAN_STATE_ORDER) || '[]');
+  kanbanStateOrder = Array.isArray(parsed)
+    ? parsed.map(v => String(v || '').trim()).filter(Boolean)
+    : [];
+} catch (_) {
+  kanbanStateOrder = [];
+}
+try {
+  kanbanLeftCollapsed = localStorage.getItem(LS_KANBAN_LEFT_COLLAPSED) === '1';
+} catch (_) {
+  kanbanLeftCollapsed = false;
+}
 try {
   boardAutoSaveEnabled = localStorage.getItem(LS_BOARD_AUTOSAVE_ENABLED) === '1';
 } catch (_) {
@@ -6174,7 +6831,7 @@ function sprintDebug(eventName, data = {}) {
   } catch (_) {}
 }
 
-const BACKLOG_SECTION_TABS = ['backlog','estimering','prioritering','timeline','roadmap','sprint','status','board','info'];
+const BACKLOG_SECTION_TABS = ['backlog','estimering','prioritering','timeline','roadmap','sprint','status','board','kanban','info'];
 const PORTFOLIO_SECTION_TABS = ['dashboard','kalkyl','analys','kostnader'];
 const UTILITY_TABS = [];
 const NAV_TABS = [...BACKLOG_SECTION_TABS, ...PORTFOLIO_SECTION_TABS, ...UTILITY_TABS];
@@ -6237,9 +6894,11 @@ function showTab(tab) {
   const searchAndTogglesBar = document.getElementById('searchAndTogglesBar');
   if (searchAndTogglesBar) searchAndTogglesBar.style.display = tab === 'backlog' ? '' : 'none';
   if (tab === 'backlog') renderBacklogControlBar();
+  const portfolioBackBtn = document.getElementById('portfolioBackBtn');
+  if (portfolioBackBtn) portfolioBackBtn.style.display = PORTFOLIO_SECTION_TABS.includes(tab) ? '' : 'none';
   // Hide original grouping bar in Backlog and Status tabs
   const groupingBar = document.getElementById('defaultGroupingBar');
-  if (groupingBar) groupingBar.style.display = (tab === 'backlog' || tab === 'status') ? 'none' : '';
+  if (groupingBar) groupingBar.style.display = (tab === 'backlog' || tab === 'status' || tab === 'kanban') ? 'none' : '';
 
   // Remove old Backlog toolbar if present
   const toolbar = document.getElementById('backlogToolbar');
@@ -6251,7 +6910,7 @@ function showTab(tab) {
   tshirtCalcMode = tab === 'settings';
   auditMode = tab === 'audit';
 
-  const needsDashClass = ['dashboard','roadmap','kalkyl','settings','analys','kostnader','timeline','sprint','prioritering','estimering','audit','importer','board','info'].includes(tab);
+  const needsDashClass = ['dashboard','roadmap','kalkyl','settings','analys','kostnader','timeline','sprint','prioritering','estimering','audit','importer','board','kanban','info'].includes(tab);
   document.body.classList.toggle('dashboard-mode', needsDashClass);
   document.body.classList.toggle('audit-mode', tab === 'audit');
 
@@ -6266,6 +6925,9 @@ function showTab(tab) {
     info.style.display = '';
   } else if (tab === 'board') {
     info.innerHTML = 'Board';
+    info.style.display = '';
+  } else if (tab === 'kanban') {
+    info.innerHTML = 'Kanban';
     info.style.display = '';
   } else if (tab === 'info') {
     info.innerHTML = 'Info';
@@ -6287,6 +6949,8 @@ function showTab(tab) {
     if (allItems.length) renderSprintGoals(); else showEmpty('Klicka "Hämta data" för att ladda.');
   } else if (tab === 'board') {
     renderBoardTab();
+  } else if (tab === 'kanban') {
+    renderKanbanTab();
   } else if (tab === 'info') {
     renderInfoTab();
   } else if (tab === 'kostnader') {
@@ -6571,12 +7235,16 @@ function toggleEditMode() {
   if (activeTab === 'backlog') {
     if (globalEditMode) isolatedCol = null;
     renderTable();
+  } else if (activeTab === 'estimering') {
+    renderEstimering();
   } else if (activeTab === 'status') {
     renderStatusTab();
   } else if (activeTab === 'prioritering') {
     renderPrioritering();
   } else if (activeTab === 'timeline') {
     renderTimeline();
+  } else if (activeTab === 'kanban') {
+    renderKanbanTab();
   }
 }
 function updateEditButtonStyle() {
@@ -7101,6 +7769,7 @@ function renderActiveView() {
     }
     renderBoardTab();
   }
+  else if (activeTab === 'kanban') renderKanbanTab();
   else if (activeTab === 'info') renderInfoTab();
   else renderTable();
 }
@@ -7112,7 +7781,7 @@ async function refreshStandardTicketLists() {
     setTabBtnsEnabled(true);
     return;
   }
-  if (['backlog','status','estimering','prioritering','timeline'].includes(tabBefore)) {
+  if (['backlog','status','estimering','prioritering','timeline','kanban'].includes(tabBefore)) {
     showTab(tabBefore);
     setTabBtnsEnabled(true);
   }
@@ -12211,6 +12880,31 @@ function sprintPathIdentity(path) {
   return `${proj}::${name}`;
 }
 
+function kanbanIsNoSprintPath(path) {
+  const rawPath = String(path || '').trim();
+  if (!rawPath) return false;
+  const project = String(rawPath.split('\\')[0] || '').trim();
+  return !!project && rawPath === project;
+}
+
+function kanbanSprintSelectablePath(path) {
+  const rawPath = String(path || '').trim();
+  if (!rawPath) return '';
+  if (sprintIsIterationLikePath(rawPath)) return rawPath;
+  if (kanbanIsNoSprintPath(rawPath)) return rawPath;
+  return '';
+}
+
+function kanbanSprintIdentity(path, fallbackProject = '') {
+  const selectablePath = kanbanSprintSelectablePath(path);
+  if (!selectablePath) return '';
+  if (kanbanIsNoSprintPath(selectablePath)) {
+    const project = String(fallbackProject || selectablePath.split('\\')[0] || '').trim().toLowerCase();
+    return project ? `${project}::__no_sprint__` : '';
+  }
+  return sprintPathIdentity(selectablePath);
+}
+
 function sprintEnterFocus(pathKey) {
   sprintFocusPath = pathKey;
   sprintFocusPhase = null;
@@ -14252,6 +14946,11 @@ function renderTshirtCalc() {
       <div class="tsc-section-title">Importer</div>
       <p style="font-size:0.78rem;color:var(--muted);margin:4px 0 12px;">Skapa tickets i DevOps från en CSV- eller Excel-fil.</p>
       <button class="btn btn-outline" id="settingsImporterBtn" onclick="showTab('importer')" style="width:auto;padding:6px 16px;font-size:0.84rem;">📥 Öppna Importer</button>
+    </div>
+    <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:2px solid var(--border);">
+      <div class="tsc-section-title">Portfolio</div>
+      <p style="font-size:0.78rem;color:var(--muted);margin:4px 0 12px;">Öppna portfolio-vyerna (Dashboard, Kalkyl, Analys, Kostnader).</p>
+      <button class="btn btn-outline" id="settingsPortfolioBtn" onclick="setTopSection('portfolio');showTab('dashboard')" style="width:auto;padding:6px 16px;font-size:0.84rem;">🗂 Öppna Portfolio</button>
     </div>
     <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:2px solid var(--border);">
       <div class="tsc-section-title">Kolumner</div>
@@ -20694,6 +21393,1034 @@ function boardIssueTreeRowsHtml(options = {}) {
   }).join('');
 }
 
+function kanbanAssigneeText(item) {
+  const raw = item?.fields?.['System.AssignedTo'];
+  if (raw == null || raw === '') return 'Ej tilldelad';
+  if (typeof raw === 'object') {
+    const text = String(raw.displayName || raw.name || raw.uniqueName || '').trim();
+    return text || 'Ej tilldelad';
+  }
+  const text = String(raw).trim();
+  return text || 'Ej tilldelad';
+}
+
+function kanbanAssigneeInitials(assigneeText) {
+  const raw = String(assigneeText || '').trim();
+  if (!raw || raw.toLowerCase() === 'ej tilldelad') return '--';
+
+  const cleaned = raw
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[()]/g, ' ')
+    .trim();
+
+  const emailMatch = cleaned.match(/([A-Za-z0-9._%+-]+)@/);
+  if (emailMatch && emailMatch[1]) {
+    const localParts = emailMatch[1]
+      .split(/[._-]+/)
+      .map(p => p.trim())
+      .filter(Boolean);
+    if (localParts.length >= 2) {
+      return (localParts[0][0] + localParts[1][0]).toUpperCase();
+    }
+    if (localParts.length === 1) {
+      return localParts[0].slice(0, 2).toUpperCase();
+    }
+  }
+
+  const parts = cleaned
+    .split(/\s+/)
+    .map(p => p.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return parts[0] ? parts[0].slice(0, 2).toUpperCase() : '--';
+}
+
+function kanbanParentText(item, itemById) {
+  const parentRaw = item?.fields?.['System.Parent'];
+  const parentId = Number(parentRaw);
+  if (!Number.isFinite(parentId) || parentId <= 0) return 'Parent: -';
+
+  const parentItem = itemById?.get(parentId);
+  const parentTitle = String(parentItem?.fields?.['System.Title'] || '').trim();
+  if (parentTitle) return `Parent: #${parentId} ${parentTitle}`;
+  return `Parent: #${parentId}`;
+}
+
+function kanbanProjectText(item) {
+  return String(workItemProject(item, '') || '').trim() || 'Okant';
+}
+
+function kanbanCardTypeIconMeta(item) {
+  const type = workItemType(item);
+  const lower = String(type || '').trim().toLowerCase();
+  if (!lower || lower.startsWith('test')) return null;
+
+  if (lower === 'bug') return { icon: '🐞', key: 'bug', label: 'Bug' };
+  if (lower === 'epic') return { icon: '👑', key: 'epic', label: 'Epic' };
+  if (lower === 'feature') return { icon: '🏆', key: 'feature', label: 'Feature' };
+  if (lower === 'issue') return { icon: '⚠', key: 'issue', label: 'Issue' };
+  if (lower === 'task') return { icon: '☑', key: 'task', label: 'Task' };
+  if (lower === 'user story') return { icon: '📖', key: 'story', label: 'User Story' };
+
+  return null;
+}
+
+function kanbanProjectColor(project) {
+  const text = String(project || '').trim();
+  if (!text) return 'hsl(210 12% 52%)';
+  const palette = [
+    '#e6194b', '#3cb44b', '#4363d8', '#f58231', '#911eb4',
+    '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990',
+    '#dcbeff', '#9a6324', '#800000', '#808000', '#000075', '#a9a9a9'
+  ];
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = ((hash * 33) + text.charCodeAt(i)) >>> 0;
+  }
+  return palette[hash % palette.length];
+}
+
+function kanbanRankValue(item) {
+  const stack = Number(item?.fields?.['Microsoft.VSTS.Common.StackRank']);
+  if (Number.isFinite(stack)) return stack;
+  const backlog = Number(item?.fields?.['Microsoft.VSTS.Common.BacklogPriority']);
+  if (Number.isFinite(backlog)) return backlog;
+  return Number.POSITIVE_INFINITY;
+}
+
+function kanbanSortByRank(a, b) {
+  const ra = kanbanRankValue(a);
+  const rb = kanbanRankValue(b);
+  if (ra !== rb) return ra - rb;
+  const ta = String(a?.fields?.['System.Title'] || '');
+  const tb = String(b?.fields?.['System.Title'] || '');
+  const byTitle = ta.localeCompare(tb, 'sv-SE', { numeric: true, sensitivity: 'base' });
+  if (byTitle !== 0) return byTitle;
+  return Number(a?.id || 0) - Number(b?.id || 0);
+}
+
+function kanbanStateOrderWeight(state) {
+  const lane = statusLaneKeyForState(state);
+  if (statusNotStartedStateKey(state)) return 1;
+  if (lane === 'started') return 2;
+  if (lane === 'testing') return 3;
+  if (lane === 'done') return 4;
+  return 2;
+}
+
+function kanbanStateSort(a, b) {
+  const wa = kanbanStateOrderWeight(a);
+  const wb = kanbanStateOrderWeight(b);
+  if (wa !== wb) return wa - wb;
+  return String(a || '').localeCompare(String(b || ''), 'sv-SE', { numeric: true, sensitivity: 'base' });
+}
+
+const KANBAN_STATE_ORDER_CANONICAL = [
+  'New',
+  'Pending',
+  'Waiting',
+  'Ready to start',
+  'In progress',
+  'Ready for test',
+  'Ready for deploy to production',
+  'In production',
+  'Completed',
+  'Closed',
+  'Archived',
+];
+
+function kanbanBuildSprintCatalog(items) {
+  const byIdentity = new Map();
+
+  const addPath = (pathValue, options = {}) => {
+    const rawPath = String(pathValue || '').trim();
+    if (!rawPath) return;
+
+    const forceNoSprint = !!options.forceNoSprint;
+    const selectablePath = forceNoSprint ? rawPath : kanbanSprintSelectablePath(rawPath);
+    if (!selectablePath) return;
+
+    const meta = sprintColumnMetaForPath(selectablePath);
+    const project = String(meta.project || selectablePath.split('\\')[0] || '').trim();
+    if (!project) return;
+    const isNoSprint = forceNoSprint || kanbanIsNoSprintPath(selectablePath);
+    const identity = kanbanSprintIdentity(selectablePath, project);
+    const score = isNoSprint ? 3 : ((meta.startDate || meta.finishDate ? 2 : 0) + (selectablePath.includes('\\') ? 1 : 0));
+
+    const existing = byIdentity.get(identity);
+    if (existing && existing.score > score) return;
+
+    byIdentity.set(identity, {
+      identity,
+      path: selectablePath,
+      project,
+      name: isNoSprint ? 'Ingen sprint' : String(meta.name || selectablePath.split('\\').pop() || selectablePath).trim(),
+      startDate: isNoSprint ? '' : (meta.startDate || ''),
+      finishDate: isNoSprint ? '' : (meta.finishDate || ''),
+      isNoSprint,
+      score,
+    });
+  };
+
+  sprintIterationsCatalog.forEach(iter => addPath(iter.path));
+  (items || []).forEach(item => {
+    const iterPath = String(item?.fields?.['System.IterationPath'] || '').trim();
+    addPath(iterPath);
+    if (kanbanIsNoSprintPath(iterPath)) addPath(iterPath, { forceNoSprint: true });
+  });
+
+  const projectMap = new Map();
+  [...byIdentity.values()].forEach(entry => {
+    if (!projectMap.has(entry.project)) projectMap.set(entry.project, []);
+    projectMap.get(entry.project).push(entry);
+  });
+
+  const projects = [...projectMap.keys()]
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }))
+    .map(project => {
+      const sprints = projectMap.get(project).sort((a, b) => {
+        if (!!a.isNoSprint !== !!b.isNoSprint) return a.isNoSprint ? -1 : 1;
+        const ad = a.startDate ? new Date(a.startDate).getTime() : Number.POSITIVE_INFINITY;
+        const bd = b.startDate ? new Date(b.startDate).getTime() : Number.POSITIVE_INFINITY;
+        if (ad !== bd) return ad - bd;
+        return a.name.localeCompare(b.name, 'sv-SE', { numeric: true, sensitivity: 'base' });
+      });
+      return { project, sprints };
+    });
+
+  const allPaths = projects.flatMap(p => p.sprints.map(s => s.path));
+  return { projects, allPaths };
+}
+
+function kanbanSprintDateText(entry) {
+  const from = sprintFormatDate(entry.startDate);
+  const to = sprintFormatDate(entry.finishDate);
+  if (!from && !to) return '';
+  return `${from || '–'} - ${to || '–'}`;
+}
+
+function kanbanSelectedSprintIdentitySet() {
+  return new Set([...kanbanSelectedSprintPaths].map(path => kanbanSprintIdentity(path)).filter(Boolean));
+}
+
+function kanbanSelectedSprintLabel() {
+  const count = kanbanSelectedSprintPaths.size;
+  return count === 1 ? '1 sprint vald' : `${count} sprintar valda`;
+}
+
+function kanbanSetAllSprints(selected) {
+  const items = allItems.filter(kanbanEligibleItemType);
+  const catalog = kanbanBuildSprintCatalog(items);
+  if (selected) {
+    kanbanSelectedSprintPaths = new Set(catalog.allPaths);
+  } else {
+    kanbanSelectedSprintPaths = new Set();
+  }
+  kanbanSprintSelectionInitialized = true;
+  renderKanbanTab();
+}
+
+function kanbanToggleProjectSprints(project, selected) {
+  const items = allItems.filter(kanbanEligibleItemType);
+  const catalog = kanbanBuildSprintCatalog(items);
+  const row = catalog.projects.find(p => p.project === project);
+  if (!row) return;
+  if (selected) row.sprints.forEach(s => kanbanSelectedSprintPaths.add(s.path));
+  else row.sprints.forEach(s => kanbanSelectedSprintPaths.delete(s.path));
+  kanbanSprintSelectionInitialized = true;
+  renderKanbanTab();
+}
+
+function kanbanToggleSprintPath(path, selected) {
+  const key = String(path || '').trim();
+  if (!key) return;
+  if (selected) kanbanSelectedSprintPaths.add(key);
+  else kanbanSelectedSprintPaths.delete(key);
+  kanbanSprintSelectionInitialized = true;
+  renderKanbanTab();
+}
+
+function kanbanSetAssigneeFilter(value) {
+  kanbanAssigneeFilter = String(value || '');
+  renderKanbanTab();
+}
+
+function kanbanSetTypeFilter(typeKey, checked) {
+  const key = String(typeKey || '').trim();
+  if (!['epic', 'feature', 'storyBug'].includes(key)) return;
+  kanbanTypeFilter = {
+    ...kanbanTypeFilter,
+    [key]: !!checked,
+  };
+  renderKanbanTab();
+}
+
+function kanbanMatchesTypeFilter(item) {
+  const type = workItemType(item);
+  if (type === WI_TYPE_EPIC) return !!kanbanTypeFilter.epic;
+  if (type === WI_TYPE_FEATURE) return !!kanbanTypeFilter.feature;
+  if (type === WI_TYPE_STORY || type === WI_TYPE_BUG) return !!kanbanTypeFilter.storyBug;
+  return false;
+}
+
+function kanbanSyncSelectedCardClasses() {
+  document.querySelectorAll('.kanban-card[data-item-id]').forEach(card => {
+    const id = Number(card.getAttribute('data-item-id') || 0);
+    card.classList.toggle('selected', kanbanSelectedCardIds.has(id));
+  });
+}
+
+function kanbanRefreshFixedScrollbar() {
+  const columnsEl = document.querySelector('.kanban-columns');
+  const proxyEl = document.getElementById('kanbanFixedScrollbar');
+  const innerEl = document.getElementById('kanbanFixedScrollbarInner');
+  if (!columnsEl || !proxyEl || !innerEl) return;
+
+  const hasOverflow = columnsEl.scrollWidth > columnsEl.clientWidth + 1;
+  if (!hasOverflow) {
+    proxyEl.style.display = 'none';
+    return;
+  }
+
+  const rect = columnsEl.getBoundingClientRect();
+  proxyEl.style.display = 'block';
+  proxyEl.style.left = `${Math.round(rect.left)}px`;
+  proxyEl.style.width = `${Math.round(rect.width)}px`;
+  innerEl.style.width = `${Math.ceil(columnsEl.scrollWidth)}px`;
+
+  if (Math.abs(proxyEl.scrollLeft - columnsEl.scrollLeft) > 1) {
+    kanbanFixedScrollbarSyncing = true;
+    proxyEl.scrollLeft = columnsEl.scrollLeft;
+    kanbanFixedScrollbarSyncing = false;
+  }
+}
+
+function kanbanSetupFixedScrollbar() {
+  const columnsEl = document.querySelector('.kanban-columns');
+  const proxyEl = document.getElementById('kanbanFixedScrollbar');
+  const innerEl = document.getElementById('kanbanFixedScrollbarInner');
+  if (!columnsEl || !proxyEl || !innerEl) return;
+
+  if (!columnsEl.dataset.fixedScrollBound) {
+    columnsEl.addEventListener('scroll', () => {
+      if (kanbanFixedScrollbarSyncing) return;
+      const bar = document.getElementById('kanbanFixedScrollbar');
+      if (!bar) return;
+      kanbanFixedScrollbarSyncing = true;
+      bar.scrollLeft = columnsEl.scrollLeft;
+      kanbanFixedScrollbarSyncing = false;
+    }, { passive: true });
+    columnsEl.dataset.fixedScrollBound = '1';
+  }
+
+  if (!proxyEl.dataset.fixedScrollBound) {
+    proxyEl.addEventListener('scroll', () => {
+      if (kanbanFixedScrollbarSyncing) return;
+      const cols = document.querySelector('.kanban-columns');
+      if (!cols) return;
+      kanbanFixedScrollbarSyncing = true;
+      cols.scrollLeft = proxyEl.scrollLeft;
+      kanbanFixedScrollbarSyncing = false;
+    }, { passive: true });
+    proxyEl.dataset.fixedScrollBound = '1';
+  }
+
+  if (typeof ResizeObserver !== 'undefined') {
+    if (kanbanFixedScrollbarResizeObserver) kanbanFixedScrollbarResizeObserver.disconnect();
+    kanbanFixedScrollbarResizeObserver = new ResizeObserver(() => kanbanRefreshFixedScrollbar());
+    kanbanFixedScrollbarResizeObserver.observe(columnsEl);
+  }
+
+  kanbanRefreshFixedScrollbar();
+  requestAnimationFrame(kanbanRefreshFixedScrollbar);
+}
+
+if (!window.__kanbanFixedScrollbarResizeBound) {
+  window.addEventListener('resize', () => {
+    if (activeTab !== 'kanban') return;
+    kanbanRefreshFixedScrollbar();
+  });
+  window.__kanbanFixedScrollbarResizeBound = true;
+}
+
+function kanbanSetSelectionAnchorFromSelection() {
+  if (kanbanSelectedCardIds.size) {
+    kanbanSelectionAnchorId = [...kanbanSelectedCardIds].slice(-1)[0] || null;
+  } else {
+    kanbanSelectionAnchorId = null;
+  }
+}
+
+function kanbanRangeSelectBetween(anchorId, targetId) {
+  const anchor = Number(anchorId);
+  const target = Number(targetId);
+  if (!Number.isFinite(anchor) || !Number.isFinite(target) || !anchor || !target) return null;
+
+  const orderedIds = [...document.querySelectorAll('.kanban-card[data-item-id]')]
+    .map(card => Number(card.getAttribute('data-item-id') || 0))
+    .filter(Boolean);
+
+  const from = orderedIds.indexOf(anchor);
+  const to = orderedIds.indexOf(target);
+  if (from < 0 || to < 0) return null;
+
+  const [start, end] = from <= to ? [from, to] : [to, from];
+  return new Set(orderedIds.slice(start, end + 1));
+}
+
+function kanbanVisibleSelectedCardIds() {
+  return [...document.querySelectorAll('.kanban-card[data-item-id]')]
+    .map(card => Number(card.getAttribute('data-item-id') || 0))
+    .filter(id => id && kanbanSelectedCardIds.has(id));
+}
+
+function kanbanDistributeGroupRanks(prevRank, nextRank, count) {
+  const total = Number(count || 0);
+  if (!Number.isFinite(total) || total <= 0) return [];
+
+  if (Number.isFinite(prevRank) && Number.isFinite(nextRank) && nextRank > prevRank) {
+    const step = (nextRank - prevRank) / (total + 1);
+    return Array.from({ length: total }, (_, index) => prevRank + (step * (index + 1)));
+  }
+
+  if (Number.isFinite(prevRank)) {
+    return Array.from({ length: total }, (_, index) => prevRank + ((index + 1) * 1000));
+  }
+
+  if (Number.isFinite(nextRank)) {
+    return Array.from({ length: total }, (_, index) => nextRank - ((total - index) * 1000));
+  }
+
+  return Array.from({ length: total }, (_, index) => (index + 1) * 1000);
+}
+
+function kanbanUpdateSelectionRectVisual() {
+  const el = document.getElementById('kanbanSelection');
+  const rt = kanbanSelecting;
+  if (!el || !rt) {
+    if (el) el.style.display = 'none';
+    return;
+  }
+  const pane = document.getElementById('kanbanRightPane');
+  if (!pane) return;
+  const rect = pane.getBoundingClientRect();
+  const x = Math.min(rt.x1, rt.x2) - rect.left;
+  const y = Math.min(rt.y1, rt.y2) - rect.top;
+  const w = Math.abs(rt.x2 - rt.x1);
+  const h = Math.abs(rt.y2 - rt.y1);
+  el.style.display = 'block';
+  el.innerHTML = `<div class="kanban-selection-rect" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;"></div>`;
+}
+
+function kanbanMarqueePick() {
+  if (!kanbanSelecting) return;
+  const left = Math.min(kanbanSelecting.x1, kanbanSelecting.x2);
+  const top = Math.min(kanbanSelecting.y1, kanbanSelecting.y2);
+  const right = Math.max(kanbanSelecting.x1, kanbanSelecting.x2);
+  const bottom = Math.max(kanbanSelecting.y1, kanbanSelecting.y2);
+  const selected = new Set();
+
+  document.querySelectorAll('.kanban-card[data-item-id]').forEach(card => {
+    const rect = card.getBoundingClientRect();
+    const hit = rect.left < right && rect.right > left && rect.top < bottom && rect.bottom > top;
+    if (hit) selected.add(Number(card.getAttribute('data-item-id') || 0));
+  });
+
+  const next = kanbanSelecting.additive ? new Set(kanbanSelectionBaseIds || []) : new Set();
+  selected.forEach(id => next.add(id));
+  kanbanSelectedCardIds = next;
+  kanbanSetSelectionAnchorFromSelection();
+  kanbanSyncSelectedCardClasses();
+}
+
+function kanbanToggleCardSelection(itemId, additive) {
+  const id = Number(itemId);
+  if (!id) return;
+  if (!additive) {
+    kanbanSelectedCardIds = new Set([id]);
+  } else {
+    const next = new Set(kanbanSelectedCardIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    kanbanSelectedCardIds = next;
+  }
+  kanbanSelectionAnchorId = id;
+  kanbanSyncSelectedCardClasses();
+}
+
+function kanbanCardClick(event, itemId) {
+  const additive = !!(event?.metaKey || event?.ctrlKey);
+  const range = !!event?.shiftKey;
+  if (range) {
+    event.preventDefault();
+    event.stopPropagation();
+    const anchorId = kanbanSelectionAnchorId || [...kanbanSelectedCardIds].slice(-1)[0] || Number(itemId);
+    const rangeSet = kanbanRangeSelectBetween(anchorId, itemId);
+    if (rangeSet && rangeSet.size) {
+      kanbanSelectedCardIds = rangeSet;
+    } else {
+      kanbanSelectedCardIds = new Set([Number(itemId)]);
+    }
+    kanbanSelectionAnchorId = Number(itemId);
+    kanbanSyncSelectedCardClasses();
+    return;
+  }
+  if (additive) {
+    event.preventDefault();
+    event.stopPropagation();
+    kanbanToggleCardSelection(itemId, true);
+    return;
+  }
+  kanbanSelectedCardIds = new Set();
+  kanbanSelectionAnchorId = Number(itemId);
+  kanbanSyncSelectedCardClasses();
+  openWorkItemModal(itemId);
+}
+
+function kanbanColumnsPointerDown(event) {
+  if (event.button !== 0) return;
+  const target = event.target;
+  if (!target || typeof target.closest !== 'function') return;
+  if (target.closest('.kanban-card') || target.closest('button, input, select, label, a')) return;
+
+  const additive = !!(event.metaKey || event.ctrlKey);
+  kanbanSelectionBaseIds = additive ? new Set(kanbanSelectedCardIds) : new Set();
+  if (!additive) kanbanSelectedCardIds = new Set();
+  if (!additive) kanbanSelectionAnchorId = null;
+  kanbanSelecting = { x1: event.clientX, y1: event.clientY, x2: event.clientX, y2: event.clientY, additive };
+  kanbanUpdateSelectionRectVisual();
+  kanbanSyncSelectedCardClasses();
+  if (event.currentTarget && typeof event.currentTarget.setPointerCapture === 'function') {
+    try { event.currentTarget.setPointerCapture(event.pointerId); } catch (_) {}
+  }
+  event.preventDefault();
+}
+
+function kanbanCancelSelection() {
+  kanbanSelecting = null;
+  const el = document.getElementById('kanbanSelection');
+  if (el) el.style.display = 'none';
+}
+
+if (!window.__kanbanPointerMoveBound) {
+  window.addEventListener('pointermove', (e) => {
+    if (!kanbanSelecting) return;
+    const leftPressed = (e.buttons & 1) === 1;
+    if (!leftPressed) {
+      kanbanCancelSelection();
+      return;
+    }
+    kanbanSelecting.x2 = e.clientX;
+    kanbanSelecting.y2 = e.clientY;
+    kanbanUpdateSelectionRectVisual();
+    kanbanMarqueePick();
+  });
+  window.addEventListener('pointerup', () => {
+    if (!kanbanSelecting) return;
+    kanbanMarqueePick();
+    kanbanCancelSelection();
+  });
+  window.__kanbanPointerMoveBound = true;
+}
+
+function kanbanToggleHideCompletedSprints(checked) {
+  kanbanHideCompletedSprints = !!checked;
+  renderKanbanTab();
+}
+
+function kanbanToggleShowEmptyColumns(checked) {
+  kanbanShowEmptyColumns = !!checked;
+  renderKanbanTab();
+}
+
+function kanbanToggleLeftCollapsed() {
+  kanbanLeftCollapsed = !kanbanLeftCollapsed;
+  try {
+    localStorage.setItem(LS_KANBAN_LEFT_COLLAPSED, kanbanLeftCollapsed ? '1' : '0');
+  } catch (_) {}
+  renderKanbanTab();
+}
+
+function kanbanSaveStateOrder() {
+  try {
+    localStorage.setItem(LS_KANBAN_STATE_ORDER, JSON.stringify(kanbanStateOrder));
+  } catch (_) {}
+}
+
+function kanbanNormalizeStateOrder(states) {
+  const incoming = [...new Set((states || []).map(v => String(v || '').trim()).filter(Boolean))];
+  if (!incoming.length) return [];
+
+  const incomingByLower = new Map();
+  incoming.forEach(s => {
+    const key = s.toLowerCase();
+    if (!incomingByLower.has(key)) incomingByLower.set(key, s);
+  });
+
+  const canonical = KANBAN_STATE_ORDER_CANONICAL
+    .map(s => incomingByLower.get(String(s).toLowerCase()))
+    .filter(Boolean);
+
+  const canonicalLower = new Set(canonical.map(s => String(s).toLowerCase()));
+  const appended = incoming
+    .filter(s => !canonicalLower.has(String(s).toLowerCase()))
+    .sort((a, b) => String(a).localeCompare(String(b), 'sv-SE', { numeric: true, sensitivity: 'base' }));
+
+  kanbanStateOrder = [...canonical, ...appended];
+  kanbanSaveStateOrder();
+  return kanbanStateOrder.slice();
+}
+
+function kanbanMoveStateColumn(state, direction) {
+  const key = String(state || '').trim();
+  if (!key || !Number.isFinite(Number(direction))) return;
+
+  const idx = kanbanStateOrder.indexOf(key);
+  if (idx < 0) return;
+  const delta = Number(direction) < 0 ? -1 : 1;
+  const nextIdx = idx + delta;
+  if (nextIdx < 0 || nextIdx >= kanbanStateOrder.length) return;
+
+  const copy = kanbanStateOrder.slice();
+  [copy[idx], copy[nextIdx]] = [copy[nextIdx], copy[idx]];
+  kanbanStateOrder = copy;
+  kanbanSaveStateOrder();
+  renderKanbanTab();
+}
+
+function kanbanBindSprintPicker(wrap) {
+  wrap.querySelectorAll('.kanban-project-select-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const project = String(btn.getAttribute('data-project') || '').trim();
+      const selected = btn.getAttribute('data-selected') === '1';
+      kanbanToggleProjectSprints(project, selected);
+    });
+  });
+
+  wrap.querySelectorAll('.kanban-sprint-row[data-kanban-sprint="1"]').forEach(row => {
+    row.addEventListener('click', () => {
+      const path = String(row.getAttribute('data-path') || '').trim();
+      const selected = row.getAttribute('data-selected') === '1';
+      kanbanToggleSprintPath(path, selected);
+    });
+  });
+}
+
+function kanbanOpenCard(event, itemId) {
+  if (event && (event.defaultPrevented || kanbanDragItemId != null)) return;
+  kanbanCardClick(event, itemId);
+}
+
+function kanbanClearDropIndicators() {
+  document.querySelectorAll('.kanban-col-body.drop-target').forEach(el => el.classList.remove('drop-target'));
+  document.querySelectorAll('.kanban-card.drop-before').forEach(el => el.classList.remove('drop-before'));
+  kanbanDropBeforeItemId = null;
+  kanbanDropTargetState = '';
+}
+
+function kanbanDragStart(event, itemId) {
+  if (event?.metaKey || event?.ctrlKey) {
+    event.preventDefault();
+    return;
+  }
+  kanbanDragItemId = Number(itemId);
+  kanbanDropBeforeItemId = null;
+  kanbanDropTargetState = '';
+  if (event?.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', String(itemId));
+  }
+  const card = event?.currentTarget;
+  if (card) card.classList.add('dragging');
+}
+
+function kanbanDragEnd(event) {
+  const card = event?.currentTarget;
+  if (card) card.classList.remove('dragging');
+  kanbanDragItemId = null;
+  kanbanClearDropIndicators();
+}
+
+function kanbanDragOverColumn(event, state) {
+  if (kanbanDragItemId == null) return;
+  event.preventDefault();
+  event.stopPropagation();
+  kanbanClearDropIndicators();
+  kanbanDropBeforeItemId = null;
+  kanbanDropTargetState = String(state || '').trim();
+  if (event.currentTarget) event.currentTarget.classList.add('drop-target');
+}
+
+function kanbanDragOverCard(event, state, beforeItemId) {
+  if (kanbanDragItemId == null) return;
+  event.preventDefault();
+  event.stopPropagation();
+  kanbanClearDropIndicators();
+  kanbanDropTargetState = String(state || '').trim();
+  kanbanDropBeforeItemId = Number(beforeItemId);
+  if (event.currentTarget) event.currentTarget.classList.add('drop-before');
+  const body = event.currentTarget?.closest('.kanban-col-body');
+  if (body) body.classList.add('drop-target');
+}
+
+async function kanbanApplyDrop(targetState, beforeItemId = null) {
+  const dragId = Number(kanbanDragItemId || 0);
+  if (!dragId) return;
+  const item = allItems.find(i => Number(i.id) === dragId);
+  if (!item) return;
+
+  const stateValue = String(targetState || '').trim();
+  if (!stateValue) return;
+  const currentState = workItemState(item);
+
+  const movingIds = kanbanSelectedCardIds.has(dragId) && kanbanSelectedCardIds.size > 1
+    ? new Set(kanbanVisibleSelectedCardIds())
+    : new Set([dragId]);
+  if (beforeItemId != null && movingIds.has(Number(beforeItemId))) return;
+
+  const selectedSprintIds = kanbanSelectedSprintIdentitySet();
+  const targetItems = allItems
+    .filter(kanbanEligibleItemType)
+    .filter(i => {
+      if (movingIds.has(Number(i.id))) return false;
+      const p = String(i?.fields?.['System.IterationPath'] || '').trim();
+      if (!p) return false;
+      const sameSprintScope = selectedSprintIds.has(sprintPathIdentity(p));
+      if (!sameSprintScope) return false;
+      return workItemState(i) === stateValue;
+    })
+    .sort(kanbanSortByRank);
+
+  let insertIndex = targetItems.length;
+  if (beforeItemId != null) {
+    const idx = targetItems.findIndex(i => Number(i.id) === Number(beforeItemId));
+    if (idx >= 0) insertIndex = idx;
+  }
+
+  const prev = insertIndex > 0 ? targetItems[insertIndex - 1] : null;
+  const next = insertIndex < targetItems.length ? targetItems[insertIndex] : null;
+  const prevRank = prev ? kanbanRankValue(prev) : null;
+  const nextRank = next ? kanbanRankValue(next) : null;
+  const movingOrder = [...document.querySelectorAll('.kanban-card[data-item-id]')]
+    .map(card => Number(card.getAttribute('data-item-id') || 0))
+    .filter(id => movingIds.has(id));
+  const movingItems = movingOrder.map(id => allItems.find(i => Number(i.id) === id)).filter(Boolean);
+  const ranks = kanbanDistributeGroupRanks(
+    Number.isFinite(prevRank) ? prevRank : null,
+    Number.isFinite(nextRank) ? nextRank : null,
+    movingItems.length
+  );
+
+  const ops = [];
+
+  for (let index = 0; index < movingItems.length; index++) {
+    const movingItem = movingItems[index];
+    const movingOps = [];
+    if (workItemState(movingItem) !== stateValue) {
+      movingOps.push({ op: 'add', path: '/fields/System.State', value: stateValue });
+    }
+    const rankValue = ranks[index];
+    if (Number.isFinite(rankValue)) {
+      movingOps.push({ op: 'add', path: '/fields/Microsoft.VSTS.Common.StackRank', value: rankValue });
+    }
+    if (!movingOps.length) continue;
+
+    const res = await witPatch(movingItem.id, movingOps);
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`HTTP ${res.status}: ${errText}`);
+    }
+
+    if (workItemState(movingItem) !== stateValue) movingItem.fields['System.State'] = stateValue;
+    if (Number.isFinite(rankValue)) movingItem.fields['Microsoft.VSTS.Common.StackRank'] = rankValue;
+  }
+}
+
+async function kanbanDropOnColumn(event, state) {
+  if (kanbanDragItemId == null) return;
+  event.preventDefault();
+  event.stopPropagation();
+  try {
+    await kanbanApplyDrop(state, null);
+    renderKanbanTab();
+  } catch (e) {
+    showToast(`Kunde inte flytta ticket: ${formatApiError(e)}`);
+  } finally {
+    kanbanDragItemId = null;
+    kanbanClearDropIndicators();
+  }
+}
+
+async function kanbanDropOnCard(event, state, beforeItemId) {
+  if (kanbanDragItemId == null) return;
+  event.preventDefault();
+  event.stopPropagation();
+  try {
+    await kanbanApplyDrop(state, Number(beforeItemId));
+    renderKanbanTab();
+  } catch (e) {
+    showToast(`Kunde inte flytta ticket: ${formatApiError(e)}`);
+  } finally {
+    kanbanDragItemId = null;
+    kanbanClearDropIndicators();
+  }
+}
+
+function renderKanbanTab() {
+  const wrap = document.getElementById('tableWrap');
+  if (!wrap) return;
+
+  const baseItems = allItems.filter(kanbanEligibleItemType);
+  const panelScopedItems = kanbanAssigneeFilter
+    ? baseItems.filter(item => kanbanMatchesTypeFilter(item) && kanbanAssigneeText(item) === kanbanAssigneeFilter)
+    : baseItems.filter(kanbanMatchesTypeFilter);
+  const sprintCatalog = kanbanBuildSprintCatalog(baseItems);
+
+  const sprintItemsByIdentity = new Map();
+  baseItems.forEach(item => {
+    const iterPath = String(item?.fields?.['System.IterationPath'] || '').trim();
+    const selectablePath = kanbanSprintSelectablePath(iterPath);
+    if (!selectablePath) return;
+    const identity = kanbanSprintIdentity(selectablePath, workItemProject(item, ''));
+    if (!sprintItemsByIdentity.has(identity)) sprintItemsByIdentity.set(identity, []);
+    sprintItemsByIdentity.get(identity).push(item);
+  });
+
+  const hideCompletedStates = new Set(['completed', 'closed', 'archived']);
+
+  const visibleSprintItemsByIdentity = new Map();
+  panelScopedItems.forEach(item => {
+    const iterPath = String(item?.fields?.['System.IterationPath'] || '').trim();
+    const selectablePath = kanbanSprintSelectablePath(iterPath);
+    if (!selectablePath) return;
+    const identity = kanbanSprintIdentity(selectablePath, workItemProject(item, ''));
+    if (!visibleSprintItemsByIdentity.has(identity)) visibleSprintItemsByIdentity.set(identity, []);
+    visibleSprintItemsByIdentity.get(identity).push(item);
+  });
+
+  const isCompletedOnlySprint = path => {
+    const identity = kanbanSprintIdentity(path);
+    const items = sprintItemsByIdentity.get(identity) || [];
+    if (!items.length) return false;
+    return items.every(item => hideCompletedStates.has(String(workItemState(item) || '').trim().toLowerCase()));
+  };
+
+  const isEmptySprint = path => {
+    const identity = kanbanSprintIdentity(path);
+    const items = sprintItemsByIdentity.get(identity) || [];
+    return items.length === 0;
+  };
+
+  const visibleProjects = sprintCatalog.projects
+    .map(projectRow => ({
+      ...projectRow,
+      sprints: (projectRow.sprints || []).filter(s => {
+        const identity = kanbanSprintIdentity(s.path, projectRow.project);
+        const visibleSprintItems = visibleSprintItemsByIdentity.get(identity) || [];
+        if (!visibleSprintItems.length) return false;
+        if (kanbanHideCompletedSprints && visibleSprintItems.every(item => hideCompletedStates.has(String(workItemState(item) || '').trim().toLowerCase()))) return false;
+        return true;
+      })
+    }))
+    .filter(projectRow => projectRow.sprints.length > 0);
+
+  const selectablePaths = visibleProjects.flatMap(projectRow => projectRow.sprints.map(s => s.path));
+  const validPaths = new Set(selectablePaths);
+
+  if (!kanbanSprintSelectionInitialized) {
+    kanbanSelectedSprintPaths = new Set(selectablePaths);
+    kanbanSprintSelectionInitialized = true;
+  }
+
+  kanbanSelectedSprintPaths = new Set([...kanbanSelectedSprintPaths].filter(path => validPaths.has(path)));
+
+  const selectedSprintIdentities = kanbanSelectedSprintIdentitySet();
+  const sprintScopedItems = baseItems
+    .filter(item => {
+      const iterPath = String(item?.fields?.['System.IterationPath'] || '').trim();
+      const selectablePath = kanbanSprintSelectablePath(iterPath);
+      if (!selectablePath) return false;
+      const identity = kanbanSprintIdentity(selectablePath, workItemProject(item, ''));
+      return selectedSprintIdentities.has(identity);
+    });
+
+  const typeScopedItems = sprintScopedItems.filter(kanbanMatchesTypeFilter);
+
+  const assignees = [...new Set(typeScopedItems.map(kanbanAssigneeText))]
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }));
+
+  if (kanbanAssigneeFilter && !assignees.includes(kanbanAssigneeFilter)) {
+    kanbanAssigneeFilter = '';
+  }
+
+  const visibleItems = kanbanAssigneeFilter
+    ? typeScopedItems.filter(item => kanbanAssigneeText(item) === kanbanAssigneeFilter)
+    : typeScopedItems;
+  const visibleItemIds = new Set(visibleItems.map(item => Number(item?.id || 0)));
+  kanbanSelectedCardIds = new Set([...kanbanSelectedCardIds].filter(id => visibleItemIds.has(id)));
+  if (kanbanSelectionAnchorId != null && !visibleItemIds.has(Number(kanbanSelectionAnchorId))) {
+    kanbanSelectionAnchorId = [...kanbanSelectedCardIds].slice(-1)[0] || null;
+  }
+
+  const stateUniverse = [...new Set(visibleItems.map(item => String(workItemState(item) || '').trim()).filter(Boolean))]
+    .sort(kanbanStateSort);
+
+  const states = kanbanShowEmptyColumns
+    ? KANBAN_STATE_ORDER_CANONICAL.slice()
+    : kanbanNormalizeStateOrder(stateUniverse.length ? stateUniverse : ['New', 'Active', 'Done']);
+  const itemById = new Map(allItems.map(i => [Number(i?.id || 0), i]));
+
+  const leftPanelHtml = visibleProjects.length
+    ? visibleProjects.map(projectRow => {
+      const selectedCount = projectRow.sprints.filter(s => kanbanSelectedSprintPaths.has(s.path)).length;
+      const projectColor = kanbanProjectColor(projectRow.project);
+      return `<div class="kanban-project-block" style="--kanban-project-color:${projectColor};">
+        <div class="kanban-project-title">
+          <span class="kanban-project-name" title="${escHtml(projectRow.project)}">${escHtml(projectRow.project)}</span>
+          <span class="kanban-project-actions">
+            <span style="color:var(--muted);font-size:0.66rem;">${selectedCount}/${projectRow.sprints.length}</span>
+            <button class="btn btn-outline kanban-project-select-btn" data-project="${escHtml(projectRow.project)}" data-selected="1" style="width:auto;padding:2px 6px;font-size:0.66rem;line-height:1;">alla</button>
+            <button class="btn btn-outline kanban-project-select-btn" data-project="${escHtml(projectRow.project)}" data-selected="0" style="width:auto;padding:2px 6px;font-size:0.66rem;line-height:1;">ingen</button>
+          </span>
+        </div>
+        <div class="kanban-sprint-list">
+          ${projectRow.sprints.map(s => {
+            const checked = kanbanSelectedSprintPaths.has(s.path);
+            const sprintLabel = s.name || s.path;
+            const dateText = kanbanSprintDateText(s);
+            return `<label class="kanban-sprint-row" data-kanban-sprint="1" data-path="${escHtml(s.path)}" data-selected="${checked ? '0' : '1'}">
+              <input type="checkbox" ${checked ? 'checked' : ''} tabindex="-1" />
+              <span class="kanban-sprint-label" title="${escHtml(s.path)}">${escHtml(sprintLabel)}${dateText ? `<span class="kanban-sprint-label-meta">${escHtml(dateText)}</span>` : ''}</span>
+            </label>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('')
+    : `<div class="kanban-empty">Inga sprintar att visa i vald scope.</div>`;
+
+  const columnsHtml = states.map((state, index) => {
+    const stateItems = visibleItems
+      .filter(item => workItemState(item) === state)
+      .sort(kanbanSortByRank);
+    const stateEsc = String(state).replace(/'/g, "\\'");
+    const editControls = globalEditMode
+      ? `<span class="kanban-col-edit-controls">
+          <button class="kanban-col-move-btn" onclick="kanbanMoveStateColumn('${stateEsc}', -1)" title="Flytta kolumn åt vänster" ${index === 0 ? 'disabled' : ''}>←</button>
+          <button class="kanban-col-move-btn" onclick="kanbanMoveStateColumn('${stateEsc}', 1)" title="Flytta kolumn åt höger" ${index === (states.length - 1) ? 'disabled' : ''}>→</button>
+        </span>`
+      : '';
+
+    return `<section class="kanban-col">
+      <div class="kanban-col-head">
+        <span class="kanban-col-head-main" title="${escHtml(state)}">${escHtml(state)}</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
+          <span class="kanban-col-count">${stateItems.length}</span>
+          ${editControls}
+        </span>
+      </div>
+      <div class="kanban-col-body"
+        ondragover="kanbanDragOverColumn(event, '${stateEsc}')"
+        ondrop="kanbanDropOnColumn(event, '${stateEsc}')">
+        ${stateItems.length ? stateItems.map(item => {
+          const title = String(item?.fields?.['System.Title'] || '').trim() || `#${item.id}`;
+          const assigneeFull = kanbanAssigneeText(item);
+          const assignee = kanbanAssigneeInitials(assigneeFull);
+          const typeIconMeta = kanbanCardTypeIconMeta(item);
+          const typeIconHtml = typeIconMeta
+            ? `<span class="kanban-card-type-icon kanban-card-type-icon-${typeIconMeta.key}" title="${escHtml(typeIconMeta.label)}">${typeIconMeta.icon}</span>`
+            : '';
+          const parentText = kanbanParentText(item, itemById);
+          const project = kanbanProjectText(item);
+          const projectColor = kanbanProjectColor(project);
+          const selectedClass = kanbanSelectedCardIds.has(Number(item.id)) ? ' selected' : '';
+          return `<article class="kanban-card${selectedClass}"
+            data-item-id="${item.id}"
+            style="--kanban-project-color:${projectColor};"
+            draggable="true"
+            onclick="kanbanOpenCard(event, ${item.id})"
+            ondragstart="kanbanDragStart(event, ${item.id})"
+            ondragend="kanbanDragEnd(event)"
+            ondragover="kanbanDragOverCard(event, '${stateEsc}', ${item.id})"
+            ondrop="kanbanDropOnCard(event, '${stateEsc}', ${item.id})"
+            title="Klicka for detaljer. Dra for att flytta.">
+            <div class="kanban-card-main">
+              <div class="kanban-card-id">#${item.id}</div>
+              ${typeIconHtml}
+              <div class="kanban-card-title">${escHtml(title)}</div>
+            </div>
+            <div class="kanban-card-assignee" title="${escHtml(assigneeFull)}">${escHtml(assignee)}</div>
+            <div class="kanban-card-parent" title="${escHtml(parentText)}">${escHtml(parentText)}</div>
+          </article>`;
+        }).join('') : '<div class="kanban-empty">Inga tickets</div>'}
+        <div class="kanban-col-drop-zone"
+          ondragover="kanbanDragOverColumn(event, '${stateEsc}')"
+          ondrop="kanbanDropOnColumn(event, '${stateEsc}')"
+          title="Släpp här för att lägga kortet sist i kolumnen"></div>
+      </div>
+    </section>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="kanban-layout${kanbanLeftCollapsed ? ' kanban-left-collapsed' : ''}">
+      <aside class="kanban-left">
+        <div class="kanban-left-head">
+          <button class="kanban-collapse-btn" onclick="kanbanToggleLeftCollapsed()" title="${kanbanLeftCollapsed ? 'Expandera vänsterpanel' : 'Kollapsa vänsterpanel'}" aria-label="${kanbanLeftCollapsed ? 'Expandera vänsterpanel' : 'Kollapsa vänsterpanel'}">${kanbanLeftCollapsed ? '→' : '←'}</button>
+          <span class="kanban-left-head-text">Sprintfilter</span>
+          <span class="kanban-left-head-actions" style="display:flex;align-items:center;gap:6px;">
+            <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanSetAllSprints(true)">Alla</button>
+            <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanSetAllSprints(false)">Ingen</button>
+          </span>
+        </div>
+        <div class="kanban-left-options">
+          <label>
+            <input type="checkbox" ${!kanbanHideCompletedSprints ? 'checked' : ''} onchange="kanbanToggleHideCompletedSprints(!this.checked)">
+            Visa completed
+          </label>
+        </div>
+        <div class="kanban-left-body">${leftPanelHtml}</div>
+      </aside>
+      <section class="kanban-right" id="kanbanRightPane">
+        <div class="kanban-right-head">
+          <span style="display:inline-flex;align-items:center;gap:8px;">
+            <button class="kanban-expand-btn" onclick="kanbanToggleLeftCollapsed()" title="Expandera vänsterpanel" aria-label="Expandera vänsterpanel">←</button>
+            <span>Tickets per state</span>
+          </span>
+          <span style="font-size:0.68rem;color:var(--muted);">${kanbanSelectedSprintLabel()}</span>
+        </div>
+        <div class="kanban-filter-bar">
+          <span class="kanban-filter-label">Assignee</span>
+          <select class="col-filter kanban-assignee-filter" onchange="kanbanSetAssigneeFilter(this.value)">
+            <option value="" ${!kanbanAssigneeFilter ? 'selected' : ''}>Alla</option>
+            ${assignees.map(name => `<option value="${escHtml(name)}" ${kanbanAssigneeFilter===name?'selected':''}>${escHtml(name)}</option>`).join('')}
+          </select>
+          <label style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:0.72rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;user-select:none;cursor:pointer;">
+            <input type="checkbox" ${kanbanShowEmptyColumns ? 'checked' : ''} onchange="kanbanToggleShowEmptyColumns(this.checked)" style="margin:0;accent-color:var(--accent2);" />
+            Visa tomma kolumner
+          </label>
+          <span class="kanban-type-filters">
+            <label><input type="checkbox" ${kanbanTypeFilter.epic ? 'checked' : ''} onchange="kanbanSetTypeFilter('epic', this.checked)">Epic</label>
+            <label><input type="checkbox" ${kanbanTypeFilter.feature ? 'checked' : ''} onchange="kanbanSetTypeFilter('feature', this.checked)">Feature</label>
+            <label><input type="checkbox" ${kanbanTypeFilter.storyBug ? 'checked' : ''} onchange="kanbanSetTypeFilter('storyBug', this.checked)">Story/Bug</label>
+          </span>
+        </div>
+        <div class="kanban-columns" onpointerdown="kanbanColumnsPointerDown(event)">${columnsHtml}</div>
+        <div id="kanbanSelection" class="kanban-selection" style="display:none;"></div>
+        <div id="kanbanFixedScrollbar" class="kanban-fixed-scrollbar" style="display:none;">
+          <div id="kanbanFixedScrollbarInner" class="kanban-fixed-scrollbar-inner"></div>
+        </div>
+      </section>
+    </div>`;
+
+  kanbanBindSprintPicker(wrap);
+  kanbanSetupFixedScrollbar();
+  kanbanSyncSelectedCardClasses();
+  if (kanbanSelectionAnchorId != null) {
+    kanbanSelectionAnchorId = Number(kanbanSelectionAnchorId) || null;
+  }
+}
+
 async function renderBoardTab() {
   const scopeKey = boardSelectedProjectScopeKey();
   const scopeChanged = boardTicketsScopeKey !== scopeKey;
@@ -21596,11 +23323,23 @@ async function statusSetDoneLaneRemainingZero(ev) {
   const fieldPath = 'Microsoft.VSTS.Scheduling.RemainingWork';
   let okCount = 0;
   let failCount = 0;
+  let skippedCount = 0;
 
   for (const id of ids) {
     const item = allItems.find(i => Number(i?.id || 0) === id);
     if (!item) {
       failCount += 1;
+      continue;
+    }
+    const rawRemaining = item?.fields?.[fieldPath];
+    const rawRemainingText = String(rawRemaining ?? '').trim();
+    if (rawRemaining == null || rawRemainingText === '') {
+      skippedCount += 1;
+      continue;
+    }
+    const currentRemaining = parseNumericFieldValue(rawRemaining);
+    if (currentRemaining == null || currentRemaining === 0) {
+      skippedCount += 1;
       continue;
     }
     try {
@@ -21614,9 +23353,15 @@ async function statusSetDoneLaneRemainingZero(ev) {
   }
 
   await renderStatusTab();
-  if (okCount > 0 && failCount === 0) showToast(`Klara: satte Remaining Work = 0 för ${okCount} ticket(s).`);
-  else if (okCount > 0) showToast(`Klara: uppdaterade ${okCount}, misslyckades ${failCount}.`);
-  else showToast('Kunde inte uppdatera Remaining Work i Klara.');
+  if (okCount > 0 && failCount === 0) {
+    showToast(`Klara: satte Remaining Work = 0 för ${okCount} ticket(s).${skippedCount ? ` Hoppade över ${skippedCount} med 0 eller tomt värde.` : ''}`);
+  } else if (okCount > 0) {
+    showToast(`Klara: uppdaterade ${okCount}, misslyckades ${failCount}.${skippedCount ? ` Hoppade över ${skippedCount} med 0 eller tomt värde.` : ''}`);
+  } else if (skippedCount > 0 && failCount === 0) {
+    showToast(`Klara: inga ändringar behövdes. ${skippedCount} ticket(s) hade 0 eller tomt Remaining Work.`);
+  } else {
+    showToast('Kunde inte uppdatera Remaining Work i Klara.');
+  }
 }
 
 function statusSumDisplay(items, getter) {
