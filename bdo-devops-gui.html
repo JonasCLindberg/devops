@@ -1084,6 +1084,11 @@
       background: rgba(88,166,255,.08);
       border-color: rgba(88,166,255,.2);
     }
+    .kanban-sprint-row.drop-target {
+      background: rgba(88,166,255,.14);
+      border-color: rgba(88,166,255,.45);
+      box-shadow: inset 0 0 0 1px rgba(88,166,255,.28);
+    }
     .kanban-sprint-row input {
       margin: 0;
       accent-color: var(--accent2);
@@ -1292,7 +1297,8 @@
     .kanban-col-drop-zone.drop-target {
       background: rgba(88,166,255,.08);
     }
-    .kanban-col-body.drop-target {
+    .kanban-col-body.drop-target,
+    .kanban-col.drop-target > .kanban-col-body {
       background: rgba(88,166,255,.08);
     }
     .kanban-card {
@@ -21461,19 +21467,31 @@ function kanbanCardTypeIconMeta(item) {
   return null;
 }
 
+const KANBAN_PROJECT_PALETTE = [
+'#e6194b', '#3cb44b', '#4363d8', '#f58231', '#911eb4',
+'#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990',
+'#dcbeff', '#9a6324', '#800000', '#808000', '#000075', '#a9a9a9'
+];
+
+const kanbanProjectColorMap = new Map();
+
+function kanbanRebuildProjectColorMap(projectNames) {
+  const ordered = [...new Set((projectNames || []).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, 'sv-SE', { numeric: true, sensitivity: 'base' }));
+
+  kanbanProjectColorMap.clear();
+  ordered.forEach((project, index) => {
+    kanbanProjectColorMap.set(project, KANBAN_PROJECT_PALETTE[index % KANBAN_PROJECT_PALETTE.length]);
+  });
+}
+
 function kanbanProjectColor(project) {
   const text = String(project || '').trim();
   if (!text) return 'hsl(210 12% 52%)';
-  const palette = [
-    '#e6194b', '#3cb44b', '#4363d8', '#f58231', '#911eb4',
-    '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990',
-    '#dcbeff', '#9a6324', '#800000', '#808000', '#000075', '#a9a9a9'
-  ];
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    hash = ((hash * 33) + text.charCodeAt(i)) >>> 0;
-  }
-  return palette[hash % palette.length];
+  if (kanbanProjectColorMap.has(text)) return kanbanProjectColorMap.get(text);
+  const fallback = KANBAN_PROJECT_PALETTE[(kanbanProjectColorMap.size + 1) % KANBAN_PROJECT_PALETTE.length];
+  kanbanProjectColorMap.set(text, fallback);
+  return fallback;
 }
 
 function kanbanRankValue(item) {
@@ -21614,6 +21632,14 @@ function kanbanSetAllSprints(selected) {
   }
   kanbanSprintSelectionInitialized = true;
   renderKanbanTab();
+}
+
+async function kanbanRefreshSprints() {
+  try {
+    await fetchData();
+  } catch (e) {
+    showToast(`Kunde inte uppdatera sprintar: ${formatApiError(e)}`);
+  }
 }
 
 function kanbanToggleProjectSprints(project, selected) {
@@ -21999,7 +22025,80 @@ function kanbanBindSprintPicker(wrap) {
       const selected = row.getAttribute('data-selected') === '1';
       kanbanToggleSprintPath(path, selected);
     });
+    row.addEventListener('dragenter', (event) => {
+      if (kanbanDragItemId == null) return;
+      event.preventDefault();
+      event.stopPropagation();
+      row.classList.add('drop-target');
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    });
+    row.addEventListener('dragover', (event) => {
+      if (kanbanDragItemId == null) return;
+      event.preventDefault();
+      event.stopPropagation();
+      row.classList.add('drop-target');
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    });
+    row.addEventListener('dragleave', (event) => {
+      const next = event.relatedTarget;
+      if (next && row.contains(next)) return;
+      row.classList.remove('drop-target');
+    });
+    row.addEventListener('drop', async (event) => {
+      if (kanbanDragItemId == null) return;
+      event.preventDefault();
+      event.stopPropagation();
+      row.classList.remove('drop-target');
+      const targetPath = String(row.getAttribute('data-path') || '').trim();
+      if (!targetPath) return;
+      try {
+        await kanbanMoveSelectedCardsToSprint(targetPath);
+        renderKanbanTab();
+      } catch (e) {
+        showToast(`Kunde inte flytta kort till sprint: ${formatApiError(e)}`);
+      } finally {
+        kanbanDragItemId = null;
+        kanbanClearDropIndicators();
+      }
+    });
   });
+}
+
+async function kanbanMoveSelectedCardsToSprint(targetPath) {
+  const pathValue = String(targetPath || '').trim();
+  if (!pathValue) return;
+  const selectedIds = kanbanSelectedCardIds.size
+    ? [...kanbanSelectedCardIds]
+    : (kanbanDragItemId != null ? [Number(kanbanDragItemId)] : []);
+  const ids = [...new Set(selectedIds.filter(id => Number(id) > 0))];
+  if (!ids.length) return;
+
+  const items = ids
+    .map(id => allItems.find(item => Number(item.id) === Number(id)))
+    .filter(Boolean)
+    .filter(item => kanbanEligibleItemType(item));
+
+  if (!items.length) return;
+
+  const updateTarget = () => {
+    const project = String(pathValue.split('\\')[0] || '').trim();
+    if (project) kanbanSelectedSprintPaths.add(pathValue);
+    if (project && kanbanIsNoSprintPath(pathValue)) {
+      kanbanSelectedSprintPaths.add(pathValue);
+    }
+  };
+
+  for (const item of items) {
+    const currentPath = String(item.fields?.['System.IterationPath'] || '').trim();
+    if (currentPath === pathValue) continue;
+    const res = await witPatch(item.id, [{ op: 'add', path: '/fields/System.IterationPath', value: pathValue }]);
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`HTTP ${res.status}: ${errText}`);
+    }
+    item.fields['System.IterationPath'] = pathValue;
+    updateTarget();
+  }
 }
 
 function kanbanOpenCard(event, itemId) {
@@ -22009,7 +22108,9 @@ function kanbanOpenCard(event, itemId) {
 
 function kanbanClearDropIndicators() {
   document.querySelectorAll('.kanban-col-body.drop-target').forEach(el => el.classList.remove('drop-target'));
+  document.querySelectorAll('.kanban-col.drop-target').forEach(el => el.classList.remove('drop-target'));
   document.querySelectorAll('.kanban-card.drop-before').forEach(el => el.classList.remove('drop-before'));
+  document.querySelectorAll('.kanban-sprint-row.drop-target').forEach(el => el.classList.remove('drop-target'));
   kanbanDropBeforeItemId = null;
   kanbanDropTargetState = '';
 }
@@ -22044,7 +22145,11 @@ function kanbanDragOverColumn(event, state) {
   kanbanClearDropIndicators();
   kanbanDropBeforeItemId = null;
   kanbanDropTargetState = String(state || '').trim();
+  const col = event.currentTarget?.closest('.kanban-col');
+  const body = event.currentTarget?.closest('.kanban-col-body') || col?.querySelector('.kanban-col-body');
   if (event.currentTarget) event.currentTarget.classList.add('drop-target');
+  if (col) col.classList.add('drop-target');
+  if (body) body.classList.add('drop-target');
 }
 
 function kanbanDragOverCard(event, state, beforeItemId) {
@@ -22166,6 +22271,9 @@ function renderKanbanTab() {
   const wrap = document.getElementById('tableWrap');
   if (!wrap) return;
 
+  const projectNames = [...new Set(allItems.map(item => String(workItemProject(item, '') || '').trim()).filter(Boolean))];
+  kanbanRebuildProjectColorMap(projectNames);
+
   const baseItems = allItems.filter(kanbanEligibleItemType);
   const panelScopedItems = kanbanAssigneeFilter
     ? baseItems.filter(item => kanbanMatchesTypeFilter(item) && kanbanAssigneeText(item) === kanbanAssigneeFilter)
@@ -22208,16 +22316,60 @@ function renderKanbanTab() {
   };
 
   const visibleProjects = sprintCatalog.projects
-    .map(projectRow => ({
-      ...projectRow,
-      sprints: (projectRow.sprints || []).filter(s => {
-        const identity = kanbanSprintIdentity(s.path, projectRow.project);
-        const visibleSprintItems = visibleSprintItemsByIdentity.get(identity) || [];
-        if (!visibleSprintItems.length) return false;
-        if (kanbanHideCompletedSprints && visibleSprintItems.every(item => hideCompletedStates.has(String(workItemState(item) || '').trim().toLowerCase()))) return false;
-        return true;
-      })
-    }))
+    .map(projectRow => {
+      const projectSprints = [...(projectRow.sprints || [])].sort((a, b) => {
+        const aDate = a.startDate ? new Date(a.startDate).getTime() : Number.POSITIVE_INFINITY;
+        const bDate = b.startDate ? new Date(b.startDate).getTime() : Number.POSITIVE_INFINITY;
+        if (aDate !== bDate) return aDate - bDate;
+        return String(a.name || a.path).localeCompare(String(b.name || b.path), 'sv-SE', { numeric: true, sensitivity: 'base' });
+      });
+
+      let currentIndex = -1;
+      const now = Date.now();
+      projectSprints.forEach((s, index) => {
+        const start = s.startDate ? new Date(s.startDate).getTime() : null;
+        const finish = s.finishDate ? new Date(s.finishDate).getTime() : null;
+        if (start != null && finish != null && start <= now && now <= finish) {
+          currentIndex = index;
+        }
+      });
+      if (currentIndex < 0 && projectSprints.length) {
+        let bestIndex = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        projectSprints.forEach((s, index) => {
+          const start = s.startDate ? new Date(s.startDate).getTime() : null;
+          const finish = s.finishDate ? new Date(s.finishDate).getTime() : null;
+          const ref = start != null ? start : (finish != null ? finish : now);
+          const dist = Math.abs(ref - now);
+          if (dist < bestDistance) {
+            bestDistance = dist;
+            bestIndex = index;
+          }
+        });
+        currentIndex = bestIndex;
+      }
+
+      const alwaysInclude = new Set();
+      if (currentIndex >= 0) {
+        alwaysInclude.add(projectSprints[currentIndex].path);
+        if (currentIndex + 1 < projectSprints.length) alwaysInclude.add(projectSprints[currentIndex + 1].path);
+      } else if (projectSprints.length) {
+        alwaysInclude.add(projectSprints[0].path);
+      }
+
+      return {
+        ...projectRow,
+        sprints: projectSprints.filter(s => {
+          const shouldAlwaysKeep = alwaysInclude.has(s.path);
+          if (shouldAlwaysKeep) return true;
+          const identity = kanbanSprintIdentity(s.path, projectRow.project);
+          const visibleSprintItems = visibleSprintItemsByIdentity.get(identity) || [];
+          if (!visibleSprintItems.length) return false;
+          if (kanbanHideCompletedSprints && visibleSprintItems.every(item => hideCompletedStates.has(String(workItemState(item) || '').trim().toLowerCase()))) return false;
+          return true;
+        })
+      };
+    })
     .filter(projectRow => projectRow.sprints.length > 0);
 
   const selectablePaths = visibleProjects.flatMap(projectRow => projectRow.sprints.map(s => s.path));
@@ -22306,7 +22458,9 @@ function renderKanbanTab() {
         </span>`
       : '';
 
-    return `<section class="kanban-col">
+    return `<section class="kanban-col"
+        ondragover="kanbanDragOverColumn(event, '${stateEsc}')"
+        ondrop="kanbanDropOnColumn(event, '${stateEsc}')">
       <div class="kanban-col-head">
         <span class="kanban-col-head-main" title="${escHtml(state)}">${escHtml(state)}</span>
         <span style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
@@ -22363,6 +22517,7 @@ function renderKanbanTab() {
           <button class="kanban-collapse-btn" onclick="kanbanToggleLeftCollapsed()" title="${kanbanLeftCollapsed ? 'Expandera vänsterpanel' : 'Kollapsa vänsterpanel'}" aria-label="${kanbanLeftCollapsed ? 'Expandera vänsterpanel' : 'Kollapsa vänsterpanel'}">${kanbanLeftCollapsed ? '→' : '←'}</button>
           <span class="kanban-left-head-text">Sprintfilter</span>
           <span class="kanban-left-head-actions" style="display:flex;align-items:center;gap:6px;">
+            <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanRefreshSprints()" title="Läs in alla sprintar på nytt" aria-label="Läs in alla sprintar på nytt">↻</button>
             <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanSetAllSprints(true)">Alla</button>
             <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanSetAllSprints(false)">Ingen</button>
           </span>
