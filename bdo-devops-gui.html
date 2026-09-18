@@ -4381,9 +4381,9 @@
       <button class="tab-btn" id="tab-timeline" onclick="showTab('timeline')" disabled>📅 Timeline</button>
       <button class="tab-btn" id="tab-roadmap" onclick="showTab('roadmap')" disabled>🗺 Roadmap</button>
       <button class="tab-btn" id="tab-sprint" onclick="showTab('sprint')" disabled>🏁 Sprint</button>
+      <button class="tab-btn" id="tab-kanban" onclick="showTab('kanban')" disabled>🗂 Kanban</button>
       <button class="tab-btn" id="tab-status" onclick="showTab('status')" disabled>📈 Status</button>
       <button class="tab-btn" id="tab-board" onclick="showTab('board')" disabled>🧩 Board</button>
-      <button class="tab-btn" id="tab-kanban" onclick="showTab('kanban')" disabled>🗂 Kanban</button>
       <button class="tab-btn" id="tab-info" onclick="showTab('info')" disabled>ℹ️ Info</button>
       <button class="tab-btn" id="tab-dashboard" onclick="showTab('dashboard')" disabled>📊 Dashboard</button>
       <button class="tab-btn" id="tab-kalkyl" onclick="showTab('kalkyl')" disabled>🧮 Kalkyl</button>
@@ -4502,6 +4502,7 @@ const LS_COL_FOCUS   = 'devops_cols_focus';
 const LS_STATUS_KEY  = 'devops_status_settings';
 const LS_SIDEBAR_COLLAPSED = 'devops_sidebar_collapsed';
 const LS_SHOW_COMPLETED_GLOBAL = 'devops_show_completed_global';
+const LS_INFO_TAB_VISIBLE = 'devops_info_tab_visible';
 const LS_DEBUG_WARN = 'devops_debug_warn_v1';
 
 let debugWarnEnabled = false;
@@ -6793,6 +6794,7 @@ let kanbanSprintSelectionInitialized = false;
 let kanbanHideCompletedSprints = true;
 let kanbanTypeFilter = { epic: true, feature: true, storyBug: true };
 let kanbanShowEmptyColumns = false;
+let kanbanFocusedState = '';
 let kanbanSelectedCardIds = new Set();
 let kanbanSelectionBaseIds = new Set();
 let kanbanSelecting = null;
@@ -6837,7 +6839,7 @@ function sprintDebug(eventName, data = {}) {
   } catch (_) {}
 }
 
-const BACKLOG_SECTION_TABS = ['backlog','estimering','prioritering','timeline','roadmap','sprint','status','board','kanban','info'];
+const BACKLOG_SECTION_TABS = ['backlog','estimering','prioritering','timeline','roadmap','sprint','kanban','status','board','info'];
 const PORTFOLIO_SECTION_TABS = ['dashboard','kalkyl','analys','kostnader'];
 const UTILITY_TABS = [];
 const NAV_TABS = [...BACKLOG_SECTION_TABS, ...PORTFOLIO_SECTION_TABS, ...UTILITY_TABS];
@@ -6853,13 +6855,37 @@ function updateSectionButtons() {
   if (p) p.classList.toggle('active', activeSection === 'portfolio');
 }
 
+let infoTabVisible = false;
+try {
+  const saved = localStorage.getItem(LS_INFO_TAB_VISIBLE);
+  if (saved === null) {
+    localStorage.setItem(LS_INFO_TAB_VISIBLE, '0');
+  } else {
+    infoTabVisible = saved !== '0';
+  }
+} catch (_) {
+  infoTabVisible = false;
+}
+
+function setInfoTabVisible(visible) {
+  infoTabVisible = !!visible;
+  try {
+    localStorage.setItem(LS_INFO_TAB_VISIBLE, infoTabVisible ? '1' : '0');
+  } catch (_) {}
+  applyTabSectionVisibility();
+  if (!infoTabVisible && activeTab === 'info') {
+    showTab(activeSection === 'portfolio' ? 'dashboard' : 'backlog');
+  }
+}
+
 function applyTabSectionVisibility() {
   const visible = new Set(tabsForSection(activeSection));
+  if (!infoTabVisible) visible.delete('info');
   NAV_TABS.forEach(t => {
     const el = document.getElementById('tab-' + t);
     if (!el) return;
-    // Utility tabs (e.g. audit) are always visible regardless of section
-    el.style.display = (visible.has(t) || UTILITY_TABS.includes(t)) ? '' : 'none';
+    const shouldDisplay = (visible.has(t) || UTILITY_TABS.includes(t)) && (t !== 'info' || infoTabVisible);
+    el.style.display = shouldDisplay ? '' : 'none';
   });
 }
 
@@ -11262,6 +11288,9 @@ function runPhase6DomainTests() {
   const idD = sprintPathIdentity('Core\\Sprint 24');
   assert('path identity distinguishes project', idC !== idD);
 
+  assert('custom iteration leaf is accepted', sprintIsIterationLikePath('Roadmap\\PI-2026\\Alpha Team Window'));
+  assert('project root is not treated as iteration', !sprintIsIterationLikePath('Roadmap'));
+
   // Edge case: minimal gap (ranks differ by 1)
   const minGapMidpoint = sprintComputeNewRank(1000, 1001);
   assert('rank minimal gap produces midpoint', minGapMidpoint > 1000 && minGapMidpoint < 1001);
@@ -12869,6 +12898,10 @@ function sprintIsIterationLikePath(path) {
   if (!p || sprintIsBacklogPathKey(p) || p === '__unscheduled__') return false;
   const parts = p.split('\\').map(x => String(x || '').trim()).filter(Boolean);
   const leaf = parts.length ? parts[parts.length - 1] : '';
+
+  // Any non-root iteration path under a project is a valid iteration even if the leaf
+  // name does not use a Sprint/Iteration prefix.
+  if (parts.length >= 2) return true;
 
   // Common naming patterns: Iteration X, Sprint X, etc.
   if (/^(iteration|sprint)\b/i.test(leaf)) return true;
@@ -14936,6 +14969,12 @@ function renderTshirtCalc() {
           <input type="radio" name="themeRadio" value="dark" ${getActiveTheme() === 'dark' ? 'checked' : ''} onchange="setTheme('dark')" /> 🌙 Mörkt
         </label>
       </div>
+    </div>
+    <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:2px solid var(--border);">
+      <div class="tsc-section-title">Flikar</div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.84rem;color:var(--text);">
+        <input type="checkbox" ${infoTabVisible ? 'checked' : ''} onchange="setInfoTabVisible(this.checked)" /> Visa Info-fliken
+      </label>
     </div>
     <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:2px solid var(--border);">
       <div class="tsc-section-title">Audit</div>
@@ -21622,11 +21661,95 @@ function kanbanSelectedSprintLabel() {
   return count === 1 ? '1 sprint vald' : `${count} sprintar valda`;
 }
 
+function kanbanVisibleSprintProjects(items = allItems.filter(kanbanEligibleItemType)) {
+  const baseItems = Array.isArray(items) ? items : [];
+  const panelScopedItems = kanbanAssigneeFilter
+    ? baseItems.filter(item => kanbanMatchesTypeFilter(item) && kanbanAssigneeText(item) === kanbanAssigneeFilter)
+    : baseItems.filter(kanbanMatchesTypeFilter);
+  const sprintCatalog = kanbanBuildSprintCatalog(baseItems);
+
+  const sprintItemsByIdentity = new Map();
+  baseItems.forEach(item => {
+    const iterPath = String(item?.fields?.['System.IterationPath'] || '').trim();
+    const selectablePath = kanbanSprintSelectablePath(iterPath);
+    if (!selectablePath) return;
+    const identity = kanbanSprintIdentity(selectablePath, workItemProject(item, ''));
+    if (!sprintItemsByIdentity.has(identity)) sprintItemsByIdentity.set(identity, []);
+    sprintItemsByIdentity.get(identity).push(item);
+  });
+
+  const hideCompletedStates = new Set(['completed', 'closed', 'archived']);
+  const visibleSprintItemsByIdentity = new Map();
+  panelScopedItems.forEach(item => {
+    const iterPath = String(item?.fields?.['System.IterationPath'] || '').trim();
+    const selectablePath = kanbanSprintSelectablePath(iterPath);
+    if (!selectablePath) return;
+    const identity = kanbanSprintIdentity(selectablePath, workItemProject(item, ''));
+    if (!visibleSprintItemsByIdentity.has(identity)) visibleSprintItemsByIdentity.set(identity, []);
+    visibleSprintItemsByIdentity.get(identity).push(item);
+  });
+
+  return sprintCatalog.projects
+    .map(projectRow => {
+      const projectSprints = [...(projectRow.sprints || [])].sort((a, b) => {
+        const aDate = a.startDate ? new Date(a.startDate).getTime() : Number.POSITIVE_INFINITY;
+        const bDate = b.startDate ? new Date(b.startDate).getTime() : Number.POSITIVE_INFINITY;
+        if (aDate !== bDate) return aDate - bDate;
+        return String(a.name || a.path).localeCompare(String(b.name || b.path), 'sv-SE', { numeric: true, sensitivity: 'base' });
+      });
+
+      let currentIndex = -1;
+      const now = Date.now();
+      projectSprints.forEach((s, index) => {
+        const start = s.startDate ? new Date(s.startDate).getTime() : null;
+        const finish = s.finishDate ? new Date(s.finishDate).getTime() : null;
+        if (start != null && finish != null && start <= now && now <= finish) {
+          currentIndex = index;
+        }
+      });
+      if (currentIndex < 0 && projectSprints.length) {
+        let bestIndex = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        projectSprints.forEach((s, index) => {
+          const start = s.startDate ? new Date(s.startDate).getTime() : null;
+          const finish = s.finishDate ? new Date(s.finishDate).getTime() : null;
+          const ref = start != null ? start : (finish != null ? finish : now);
+          const dist = Math.abs(ref - now);
+          if (dist < bestDistance) {
+            bestDistance = dist;
+            bestIndex = index;
+          }
+        });
+        currentIndex = bestIndex;
+      }
+
+      const alwaysInclude = new Set();
+      if (currentIndex >= 0) {
+        alwaysInclude.add(projectSprints[currentIndex].path);
+        if (currentIndex + 1 < projectSprints.length) alwaysInclude.add(projectSprints[currentIndex + 1].path);
+      } else if (projectSprints.length) {
+        alwaysInclude.add(projectSprints[0].path);
+      }
+
+      return {
+        ...projectRow,
+        sprints: projectSprints.filter(s => {
+          if (alwaysInclude.has(s.path)) return true;
+          const identity = kanbanSprintIdentity(s.path, projectRow.project);
+          const visibleSprintItems = visibleSprintItemsByIdentity.get(identity) || [];
+          if (!visibleSprintItems.length) return false;
+          if (kanbanHideCompletedSprints && visibleSprintItems.every(item => hideCompletedStates.has(String(workItemState(item) || '').trim().toLowerCase()))) return false;
+          return true;
+        })
+      };
+    })
+    .filter(projectRow => projectRow.sprints.length > 0);
+}
+
 function kanbanSetAllSprints(selected) {
-  const items = allItems.filter(kanbanEligibleItemType);
-  const catalog = kanbanBuildSprintCatalog(items);
+  const visibleProjects = kanbanVisibleSprintProjects();
   if (selected) {
-    kanbanSelectedSprintPaths = new Set(catalog.allPaths);
+    kanbanSelectedSprintPaths = new Set(visibleProjects.flatMap(projectRow => projectRow.sprints.map(s => s.path)));
   } else {
     kanbanSelectedSprintPaths = new Set();
   }
@@ -21643,9 +21766,7 @@ async function kanbanRefreshSprints() {
 }
 
 function kanbanToggleProjectSprints(project, selected) {
-  const items = allItems.filter(kanbanEligibleItemType);
-  const catalog = kanbanBuildSprintCatalog(items);
-  const row = catalog.projects.find(p => p.project === project);
+  const row = kanbanVisibleSprintProjects().find(p => p.project === project);
   if (!row) return;
   if (selected) row.sprints.forEach(s => kanbanSelectedSprintPaths.add(s.path));
   else row.sprints.forEach(s => kanbanSelectedSprintPaths.delete(s.path));
@@ -21952,6 +22073,13 @@ function kanbanToggleHideCompletedSprints(checked) {
 
 function kanbanToggleShowEmptyColumns(checked) {
   kanbanShowEmptyColumns = !!checked;
+  renderKanbanTab();
+}
+
+function kanbanToggleFocusedState(state) {
+  const nextState = String(state || '').trim();
+  if (!nextState) return;
+  kanbanFocusedState = kanbanFocusedState === nextState ? '' : nextState;
   renderKanbanTab();
 }
 
@@ -22278,99 +22406,7 @@ function renderKanbanTab() {
   const panelScopedItems = kanbanAssigneeFilter
     ? baseItems.filter(item => kanbanMatchesTypeFilter(item) && kanbanAssigneeText(item) === kanbanAssigneeFilter)
     : baseItems.filter(kanbanMatchesTypeFilter);
-  const sprintCatalog = kanbanBuildSprintCatalog(baseItems);
-
-  const sprintItemsByIdentity = new Map();
-  baseItems.forEach(item => {
-    const iterPath = String(item?.fields?.['System.IterationPath'] || '').trim();
-    const selectablePath = kanbanSprintSelectablePath(iterPath);
-    if (!selectablePath) return;
-    const identity = kanbanSprintIdentity(selectablePath, workItemProject(item, ''));
-    if (!sprintItemsByIdentity.has(identity)) sprintItemsByIdentity.set(identity, []);
-    sprintItemsByIdentity.get(identity).push(item);
-  });
-
-  const hideCompletedStates = new Set(['completed', 'closed', 'archived']);
-
-  const visibleSprintItemsByIdentity = new Map();
-  panelScopedItems.forEach(item => {
-    const iterPath = String(item?.fields?.['System.IterationPath'] || '').trim();
-    const selectablePath = kanbanSprintSelectablePath(iterPath);
-    if (!selectablePath) return;
-    const identity = kanbanSprintIdentity(selectablePath, workItemProject(item, ''));
-    if (!visibleSprintItemsByIdentity.has(identity)) visibleSprintItemsByIdentity.set(identity, []);
-    visibleSprintItemsByIdentity.get(identity).push(item);
-  });
-
-  const isCompletedOnlySprint = path => {
-    const identity = kanbanSprintIdentity(path);
-    const items = sprintItemsByIdentity.get(identity) || [];
-    if (!items.length) return false;
-    return items.every(item => hideCompletedStates.has(String(workItemState(item) || '').trim().toLowerCase()));
-  };
-
-  const isEmptySprint = path => {
-    const identity = kanbanSprintIdentity(path);
-    const items = sprintItemsByIdentity.get(identity) || [];
-    return items.length === 0;
-  };
-
-  const visibleProjects = sprintCatalog.projects
-    .map(projectRow => {
-      const projectSprints = [...(projectRow.sprints || [])].sort((a, b) => {
-        const aDate = a.startDate ? new Date(a.startDate).getTime() : Number.POSITIVE_INFINITY;
-        const bDate = b.startDate ? new Date(b.startDate).getTime() : Number.POSITIVE_INFINITY;
-        if (aDate !== bDate) return aDate - bDate;
-        return String(a.name || a.path).localeCompare(String(b.name || b.path), 'sv-SE', { numeric: true, sensitivity: 'base' });
-      });
-
-      let currentIndex = -1;
-      const now = Date.now();
-      projectSprints.forEach((s, index) => {
-        const start = s.startDate ? new Date(s.startDate).getTime() : null;
-        const finish = s.finishDate ? new Date(s.finishDate).getTime() : null;
-        if (start != null && finish != null && start <= now && now <= finish) {
-          currentIndex = index;
-        }
-      });
-      if (currentIndex < 0 && projectSprints.length) {
-        let bestIndex = 0;
-        let bestDistance = Number.POSITIVE_INFINITY;
-        projectSprints.forEach((s, index) => {
-          const start = s.startDate ? new Date(s.startDate).getTime() : null;
-          const finish = s.finishDate ? new Date(s.finishDate).getTime() : null;
-          const ref = start != null ? start : (finish != null ? finish : now);
-          const dist = Math.abs(ref - now);
-          if (dist < bestDistance) {
-            bestDistance = dist;
-            bestIndex = index;
-          }
-        });
-        currentIndex = bestIndex;
-      }
-
-      const alwaysInclude = new Set();
-      if (currentIndex >= 0) {
-        alwaysInclude.add(projectSprints[currentIndex].path);
-        if (currentIndex + 1 < projectSprints.length) alwaysInclude.add(projectSprints[currentIndex + 1].path);
-      } else if (projectSprints.length) {
-        alwaysInclude.add(projectSprints[0].path);
-      }
-
-      return {
-        ...projectRow,
-        sprints: projectSprints.filter(s => {
-          const shouldAlwaysKeep = alwaysInclude.has(s.path);
-          if (shouldAlwaysKeep) return true;
-          const identity = kanbanSprintIdentity(s.path, projectRow.project);
-          const visibleSprintItems = visibleSprintItemsByIdentity.get(identity) || [];
-          if (!visibleSprintItems.length) return false;
-          if (kanbanHideCompletedSprints && visibleSprintItems.every(item => hideCompletedStates.has(String(workItemState(item) || '').trim().toLowerCase()))) return false;
-          return true;
-        })
-      };
-    })
-    .filter(projectRow => projectRow.sprints.length > 0);
+  const visibleProjects = kanbanVisibleSprintProjects(baseItems);
 
   const selectablePaths = visibleProjects.flatMap(projectRow => projectRow.sprints.map(s => s.path));
   const validPaths = new Set(selectablePaths);
@@ -22416,6 +22452,7 @@ function renderKanbanTab() {
   const states = kanbanShowEmptyColumns
     ? KANBAN_STATE_ORDER_CANONICAL.slice()
     : kanbanNormalizeStateOrder(stateUniverse.length ? stateUniverse : ['New', 'Active', 'Done']);
+  const visibleStates = kanbanFocusedState ? states.filter(state => state === kanbanFocusedState) : states;
   const itemById = new Map(allItems.map(i => [Number(i?.id || 0), i]));
 
   const leftPanelHtml = visibleProjects.length
@@ -22446,7 +22483,7 @@ function renderKanbanTab() {
     }).join('')
     : `<div class="kanban-empty">Inga sprintar att visa i vald scope.</div>`;
 
-  const columnsHtml = states.map((state, index) => {
+  const columnsHtml = visibleStates.map((state, index) => {
     const stateItems = visibleItems
       .filter(item => workItemState(item) === state)
       .sort(kanbanSortByRank);
@@ -22454,16 +22491,17 @@ function renderKanbanTab() {
     const editControls = globalEditMode
       ? `<span class="kanban-col-edit-controls">
           <button class="kanban-col-move-btn" onclick="kanbanMoveStateColumn('${stateEsc}', -1)" title="Flytta kolumn åt vänster" ${index === 0 ? 'disabled' : ''}>←</button>
-          <button class="kanban-col-move-btn" onclick="kanbanMoveStateColumn('${stateEsc}', 1)" title="Flytta kolumn åt höger" ${index === (states.length - 1) ? 'disabled' : ''}>→</button>
+          <button class="kanban-col-move-btn" onclick="kanbanMoveStateColumn('${stateEsc}', 1)" title="Flytta kolumn åt höger" ${index === (visibleStates.length - 1) ? 'disabled' : ''}>→</button>
         </span>`
       : '';
 
     return `<section class="kanban-col"
         ondragover="kanbanDragOverColumn(event, '${stateEsc}')"
         ondrop="kanbanDropOnColumn(event, '${stateEsc}')">
-      <div class="kanban-col-head">
+      <div class="kanban-col-head" onclick="kanbanToggleFocusedState('${stateEsc}'); event.stopPropagation();">
         <span class="kanban-col-head-main" title="${escHtml(state)}">${escHtml(state)}</span>
         <span style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
+          <button class="btn btn-outline" type="button" style="width:auto;padding:2px 7px;font-size:0.62rem;line-height:1.1;white-space:nowrap;" onclick="event.stopPropagation(); kanbanToggleFocusedState('${stateEsc}');" title="${kanbanFocusedState === state ? 'Visa alla kolumner' : 'Visa bara denna kolumn'}">${kanbanFocusedState === state ? 'Visa alla' : 'Endast'}</button>
           <span class="kanban-col-count">${stateItems.length}</span>
           ${editControls}
         </span>
