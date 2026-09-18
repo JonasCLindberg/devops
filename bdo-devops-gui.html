@@ -1122,10 +1122,23 @@
       flex-wrap: wrap;
     }
     .kanban-assignee-filter {
-      width: 340px;
-      min-width: 340px;
-      max-width: 340px;
-      flex: 0 0 340px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .kanban-assignee-filter-btn {
+      width: auto;
+      padding: 3px 8px;
+      font-size: 0.68rem;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .kanban-assignee-filter-btn.active {
+      background: color-mix(in oklab, var(--accent2) 18%, var(--surface));
+      border-color: color-mix(in oklab, var(--accent2) 48%, var(--border));
+      color: var(--text);
     }
     .kanban-type-filters {
       display: inline-flex;
@@ -8439,6 +8452,92 @@ async function fetchWorkItemTypesForProject(project) {
   })).filter(t => t.name);
 }
 
+const workItemTypeStatesCache = new Map();
+
+async function fetchWorkItemTypeStatesForProject(project, typeName) {
+  const cleanProject = String(project || '').trim();
+  const cleanTypeName = String(typeName || '').trim();
+  if (!cleanProject || !cleanTypeName) return [];
+
+  const cacheKey = `${cleanProject.toLowerCase()}::${cleanTypeName.toLowerCase()}`;
+  if (workItemTypeStatesCache.has(cacheKey)) {
+    return workItemTypeStatesCache.get(cacheKey) || [];
+  }
+
+  let states = [];
+  try {
+    const url = `https://dev.azure.com/${ORG}/${encodeURIComponent(cleanProject)}/_apis/wit/workitemtypes/${encodeURIComponent(cleanTypeName)}/states?api-version=7.1`;
+    const res = await apiGet(url);
+    if (res.ok) {
+      const data = await res.json();
+      states = (data?.value || [])
+        .map(state => String(state?.name || '').trim())
+        .filter(Boolean);
+    }
+  } catch (e) {
+    debugWarn('fetchWorkItemTypeStatesForProject', e, { project: cleanProject, typeName: cleanTypeName });
+  }
+
+  if (!states.length) {
+    states = [...new Set(
+      allItems
+        .filter(item => workItemProject(item, '') === cleanProject && workItemType(item).toLowerCase() === cleanTypeName.toLowerCase())
+        .map(item => workItemState(item))
+        .filter(Boolean)
+    )];
+  }
+
+  workItemTypeStatesCache.set(cacheKey, states);
+  return states;
+}
+
+function pickSupportedStateCandidate(states, preferredTerms = []) {
+  const cleanStates = (states || []).map(state => String(state || '').trim()).filter(Boolean);
+  if (!cleanStates.length) return '';
+
+  for (const term of preferredTerms) {
+    const hit = cleanStates.find(state => String(state || '').trim().toLowerCase().includes(String(term || '').toLowerCase()));
+    if (hit) return hit;
+  }
+
+  return cleanStates[0] || '';
+}
+
+async function kanbanResolveSupportedStateForItem(item, targetState) {
+  const desiredState = String(targetState || '').trim();
+  if (!desiredState) return '';
+
+  const project = workItemProject(item, '');
+  const typeName = workItemType(item);
+  const supportedStates = await fetchWorkItemTypeStatesForProject(project, typeName);
+  if (!supportedStates.length) return desiredState;
+
+  const exact = supportedStates.find(state => String(state || '').trim().toLowerCase() === desiredState.toLowerCase());
+  if (exact) return exact;
+
+  const lane = statusLaneKeyForState(desiredState);
+  if (lane) {
+    const laneStates = supportedStates.filter(state => statusLaneKeyForState(state) === lane);
+    if (laneStates.length) {
+      if (lane === 'done') return pickSupportedStateCandidate(laneStates, ['completed', 'closed', 'done', 'resolved', 'released', 'deployed', 'archived']);
+      if (lane === 'testing') return pickSupportedStateCandidate(laneStates, ['ready for test', 'testing']);
+      return pickSupportedStateCandidate(laneStates, ['in progress', 'active', 'committed', 'in development', 'in review', 'doing', 'open']);
+    }
+  }
+
+  const notStartedKey = statusNotStartedStateKey(desiredState);
+  if (notStartedKey) {
+    const notStartedStates = supportedStates.filter(state => statusNotStartedStateKey(state) === notStartedKey);
+    if (notStartedStates.length) {
+      if (notStartedKey === 'ready') return pickSupportedStateCandidate(notStartedStates, ['ready to start', 'ready for start']);
+      if (notStartedKey === 'pending') return pickSupportedStateCandidate(notStartedStates, ['pending', 'waiting']);
+      return pickSupportedStateCandidate(notStartedStates, ['new', 'to do', 'todo', 'proposed', 'assigned', 'not started']);
+    }
+  }
+
+  return '';
+}
+
 async function ensureFavoritesWiTypeForProject(project) {
   const types = await fetchWorkItemTypesForProject(project);
   if (!types.length) throw new Error('Inga work item-typer hittades i valt projekt.');
@@ -10801,14 +10900,15 @@ async function sprintToggleGoalDone(event, itemId) {
 }
 
 async function sprintFetchWorkItemById(itemId, project) {
+  const cacheBuster = Date.now();
   const urls = [];
   if (project) {
-    urls.push(`https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/workitems/${itemId}?api-version=7.1&fields=${FIELDS.join(',')}`);
+    urls.push(`https://dev.azure.com/${ORG}/${encodeURIComponent(project)}/_apis/wit/workitems/${itemId}?api-version=7.1&_=${cacheBuster}&fields=${FIELDS.join(',')}`);
   }
-  urls.push(`https://dev.azure.com/${ORG}/_apis/wit/workitems/${itemId}?api-version=7.1&fields=${FIELDS.join(',')}`);
+  urls.push(`https://dev.azure.com/${ORG}/_apis/wit/workitems/${itemId}?api-version=7.1&_=${cacheBuster}&fields=${FIELDS.join(',')}`);
 
   for (const u of urls) {
-    const res = await apiGet(u);
+    const res = await fetch(u, { headers: getHeaders(), cache: 'no-store' });
     if (res.ok) return await res.json();
   }
   return null;
@@ -21479,12 +21579,12 @@ function kanbanAssigneeInitials(assigneeText) {
 function kanbanParentText(item, itemById) {
   const parentRaw = item?.fields?.['System.Parent'];
   const parentId = Number(parentRaw);
-  if (!Number.isFinite(parentId) || parentId <= 0) return 'Parent: -';
+  if (!Number.isFinite(parentId) || parentId <= 0) return '-';
 
   const parentItem = itemById?.get(parentId);
   const parentTitle = String(parentItem?.fields?.['System.Title'] || '').trim();
-  if (parentTitle) return `Parent: #${parentId} ${parentTitle}`;
-  return `Parent: #${parentId}`;
+  if (parentTitle) return parentTitle;
+  return `#${parentId}`;
 }
 
 function kanbanProjectText(item) {
@@ -21753,6 +21853,25 @@ function kanbanSetAllSprints(selected) {
   } else {
     kanbanSelectedSprintPaths = new Set();
   }
+  kanbanSprintSelectionInitialized = true;
+  renderKanbanTab();
+}
+
+function kanbanCurrentSprintPaths(visibleProjects = kanbanVisibleSprintProjects()) {
+  const now = Date.now();
+  return visibleProjects.flatMap(projectRow => projectRow.sprints)
+    .filter(sprint => {
+      const meta = sprintColumnMetaForPath(sprint.path);
+      const start = meta.startDate ? new Date(meta.startDate).getTime() : null;
+      const finish = meta.finishDate ? new Date(meta.finishDate).getTime() : null;
+      if (start == null || finish == null) return false;
+      return start <= now && now <= finish;
+    })
+    .map(sprint => sprint.path);
+}
+
+function kanbanSetCurrentSprints() {
+  kanbanSelectedSprintPaths = new Set(kanbanCurrentSprintPaths());
   kanbanSprintSelectionInitialized = true;
   renderKanbanTab();
 }
@@ -22194,39 +22313,115 @@ function kanbanBindSprintPicker(wrap) {
 
 async function kanbanMoveSelectedCardsToSprint(targetPath) {
   const pathValue = String(targetPath || '').trim();
-  if (!pathValue) return;
-  const selectedIds = kanbanSelectedCardIds.size
-    ? [...kanbanSelectedCardIds]
-    : (kanbanDragItemId != null ? [Number(kanbanDragItemId)] : []);
+  if (!pathValue) throw new Error('Målsprint saknas för flytten.');
+  const draggedId = Number(kanbanDragItemId);
+  const selectedCardIdsSnapshot = new Set(kanbanSelectedCardIds);
+  const targetMeta = sprintColumnMetaForPath(pathValue);
+  const targetProject = String(targetMeta?.project || pathValue.split('\\')[0] || '').trim();
+  if (!targetProject) throw new Error('Kunde inte avgöra målprojekt för sprinten.');
+  const targetCandidates = kanbanIsNoSprintPath(pathValue)
+    ? [pathValue]
+    : await sprintIterationPatchCandidatesValidated(targetProject, pathValue);
+  const uniqueTargetCandidates = [...new Set(targetCandidates.map(path => String(path || '').trim()).filter(Boolean))];
+  if (!uniqueTargetCandidates.length) {
+    throw new Error(`Ingen giltig iterationspath hittades i projektet ${targetProject}.`);
+  }
+  const selectedSprintIdentities = kanbanSelectedSprintIdentitySet();
+  const destinationAlreadySelected = uniqueTargetCandidates.some(candidate => selectedSprintIdentities.has(kanbanSprintIdentity(candidate, targetProject)));
+  const selectedIds = (draggedId > 0 && selectedCardIdsSnapshot.has(draggedId))
+    ? [...selectedCardIdsSnapshot]
+    : (draggedId > 0 ? [draggedId] : [...selectedCardIdsSnapshot]);
   const ids = [...new Set(selectedIds.filter(id => Number(id) > 0))];
-  if (!ids.length) return;
+  if (!ids.length) {
+    throw new Error('Ingen vald ticket hittades att flytta till sprinten.');
+  }
 
   const items = ids
     .map(id => allItems.find(item => Number(item.id) === Number(id)))
     .filter(Boolean)
     .filter(item => kanbanEligibleItemType(item));
 
-  if (!items.length) return;
+  if (!items.length) {
+    throw new Error('Vald ticket kunde inte läsas in eller får inte flyttas i Kanban.');
+  }
+  const sourceIncludesNoSprint = items.some(item => {
+    const currentPath = String(item.fields?.['System.IterationPath'] || '').trim();
+    return !currentPath || kanbanIsNoSprintPath(currentPath);
+  });
 
-  const updateTarget = () => {
-    const project = String(pathValue.split('\\')[0] || '').trim();
-    if (project) kanbanSelectedSprintPaths.add(pathValue);
-    if (project && kanbanIsNoSprintPath(pathValue)) {
-      kanbanSelectedSprintPaths.add(pathValue);
-    }
-  };
+  const incompatible = items.filter(item => String(workItemProject(item, '') || '').trim() !== targetProject);
+  if (incompatible.length) {
+    const sample = incompatible
+      .slice(0, 3)
+      .map(item => `#${item.id} (${workItemProject(item, 'Okant')})`)
+      .join(', ');
+    const extra = incompatible.length > 3 ? ` +${incompatible.length - 3} till` : '';
+    throw new Error(`Kanban kan bara flytta tickets till sprintar i samma projekt. Målsprinten ligger i ${targetProject}, men följande tickets gör det inte: ${sample}${extra}.`);
+  }
 
+  let movedCount = 0;
   for (const item of items) {
     const currentPath = String(item.fields?.['System.IterationPath'] || '').trim();
-    if (currentPath === pathValue) continue;
-    const res = await witPatch(item.id, [{ op: 'add', path: '/fields/System.IterationPath', value: pathValue }]);
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`HTTP ${res.status}: ${errText}`);
+    if (uniqueTargetCandidates.some(candidate => candidate === currentPath)) continue;
+    const hasIterationField = Object.prototype.hasOwnProperty.call(item.fields || {}, 'System.IterationPath');
+
+    let appliedPath = '';
+    let patchReturnedPath = '';
+    let lastErr = '';
+    for (const candidate of uniqueTargetCandidates) {
+      const patchOps = hasIterationField
+        ? [
+            { op: 'replace', path: '/fields/System.IterationPath', value: candidate },
+            { op: 'add', path: '/fields/System.IterationPath', value: candidate },
+          ]
+        : [
+            { op: 'add', path: '/fields/System.IterationPath', value: candidate },
+            { op: 'replace', path: '/fields/System.IterationPath', value: candidate },
+          ];
+
+      for (const ops of patchOps) {
+        const res = await witPatchByProjectItem(targetProject, item.id, [ops]);
+        if (res.ok) {
+          let patched = null;
+          try {
+            patched = await res.json();
+          } catch (_) {}
+          const returnedPath = String(patched?.fields?.['System.IterationPath'] || '').trim();
+          if (patched && !returnedPath) {
+            lastErr = `Azure DevOps returnerade tom iterationspath för kandidaten ${candidate}.`;
+            continue;
+          }
+          appliedPath = candidate;
+          patchReturnedPath = returnedPath;
+          break;
+        }
+        lastErr = await res.text();
+      }
+      if (appliedPath) break;
     }
-    item.fields['System.IterationPath'] = pathValue;
-    updateTarget();
+
+    if (!appliedPath) {
+      throw new Error(lastErr ? `Ingen giltig iterationspath i målprojektet. ${lastErr}` : `Ingen giltig iterationspath hittades i projektet ${targetProject}.`);
+    }
+
+    const hydrated = await sprintFetchWorkItemById(item.id, targetProject);
+    const hydratedPath = String(hydrated?.fields?.['System.IterationPath'] || '').trim();
+    const finalPath = patchReturnedPath || hydratedPath;
+    if (!finalPath) {
+      throw new Error(`Azure DevOps svarade utan iterationspath efter flytt av #${item.id}. Kandidat som skickades: ${appliedPath}`);
+    }
+    item.fields['System.IterationPath'] = finalPath;
+    movedCount += 1;
+    if (sourceIncludesNoSprint && finalPath && !kanbanSelectedSprintPaths.has(finalPath)) {
+      kanbanSelectedSprintPaths.add(finalPath);
+    }
   }
+
+  if (!movedCount) {
+    showToast('Ticket ligger redan i målsprinten.');
+    return;
+  }
+
 }
 
 function kanbanOpenCard(event, itemId) {
@@ -22345,8 +22540,13 @@ async function kanbanApplyDrop(targetState, beforeItemId = null) {
   for (let index = 0; index < movingItems.length; index++) {
     const movingItem = movingItems[index];
     const movingOps = [];
-    if (workItemState(movingItem) !== stateValue) {
-      movingOps.push({ op: 'add', path: '/fields/System.State', value: stateValue });
+    const resolvedStateValue = await kanbanResolveSupportedStateForItem(movingItem, stateValue);
+    if (!resolvedStateValue) {
+      const typeName = workItemType(movingItem) || 'work item';
+      throw new Error(`State ${stateValue} stöds inte för ${typeName} i projektet ${workItemProject(movingItem, 'okänt projekt')}.`);
+    }
+    if (workItemState(movingItem) !== resolvedStateValue) {
+      movingOps.push({ op: 'replace', path: '/fields/System.State', value: resolvedStateValue });
     }
     const rankValue = ranks[index];
     if (Number.isFinite(rankValue)) {
@@ -22354,13 +22554,19 @@ async function kanbanApplyDrop(targetState, beforeItemId = null) {
     }
     if (!movingOps.length) continue;
 
-    const res = await witPatch(movingItem.id, movingOps);
+    let res = await witPatch(movingItem.id, movingOps);
+    if (!res.ok && movingOps.some(op => op.path === '/fields/System.State' && op.op === 'replace')) {
+      const retryOps = movingOps.map(op => op.path === '/fields/System.State' && op.op === 'replace'
+        ? { ...op, op: 'add' }
+        : op);
+      res = await witPatch(movingItem.id, retryOps);
+    }
     if (!res.ok) {
       const errText = await res.text();
       throw new Error(`HTTP ${res.status}: ${errText}`);
     }
 
-    if (workItemState(movingItem) !== stateValue) movingItem.fields['System.State'] = stateValue;
+    if (workItemState(movingItem) !== resolvedStateValue) movingItem.fields['System.State'] = resolvedStateValue;
     if (Number.isFinite(rankValue)) movingItem.fields['Microsoft.VSTS.Common.StackRank'] = rankValue;
   }
 }
@@ -22412,7 +22618,8 @@ function renderKanbanTab() {
   const validPaths = new Set(selectablePaths);
 
   if (!kanbanSprintSelectionInitialized) {
-    kanbanSelectedSprintPaths = new Set(selectablePaths);
+    const currentPaths = kanbanCurrentSprintPaths(visibleProjects);
+    kanbanSelectedSprintPaths = new Set(currentPaths.length ? currentPaths : selectablePaths);
     kanbanSprintSelectionInitialized = true;
   }
 
@@ -22424,6 +22631,7 @@ function renderKanbanTab() {
       const iterPath = String(item?.fields?.['System.IterationPath'] || '').trim();
       const selectablePath = kanbanSprintSelectablePath(iterPath);
       if (!selectablePath) return false;
+      if (kanbanIsNoSprintPath(selectablePath) && ['closed', 'completed', 'archived'].includes(workItemStateLower(item))) return false;
       const identity = kanbanSprintIdentity(selectablePath, workItemProject(item, ''));
       return selectedSprintIdentities.has(identity);
     });
@@ -22446,7 +22654,7 @@ function renderKanbanTab() {
     kanbanSelectionAnchorId = [...kanbanSelectedCardIds].slice(-1)[0] || null;
   }
 
-  const stateUniverse = [...new Set(visibleItems.map(item => String(workItemState(item) || '').trim()).filter(Boolean))]
+  const stateUniverse = [...new Set(typeScopedItems.map(item => String(workItemState(item) || '').trim()).filter(Boolean))]
     .sort(kanbanStateSort);
 
   const states = kanbanShowEmptyColumns
@@ -22457,13 +22665,11 @@ function renderKanbanTab() {
 
   const leftPanelHtml = visibleProjects.length
     ? visibleProjects.map(projectRow => {
-      const selectedCount = projectRow.sprints.filter(s => kanbanSelectedSprintPaths.has(s.path)).length;
       const projectColor = kanbanProjectColor(projectRow.project);
       return `<div class="kanban-project-block" style="--kanban-project-color:${projectColor};">
         <div class="kanban-project-title">
           <span class="kanban-project-name" title="${escHtml(projectRow.project)}">${escHtml(projectRow.project)}</span>
           <span class="kanban-project-actions">
-            <span style="color:var(--muted);font-size:0.66rem;">${selectedCount}/${projectRow.sprints.length}</span>
             <button class="btn btn-outline kanban-project-select-btn" data-project="${escHtml(projectRow.project)}" data-selected="1" style="width:auto;padding:2px 6px;font-size:0.66rem;line-height:1;">alla</button>
             <button class="btn btn-outline kanban-project-select-btn" data-project="${escHtml(projectRow.project)}" data-selected="0" style="width:auto;padding:2px 6px;font-size:0.66rem;line-height:1;">ingen</button>
           </span>
@@ -22558,6 +22764,7 @@ function renderKanbanTab() {
             <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanRefreshSprints()" title="Läs in alla sprintar på nytt" aria-label="Läs in alla sprintar på nytt">↻</button>
             <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanSetAllSprints(true)">Alla</button>
             <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanSetAllSprints(false)">Ingen</button>
+            <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanSetCurrentSprints()">Nuvarande</button>
           </span>
         </div>
         <div class="kanban-left-options">
@@ -22578,10 +22785,10 @@ function renderKanbanTab() {
         </div>
         <div class="kanban-filter-bar">
           <span class="kanban-filter-label">Assignee</span>
-          <select class="col-filter kanban-assignee-filter" onchange="kanbanSetAssigneeFilter(this.value)">
-            <option value="" ${!kanbanAssigneeFilter ? 'selected' : ''}>Alla</option>
-            ${assignees.map(name => `<option value="${escHtml(name)}" ${kanbanAssigneeFilter===name?'selected':''}>${escHtml(name)}</option>`).join('')}
-          </select>
+          <span class="kanban-assignee-filter">
+            <button class="btn btn-outline kanban-assignee-filter-btn${!kanbanAssigneeFilter ? ' active' : ''}" type="button" onclick="kanbanSetAssigneeFilter('')">Alla</button>
+            ${assignees.map(name => `<button class="btn btn-outline kanban-assignee-filter-btn${kanbanAssigneeFilter===name?' active':''}" type="button" onclick="kanbanSetAssigneeFilter(${JSON.stringify(name).replace(/"/g, '&quot;')})">${escHtml(name)}</button>`).join('')}
+          </span>
           <label style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:0.72rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;user-select:none;cursor:pointer;">
             <input type="checkbox" ${kanbanShowEmptyColumns ? 'checked' : ''} onchange="kanbanToggleShowEmptyColumns(this.checked)" style="margin:0;accent-color:var(--accent2);" />
             Visa tomma kolumner
