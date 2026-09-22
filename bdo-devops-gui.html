@@ -165,7 +165,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Manrope', sans-serif;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -192,7 +192,7 @@
     display: block;
   }
   header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
-  header span { color: var(--muted); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; margin-left: 4px; }
+  header span { color: var(--muted); font-size: 0.8rem; font-family: 'IBM Plex Mono', monospace; margin-left: 4px; }
 
   .top-section-switch {
     position: absolute;
@@ -210,7 +210,7 @@
     border: none;
     background: transparent;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.76rem;
     font-weight: 700;
     letter-spacing: .04em;
@@ -275,13 +275,13 @@
     color: var(--accent2);
     border-color: var(--accent2);
   }
-  body.sidebar-collapsed aside {
+  body.sidebar-collapsed .main-sidebar {
     width: 18px;
     min-width: 18px;
     padding: 24px 0;
     overflow: hidden;
   }
-  body.sidebar-collapsed aside > * {
+  body.sidebar-collapsed .main-sidebar > * {
     opacity: 0;
     pointer-events: none;
   }
@@ -291,7 +291,7 @@
 
   .section-label {
     font-size: 0.71rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     letter-spacing: 0.12em;
     color: var(--muted);
     text-transform: uppercase;
@@ -307,7 +307,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.84rem;
     padding: 8px 11px;
     outline: none;
@@ -346,7 +346,7 @@
   }
   .conn-dot-accent { background: var(--accent2); }
   .conn-brand-name {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.84rem;
     color: var(--text);
   }
@@ -405,7 +405,7 @@
   .proj-select-link {
     font-size: 0.86rem;
     cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
   }
   .proj-select-link.all { color: var(--accent2); }
   .proj-select-link.none { color: var(--muted); }
@@ -416,7 +416,7 @@
     border-radius: 4px;
     color: var(--muted);
     font-size: 0.63rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     padding: 2px 7px;
     cursor: pointer;
     transition: all .15s;
@@ -459,7 +459,7 @@
     border: none;
     background: transparent;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: .04em;
@@ -501,7 +501,7 @@
     height: 22px;
     padding: 0 7px;
     font-size: 0.66rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     border-radius: 5px;
   }
   .favorite-list-name {
@@ -523,7 +523,7 @@
   .favorite-source {
     font-size: 0.64rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -539,7 +539,7 @@
     padding: 0;
     border-radius: 6px;
     font-size: 0.74rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
   }
   .create-favorite-main-btn {
     width: 24px;
@@ -566,7 +566,7 @@
     border:none;
     background:transparent;
     color:var(--muted);
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.8rem;
     line-height:1;
     cursor:pointer;
@@ -590,7 +590,7 @@
     padding: 9px 16px;
     border-radius: var(--radius);
     border: none;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Manrope', sans-serif;
     font-size: 0.88rem;
     font-weight: 600;
     cursor: pointer;
@@ -646,7 +646,7 @@
   }
   .tab-btn {
     padding: 10px 20px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.84rem;
     font-weight: 600;
     color: var(--muted);
@@ -682,7 +682,7 @@
     flex-shrink: 0;
   }
   .result-info {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.88rem;
     color: var(--muted);
   }
@@ -694,7 +694,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.84rem;
     padding: 7px 11px;
     outline: none;
@@ -754,7 +754,7 @@
     gap: 8px;
     padding: 8px 10px;
     border-bottom: 1px solid var(--border);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.72rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -887,7 +887,12 @@
       box-sizing: border-box;
     }
     .kanban-layout.kanban-left-collapsed {
-      grid-template-columns: 44px minmax(0, 1fr);
+      grid-template-columns: 18px minmax(0, 1fr);
+    }
+    .kanban-left-shell {
+      position: relative;
+      min-width: 0;
+      overflow: visible;
     }
     .kanban-left,
     .kanban-right {
@@ -906,8 +911,45 @@
       flex-direction: column;
       overflow: hidden;
     }
+    .kanban-sidebar-collapse-btn {
+      position: absolute;
+      top: 14px;
+      left: calc(100% - 24px);
+      z-index: 15;
+      width: 24px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      transition: left .18s ease, color .15s ease, border-color .15s ease, background .15s ease;
+      padding: 0;
+      font-size: 0.84rem;
+      line-height: 1;
+    }
+    .kanban-sidebar-collapse-btn:hover {
+      color: var(--accent2);
+      border-color: var(--accent2);
+    }
+    .kanban-layout.kanban-left-collapsed .kanban-sidebar-collapse-btn {
+      left: 4px;
+    }
     .kanban-layout.kanban-left-collapsed .kanban-left {
-      align-items: stretch;
+      width: 18px;
+      min-width: 18px;
+      padding: 24px 0;
+      overflow: hidden;
+      border-color: transparent;
+      background: transparent;
+    }
+    .kanban-layout.kanban-left-collapsed .kanban-left > * {
+      opacity: 0;
+      pointer-events: none;
     }
     .kanban-left-head,
     .kanban-right-head {
@@ -917,66 +959,11 @@
       gap: 8px;
       padding: 8px 10px;
       border-bottom: 1px solid var(--border);
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.72rem;
       letter-spacing: 0.05em;
       text-transform: uppercase;
       color: var(--muted);
-    }
-    .kanban-collapse-btn {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      border-radius: 6px;
-      min-width: 24px;
-      width: 24px;
-      height: 24px;
-      line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 0;
-      font-size: 0.84rem;
-      flex-shrink: 0;
-    }
-    .kanban-collapse-btn:hover {
-      color: var(--text);
-      border-color: var(--accent2);
-    }
-    .kanban-expand-btn {
-      display: none;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      border-radius: 6px;
-      min-width: 24px;
-      width: 24px;
-      height: 24px;
-      line-height: 1;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 0;
-      font-size: 0.84rem;
-      flex-shrink: 0;
-    }
-    .kanban-expand-btn:hover {
-      color: var(--text);
-      border-color: var(--accent2);
-    }
-    .kanban-layout.kanban-left-collapsed .kanban-expand-btn {
-      display: inline-flex;
-    }
-    .kanban-layout.kanban-left-collapsed .kanban-left-head {
-      justify-content: center;
-      padding: 8px 6px;
-    }
-    .kanban-layout.kanban-left-collapsed .kanban-left-head > .kanban-left-head-text,
-    .kanban-layout.kanban-left-collapsed .kanban-left-head > .kanban-left-head-actions,
-    .kanban-layout.kanban-left-collapsed .kanban-left-options,
-    .kanban-layout.kanban-left-collapsed .kanban-left-body {
-      display: none;
     }
     .kanban-left-options {
       display: flex;
@@ -985,7 +972,7 @@
       padding: 8px 10px;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.7rem;
       color: var(--muted);
       text-transform: uppercase;
@@ -1040,7 +1027,7 @@
       padding: 6px 8px;
       border-bottom: 1px solid var(--border);
       font-size: 0.76rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       color: var(--kanban-project-color, var(--accent2));
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -1103,7 +1090,7 @@
     }
     .kanban-sprint-label-meta {
       color: var(--muted);
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.66rem;
       margin-left: 4px;
     }
@@ -1152,7 +1139,7 @@
       gap: 5px;
       color: var(--muted);
       font-size: 0.72rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       text-transform: uppercase;
       letter-spacing: .04em;
       user-select: none;
@@ -1167,7 +1154,7 @@
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: .05em;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
     }
     .kanban-columns {
       flex: 1;
@@ -1250,7 +1237,7 @@
       gap: 8px;
       padding: 8px 10px;
       border-bottom: 1px solid var(--border);
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.72rem;
       color: var(--muted);
       text-transform: uppercase;
@@ -1351,7 +1338,7 @@
       border-top: 2px solid var(--accent2);
     }
     .kanban-card-id {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.72rem;
       color: #000;
       flex-shrink: 0;
@@ -1396,12 +1383,12 @@
     .kanban-card-assignee {
       color: var(--muted);
       font-size: 0.74rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
     }
     .kanban-card-parent {
       color: var(--muted);
       font-size: 0.7rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1409,7 +1396,7 @@
     .kanban-card-project {
       color: var(--kanban-project-color, var(--muted));
       font-size: 0.7rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       text-transform: uppercase;
       letter-spacing: .04em;
       white-space: nowrap;
@@ -1420,7 +1407,7 @@
       padding: 10px;
       color: var(--muted);
       font-size: 0.76rem;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'IBM Plex Mono', monospace;
     }
     @media (max-width: 1180px) {
       .kanban-layout {
@@ -1445,7 +1432,7 @@
     color: var(--muted);
     padding: 5px 10px;
     font-size: 0.72rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     cursor: pointer;
   }
   .board-sprint-trigger:hover {
@@ -1501,7 +1488,7 @@
     color: var(--muted);
     padding: 2px 8px;
     font-size: 0.7rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     cursor: pointer;
   }
   .board-sprint-chip:hover { border-color: var(--accent2); color: var(--text); }
@@ -1556,7 +1543,7 @@
     background: var(--surface2);
     border-bottom: 1px solid var(--border);
     font-size: 0.76rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     color: var(--muted);
   }
   .info-template-context .label {
@@ -1629,7 +1616,7 @@
     padding:10px 12px;
     font-size:0.78rem;
     color:var(--muted);
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     border: 1px solid var(--border);
     border-radius: 10px;
     background: var(--surface);
@@ -1721,7 +1708,7 @@
     color:var(--muted);
     border-radius:999px;
     padding:4px 12px;
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.72rem;
     line-height:1.2;
     cursor:pointer;
@@ -1779,7 +1766,7 @@
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.75rem;
     color:var(--muted);
   }
@@ -1819,7 +1806,7 @@
     align-items:center;
     justify-content:center;
     text-align:center;
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.76rem;
     color:var(--muted);
     opacity:0.8;
@@ -1868,7 +1855,7 @@
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.75rem;
     color:var(--muted);
   }
@@ -1926,7 +1913,7 @@
     display:flex;
     align-items:center;
     gap:8px;
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.72rem;
     color:var(--muted);
     white-space:nowrap;
@@ -1938,7 +1925,7 @@
     align-items:center;
     justify-content:center;
     text-align:center;
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.76rem;
     color:var(--muted);
     opacity:0.8;
@@ -1962,7 +1949,7 @@
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.75rem;
     color:var(--muted);
   }
@@ -1988,7 +1975,7 @@
     padding:4px 6px;
   }
   .status-triage-grid-head {
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.7rem;
     text-transform:uppercase;
     letter-spacing:.05em;
@@ -2014,13 +2001,13 @@
     font-size:0.82rem;
   }
   .status-triage-cell-num {
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.78rem;
     color:var(--text);
     white-space:nowrap;
   }
   .status-triage-cell-date {
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.75rem;
     color:var(--muted);
     white-space:nowrap;
@@ -2028,7 +2015,7 @@
   .status-triage-empty {
     padding:12px;
     color:var(--muted);
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.76rem;
     opacity:0.8;
   }
@@ -2054,7 +2041,7 @@
     justify-content:space-between;
     gap:10px;
     padding:10px 12px;
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.72rem;
     text-transform:uppercase;
     letter-spacing:.06em;
@@ -2096,7 +2083,7 @@
   }
   .status-lane-item-state { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .status-lane-item-num {
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.78rem;
     color:var(--text);
     white-space:nowrap;
@@ -2104,7 +2091,7 @@
   .status-lane-empty {
     padding:10px 12px;
     color:var(--muted);
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-size:0.76rem;
     opacity:0.7;
   }
@@ -2135,7 +2122,7 @@
     border-radius: 8px;
     background: var(--surface);
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.75rem;
     padding: 8px;
     resize: none;
@@ -2146,7 +2133,7 @@
     border-radius: 10px;
     background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0));
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.78rem;
     display: flex;
     align-items: center;
@@ -2240,7 +2227,7 @@
     border-bottom: 1px solid var(--border);
     border-radius: 8px 8px 0 0;
     cursor: grab;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-weight: 600;
   }
   .board-native-node-id {
@@ -2283,7 +2270,7 @@
     border: 1px solid var(--border);
     color: var(--muted);
     font-size: 0.66rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     background: color-mix(in oklab, var(--surface2) 70%, transparent 30%);
     max-width: calc(100% - 16px);
     overflow: hidden;
@@ -2437,7 +2424,7 @@
     box-shadow: 0 3px 10px rgba(0,0,0,.08);
     pointer-events: auto;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: .66rem;
   }
   .board-native-axis-x {
@@ -2464,7 +2451,7 @@
     box-shadow: 0 3px 10px rgba(0,0,0,.08);
     pointer-events: auto;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: .66rem;
     overflow: hidden;
   }
@@ -2597,7 +2584,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     pointer-events: none;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
   }
   .board-native-axis-label {
     position: absolute;
@@ -2650,7 +2637,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     pointer-events: none;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
   }
   .board-native-axis-marker-label-x {
     bottom: calc(50% + 10px);
@@ -2678,7 +2665,7 @@
     align-items: center;
     justify-content: center;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.78rem;
     pointer-events: none;
   }
@@ -2696,7 +2683,7 @@
   th {
     padding: 10px 14px;
     text-align: left;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.86rem;
     letter-spacing: 0.08em;
     color: var(--muted);
@@ -2752,7 +2739,7 @@
     border: 1px solid var(--border);
     border-radius: 4px;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.71rem;
     padding: 2px 5px;
     outline: none;
@@ -2782,7 +2769,7 @@
   .sprint-linked-tickets-label {
     font-size: 0.66rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
     letter-spacing: .05em;
   }
@@ -2854,7 +2841,7 @@
   .sprint-col-header {
     padding: 10px 12px;
     border-bottom: 1px solid var(--border);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: .06em;
@@ -2961,7 +2948,7 @@
   .sprint-create-project-label {
     font-size: 0.75rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
     letter-spacing: .06em;
   }
@@ -2981,7 +2968,7 @@
   .prio-toolbar-label {
     font-size: 0.71rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
   }
   .prio-model-group {
@@ -2995,7 +2982,7 @@
   .prio-model-label {
     font-size: 0.71rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
     letter-spacing: .05em;
   }
@@ -3024,7 +3011,7 @@
   .timeline-toolbar-label {
     font-size: 0.71rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
     letter-spacing: .04em;
   }
@@ -3055,7 +3042,7 @@
   .timeline-zoom-value {
     min-width: 42px;
     text-align: right;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.72rem;
     color: var(--muted);
   }
@@ -3093,7 +3080,7 @@
   }
 
   /* AO color badges */
-  .ao-badge { font-family:'JetBrains Mono',monospace; font-size:0.84rem; font-weight:600; padding:1px 6px; border-radius:4px; }
+  .ao-badge { font-family:'IBM Plex Mono',monospace; font-size:0.84rem; font-weight:600; padding:1px 6px; border-radius:4px; }
   .ao-foretagsservice { color:#79c0ff; }
   .ao-revision        { color:#7ee787; }
   .ao-skatt           { color:#ffc947; }
@@ -3102,7 +3089,7 @@
   .ao-unknown         { color:var(--muted); }
 
   /* Custom.Typ badges */
-  .customtyp-badge       { font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:600; padding:2px 7px; border-radius:4px; }
+  .customtyp-badge       { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; font-weight:600; padding:2px 7px; border-radius:4px; }
   .customtyp-projekt     { background:rgba(88,166,255,.18);  color:#79c0ff; }
   .customtyp-underhall   { background:rgba(210,153,34,.18);  color:#f0c040; }
   .customtyp-forbattring,
@@ -3112,7 +3099,7 @@
 
   /* T-shirt size badges */
   .tshirt-badge,
-  .roadmap-badge { font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:700; padding:2px 7px; border-radius:4px; }
+  .roadmap-badge { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; font-weight:700; padding:2px 7px; border-radius:4px; }
   .tshirt-xs  { background:rgba(125,133,144,.18); color:#c9d1d9; }
   .tshirt-s   { background:rgba(63,185,80,.18);   color:#6bdb78; }
   .tshirt-m   { background:rgba(88,166,255,.18);  color:#79c0ff; }
@@ -3162,7 +3149,7 @@
   }
 
   .id-cell {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.84rem;
     color: var(--accent2);
     white-space: nowrap;
@@ -3180,7 +3167,7 @@
     padding: 2px 8px;
     border-radius: 20px;
     font-size: 0.7rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     white-space: nowrap;
     font-weight: 600;
   }
@@ -3255,7 +3242,7 @@
   }
   .feature-link {
     font-size: 0.86rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     color: #79c0ff;
     text-decoration: none;
     opacity: 0.8;
@@ -3263,13 +3250,13 @@
   .feature-link:hover { opacity: 1; text-decoration: underline; }
   .epic-link {
     font-size: 0.86rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     color: #d2a8ff;
     text-decoration: none;
     opacity: 0.85;
   }
   .epic-link:hover { opacity: 1; text-decoration: underline; }
-  .no-epic { color: var(--muted); font-size: 0.86rem; font-family: 'JetBrains Mono', monospace; }
+  .no-epic { color: var(--muted); font-size: 0.86rem; font-family: 'IBM Plex Mono', monospace; }
   .epic-expand-btn {
     width: 16px;
     height: 16px;
@@ -3308,7 +3295,7 @@
     border: 1px solid rgba(88,166,255,.3);
     background: rgba(88,166,255,.08);
     color: var(--accent);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.6rem;
     cursor: pointer;
     transition: background .15s, border-color .15s;
@@ -3366,7 +3353,7 @@
     width: 100%;
     padding: 7px 10px;
     font-size: 0.8rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
   }
   .storage-project-btn.active {
     border-color: var(--accent2);
@@ -3405,7 +3392,7 @@
   }
   .wi-modal-label {
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: .04em;
@@ -3427,7 +3414,7 @@
     align-items: center;
     gap: 6px;
     margin-top: 10px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.8rem;
     color: var(--accent2);
     text-decoration: none;
@@ -3440,7 +3427,7 @@
     border: 1px solid var(--border);
     border-radius: 5px;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.78rem;
     padding: 5px 7px;
     outline: none;
@@ -3472,7 +3459,7 @@
     border-radius: 6px;
     padding: 6px 10px;
     font-size: 0.78rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-weight: 700;
     cursor: pointer;
   }
@@ -3685,7 +3672,7 @@
   }
   /* ── Sprint cell ── */
   .sprint-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.86rem;
     color: var(--muted);
     white-space: nowrap;
@@ -3698,7 +3685,7 @@
     display: inline-block;
     padding: 2px 7px;
     border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.86rem;
     font-weight: 600;
     white-space: nowrap;
@@ -3711,7 +3698,7 @@
     border: 1px solid var(--border);
     border-radius: 4px;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.86rem;
     padding: 2px 4px;
     cursor: pointer;
@@ -3731,14 +3718,14 @@
   .prio-trash:hover { opacity: 1; color: var(--danger); }
   .wsjf-cell { display:flex; flex-direction:column; align-items:center; gap:2px; }
   .wsjf-row  { display:flex; gap:3px; align-items:center; }
-  .wsjf-label { font-family:'JetBrains Mono',monospace; font-size:0.64rem; color:var(--muted); width:16px; text-align:right; flex-shrink:0; }
+  .wsjf-label { font-family:'IBM Plex Mono',monospace; font-size:0.64rem; color:var(--muted); width:16px; text-align:right; flex-shrink:0; }
   .wsjf-input {
     width: 56px;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 3px;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.88rem;
     padding: 2px 6px;
     text-align: center;
@@ -3750,7 +3737,7 @@
   .wsjf-input:focus { border-color: var(--accent2); }
   .wsjf-input.wsjf-error { border-color: var(--danger); background: rgba(248,81,73,.1); }
   .wsjf-score {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.7rem;
     font-weight: 700;
     padding: 1px 5px;
@@ -3767,7 +3754,7 @@
     border: 1px solid var(--accent2);
     border-radius: 4px;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 0.88rem;
     padding: 2px 6px;
     text-align: center;
@@ -3833,14 +3820,14 @@
   .plan-wrap,
   .dash-wrap { padding: 24px 28px; overflow-y: auto; }
   .plan-table { width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:32px; }
-  .plan-table th { padding:8px 14px; text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.71rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); border-bottom:2px solid var(--border); white-space:nowrap; }
+  .plan-table th { padding:8px 14px; text-align:left; font-family:'IBM Plex Mono',monospace; font-size:0.71rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); border-bottom:2px solid var(--border); white-space:nowrap; }
   .plan-table td { padding:8px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
   .plan-table tr:hover td { background:rgba(255,255,255,.03); }
-  .plan-table td:first-child { font-family:'JetBrains Mono',monospace; }
-  .plan-input { background:var(--surface2); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.84rem; padding:3px 7px; width:70px; text-align:right; outline:none; }
+  .plan-table td:first-child { font-family:'IBM Plex Mono',monospace; }
+  .plan-input { background:var(--surface2); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:0.84rem; padding:3px 7px; width:70px; text-align:right; outline:none; }
   .plan-input:focus { border-color:var(--accent2); }
-  .plan-table td.plan-derived { font-family:'JetBrains Mono',monospace; color:var(--accent2); font-size:0.84rem; }
-  .plan-table td.plan-muted  { font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:0.84rem; }
+  .plan-table td.plan-derived { font-family:'IBM Plex Mono',monospace; color:var(--accent2); font-size:0.84rem; }
+  .plan-table td.plan-muted  { font-family:'IBM Plex Mono',monospace; color:var(--muted); font-size:0.84rem; }
   .plan-title { font-size:0.90rem; font-weight:700; color:var(--text); margin-bottom:14px; }
   .plan-title strong { color:var(--accent2); }
 
@@ -3851,8 +3838,8 @@
     margin-left: 10px;
   }
   .grouping-bar-backlog .toggle-wrap { margin-bottom: 0; }
-  .grouping-label { font-family:'JetBrains Mono',monospace; font-size:0.71rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-right:4px; }
-  .group-btn { padding:4px 14px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .15s; white-space:nowrap; }
+  .grouping-label { font-family:'IBM Plex Mono',monospace; font-size:0.71rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-right:4px; }
+  .group-btn { padding:4px 14px; font-family:'IBM Plex Mono',monospace; font-size:0.7rem; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .15s; white-space:nowrap; }
   .group-btn:hover { border-color:var(--accent2); color:var(--text); }
   .group-btn.active { background:var(--accent2); border-color:var(--accent2); color:var(--bg); font-weight:700; }
 
@@ -3861,21 +3848,21 @@
   .prio-toolbar { display:flex; align-items:center; gap:8px; padding:8px 14px; border-bottom:1px solid var(--border); flex-shrink:0; flex-wrap:wrap; }
   .prio-toolbar-sep { width:1px; height:22px; background:var(--border); flex-shrink:0; margin:0 4px; }
   .prio-model-btn,
-  .kost-month-btn { padding:4px 12px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; border-radius:16px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .15s; }
+  .kost-month-btn { padding:4px 12px; font-family:'IBM Plex Mono',monospace; font-size:0.7rem; border-radius:16px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all .15s; }
   .prio-model-btn:hover,
   .kost-month-btn:hover { border-color:var(--accent2); color:var(--text); }
   .prio-model-btn.active { background:var(--accent2); border-color:var(--accent2); color:var(--bg); font-weight:700; }
-  .prio-model-label { font-size:0.86rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; color:var(--muted); letter-spacing:.06em; flex-shrink:0; }
+  .prio-model-label { font-size:0.86rem; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; color:var(--muted); letter-spacing:.06em; flex-shrink:0; }
   .prio-table-wrap { flex:1; overflow:auto; }
   .prio-table { border-collapse:collapse; width:100%; }
-  .prio-table th { font-family:'JetBrains Mono',monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:6px 10px; border-bottom:2px solid var(--border); text-align:left; position:sticky; top:0; background:var(--surface2); z-index:2; white-space:nowrap; }
+  .prio-table th { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:6px 10px; border-bottom:2px solid var(--border); text-align:left; position:sticky; top:0; background:var(--surface2); z-index:2; white-space:nowrap; }
   .prio-table th.num,
   .kost-table th.num { text-align:right; }
   .prio-table td { padding:5px 10px; border-bottom:1px solid rgba(125,133,144,.08); font-size:0.88rem; vertical-align:middle; }
   .prio-table td.num,
-  .kost-table td.num { text-align:right; font-family:'JetBrains Mono',monospace; }
-  .prio-group-row td { background:rgba(88,166,255,.05); font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:700; color:var(--accent2); border-top:2px solid var(--border); padding:6px 10px; }
-  .prio-rank { font-family:'JetBrains Mono',monospace; font-size:0.86rem; color:var(--muted); min-width:24px; text-align:right; }
+  .kost-table td.num { text-align:right; font-family:'IBM Plex Mono',monospace; }
+  .prio-group-row td { background:rgba(88,166,255,.05); font-family:'IBM Plex Mono',monospace; font-size:0.7rem; font-weight:700; color:var(--accent2); border-top:2px solid var(--border); padding:6px 10px; }
+  .prio-rank { font-family:'IBM Plex Mono',monospace; font-size:0.86rem; color:var(--muted); min-width:24px; text-align:right; }
   .wsjf-hi { color:#6bdb78; font-weight:700; }
   .wsjf-med { color:#f0c040; }
   .wsjf-lo { color:var(--muted); }
@@ -3885,39 +3872,39 @@
   .prio-toolbar { display:flex; align-items:center; gap:8px; padding:8px 16px; border-bottom:1px solid var(--border); flex-shrink:0; flex-wrap:wrap; }
   .prio-body { flex:1; overflow:auto; display:flex; }
   .prio-list { flex:0 0 auto; min-width:340px; max-width:480px; border-right:2px solid var(--border); display:flex; flex-direction:column; }
-  .prio-list-header { display:flex; align-items:center; padding:6px 10px; background:var(--surface2); border-bottom:2px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:0.6rem; text-transform:uppercase; color:var(--muted); gap:6px; flex-shrink:0; }
-  .prio-group-row { padding:6px 10px; background:var(--surface); border-bottom:1px solid var(--border); font-size:0.7rem; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--accent2); text-transform:uppercase; }
+  .prio-list-header { display:flex; align-items:center; padding:6px 10px; background:var(--surface2); border-bottom:2px solid var(--border); font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; color:var(--muted); gap:6px; flex-shrink:0; }
+  .prio-group-row { padding:6px 10px; background:var(--surface); border-bottom:1px solid var(--border); font-size:0.7rem; font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--accent2); text-transform:uppercase; }
   .prio-epic-row { display:flex; align-items:center; gap:6px; padding:0 10px; border-bottom:1px solid rgba(125,133,144,.08); height:36px; box-sizing:border-box; font-size:0.86rem; }
   .prio-epic-row:hover { background:rgba(88,166,255,.04); }
   .prio-panel { flex:1; display:flex; flex-direction:column; }
-  .prio-panel-header { display:flex; align-items:center; padding:6px 10px; background:var(--surface2); border-bottom:2px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:0.6rem; text-transform:uppercase; color:var(--muted); gap:16px; flex-shrink:0; }
+  .prio-panel-header { display:flex; align-items:center; padding:6px 10px; background:var(--surface2); border-bottom:2px solid var(--border); font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; color:var(--muted); gap:16px; flex-shrink:0; }
   .prio-panel-row { display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid rgba(125,133,144,.08); height:36px; box-sizing:border-box; }
   .prio-panel-group { height:29px; background:var(--surface); border-bottom:1px solid var(--border); }
   /* WSJF bar */
   .wsjf-bar-wrap { display:flex; align-items:center; gap:4px; flex:1; }
   .wsjf-bar-track { flex:1; height:8px; background:rgba(125,133,144,.15); border-radius:4px; overflow:visible; position:relative; cursor:ew-resize; }
   .wsjf-bar-fill { height:100%; border-radius:4px; transition:width .1s; pointer-events:none; }
-  .wsjf-bar-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); width:16px; text-align:right; flex-shrink:0; }
-  .wsjf-score-big { font-family:'JetBrains Mono',monospace; font-size:0.9rem; font-weight:700; min-width:36px; text-align:center; }
+  .wsjf-bar-label { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--muted); width:16px; text-align:right; flex-shrink:0; }
+  .wsjf-score-big { font-family:'IBM Plex Mono',monospace; font-size:0.9rem; font-weight:700; min-width:36px; text-align:center; }
 
   /* Timeline view */
   .tl-wrap { display:flex; flex-direction:column; height:100%; overflow:hidden; }
   .tl-toolbar { display:flex; align-items:center; gap:12px; padding:8px 16px; border-bottom:1px solid var(--border); flex-shrink:0; font-size:0.88rem; }
   .tl-body { flex:1; overflow:auto; display:flex; }
   .tl-labels { flex-shrink:0; min-width:200px; max-width:260px; border-right:1px solid var(--border); }
-  .tl-label-header { height:44px; border-bottom:2px solid var(--border); background:var(--surface2); display:flex; align-items:center; padding:0 12px; font-family:'JetBrains Mono',monospace; font-size:0.6rem; text-transform:uppercase; color:var(--muted); }
-  .tl-group-hdr { padding:8px 12px 4px; font-size:0.7rem; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--accent2); text-transform:uppercase; background:var(--surface); border-bottom:1px solid var(--border); }
+  .tl-label-header { height:44px; border-bottom:2px solid var(--border); background:var(--surface2); display:flex; align-items:center; padding:0 12px; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; color:var(--muted); }
+  .tl-group-hdr { padding:8px 12px 4px; font-size:0.7rem; font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--accent2); text-transform:uppercase; background:var(--surface); border-bottom:1px solid var(--border); }
   .tl-row-label { height:32px; display:flex; align-items:center; padding:0 12px; border-bottom:1px solid rgba(125,133,144,.08); font-size:0.86rem; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .tl-row-label.tl-no-date { color:var(--muted); }
   .tl-chart { flex:1; position:relative; overflow:hidden; }
   .tl-chart-header { height:44px; border-bottom:2px solid var(--border); background:var(--surface2); display:flex; position:sticky; top:0; z-index:2; }
-  .tl-month-col { border-right:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); flex-shrink:0; }
+  .tl-month-col { border-right:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--muted); flex-shrink:0; }
   .tl-month-col.current { background:rgba(88,166,255,.06); color:var(--accent2); font-weight:700; }
   .tl-rows { position:relative; }
   .tl-row { height:32px; display:flex; align-items:center; border-bottom:1px solid rgba(125,133,144,.08); position:relative; }
   .tl-row-bg { position:absolute; inset:0; }
   .tl-row-bg.tl-group-bg { background:rgba(88,166,255,.02); }
-  .tl-bar { position:absolute; height:16px; border-radius:8px; top:8px; display:flex; align-items:center; padding:0 6px; overflow:hidden; font-size:0.86rem; font-family:'JetBrains Mono',monospace; color:#fff; font-weight:700; white-space:nowrap; cursor:grab; user-select:none; }
+  .tl-bar { position:absolute; height:16px; border-radius:8px; top:8px; display:flex; align-items:center; padding:0 6px; overflow:hidden; font-size:0.86rem; font-family:'IBM Plex Mono',monospace; color:#fff; font-weight:700; white-space:nowrap; cursor:grab; user-select:none; }
   .tl-bar:active { cursor:grabbing; }
   .tl-drag-handle { width:8px; height:100%; flex-shrink:0; opacity:0.4; cursor:ew-resize; display:flex; align-items:center; justify-content:center; }
   .tl-drag-handle::after { content:'|'; font-size:9px; }
@@ -3927,11 +3914,11 @@
   .tl-grid-line { position:absolute; top:44px; bottom:0; width:1px; background:var(--border); opacity:0.4; z-index:1; pointer-events:none; }
   /* Edit mode date inputs */
   .tl-date-col { flex-shrink:0; border-right:1px solid var(--border); }
-  .tl-date-header { height:44px; border-bottom:2px solid var(--border); background:var(--surface2); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:0.6rem; text-transform:uppercase; color:var(--muted); }
+  .tl-date-header { height:44px; border-bottom:2px solid var(--border); background:var(--surface2); display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; color:var(--muted); }
   .tl-date-cell { height:32px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid rgba(125,133,144,.08); padding:0 4px; }
-  .tl-date-input { background:var(--surface2); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.71rem; padding:2px 4px; width:88px; outline:none; }
+  .tl-date-input { background:var(--surface2); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:0.71rem; padding:2px 4px; width:88px; outline:none; }
   .tl-date-input:focus { border-color:var(--accent2); }
-  .tl-quick-btn { padding:2px 6px; font-family:'JetBrains Mono',monospace; font-size:0.6rem; border-radius:3px; border:1px solid var(--border); background:var(--surface2); color:var(--muted); cursor:pointer; }
+  .tl-quick-btn { padding:2px 6px; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; border-radius:3px; border:1px solid var(--border); background:var(--surface2); color:var(--muted); cursor:pointer; }
   .tl-quick-btn:hover { border-color:var(--accent2); color:var(--accent2); }
 
   /* Kostnader view */
@@ -3940,63 +3927,63 @@
   .kost-month-bar { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
   .kost-month-btn.active { background:var(--accent2); border-color:var(--accent2); color:var(--bg); font-weight:700; }
   .kost-table { border-collapse:collapse; font-size:0.76rem; white-space:nowrap; }
-  .kost-table th { font-family:'JetBrains Mono',monospace; font-size:0.64rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:4px 10px 4px 0; border-bottom:2px solid var(--border); text-align:left; }
+  .kost-table th { font-family:'IBM Plex Mono',monospace; font-size:0.64rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:4px 10px 4px 0; border-bottom:2px solid var(--border); text-align:left; }
   .kost-table td { padding:3px 10px 3px 0; border-bottom:1px solid rgba(125,133,144,.08); }
-  .kost-table tr.kost-total td { border-top:2px solid var(--border); font-weight:700; font-family:'JetBrains Mono',monospace; color:var(--accent2); padding-top:6px; }
+  .kost-table tr.kost-total td { border-top:2px solid var(--border); font-weight:700; font-family:'IBM Plex Mono',monospace; color:var(--accent2); padding-top:6px; }
   .kost-table tr:hover td { background:rgba(88,166,255,.04); }
   .kost-group-hdr { background:rgba(88,166,255,.06); }
-  .kost-group-hdr td { font-weight:700; color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:0.84rem; padding:6px 10px 6px 0; border-bottom:1px solid var(--border); }
+  .kost-group-hdr td { font-weight:700; color:var(--accent2); font-family:'IBM Plex Mono',monospace; font-size:0.84rem; padding:6px 10px 6px 0; border-bottom:1px solid var(--border); }
   .kost-epic-row td { font-size:0.86rem; color:var(--text); padding:3px 10px 3px 12px; }
 
   /* Analys view */
   .analys-section { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px 20px; }
-  .analys-section-title { font-size:0.71rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+  .analys-section-title { font-size:0.71rem; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(--border); }
   .analys-score-bar { height:8px; border-radius:4px; background:rgba(125,133,144,.15); overflow:hidden; margin-top:4px; }
   .analys-score-fill { height:100%; border-radius:4px; transition:width .3s; }
   .analys-grid,
   .kalkyl-summary-grid { display:flex; gap:12px; flex-wrap:wrap; }
   .analys-card { background:var(--surface2); border-radius:6px; padding:10px 14px; min-width:110px; }
-  .analys-card-label { font-size:0.6rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:3px; }
-  .analys-card-val { font-size:1.3rem; font-weight:700; font-family:'JetBrains Mono',monospace; }
+  .analys-card-label { font-size:0.6rem; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:3px; }
+  .analys-card-val { font-size:1.3rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
   .analys-table { width:auto; border-collapse:collapse; font-size:0.76rem; }
-  .analys-table th { font-family:'JetBrains Mono',monospace; font-size:0.64rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:3px 10px 3px 0; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
+  .analys-table th { font-family:'IBM Plex Mono',monospace; font-size:0.64rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:3px 10px 3px 0; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
   .analys-table td { padding:3px 10px 3px 0; border-bottom:1px solid rgba(125,133,144,.08); vertical-align:middle; white-space:nowrap; }
   .analys-rgt-bar { height:24px; display:flex; border-radius:4px; overflow:hidden; gap:2px; }
-  .analys-rgt-seg { display:flex; align-items:center; justify-content:center; font-size:0.71rem; font-family:'JetBrains Mono',monospace; font-weight:700; color:#fff; transition:width .3s; min-width:0; overflow:hidden; }
+  .analys-rgt-seg { display:flex; align-items:center; justify-content:center; font-size:0.71rem; font-family:'IBM Plex Mono',monospace; font-weight:700; color:#fff; transition:width .3s; min-width:0; overflow:hidden; }
   .analys-target-line { position:relative; }
 
   /* T-shirt kalkyl */
   .tsc-wrap { padding:24px 28px; overflow-y:auto; }
   .tsc-table { width:auto; min-width:0; border-collapse:collapse; font-size:0.84rem; margin-bottom:20px; }
-  .tsc-table th { font-family:'JetBrains Mono',monospace; font-size:0.86rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); padding:4px 10px; text-align:left; border-bottom:2px solid var(--border); white-space:nowrap; }
+  .tsc-table th { font-family:'IBM Plex Mono',monospace; font-size:0.86rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); padding:4px 10px; text-align:left; border-bottom:2px solid var(--border); white-space:nowrap; }
   .tsc-table td { padding:3px 10px; border-bottom:1px solid var(--border); vertical-align:middle; }
   .tsc-table tr:last-child td { border-bottom:none; }
   .tsc-table tbody tr:hover td { background:rgba(88,166,255,.04); }
-  .tsc-input { background:var(--surface2); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.88rem; padding:2px 5px; width:55px; outline:none; text-align:right; }
+  .tsc-input { background:var(--surface2); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:0.88rem; padding:2px 5px; width:55px; outline:none; text-align:right; }
   .tsc-input:focus { border-color:var(--accent2); }
-  .tsc-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:0.88rem; font-weight:700; }
-  .tsc-section-title { font-size:0.8rem; font-family:'Inter',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent2); margin-bottom:14px; padding-bottom:8px; border-bottom:2px solid var(--border); }
+  .tsc-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:0.88rem; font-weight:700; }
+  .tsc-section-title { font-size:0.8rem; font-family:'Manrope',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent2); margin-bottom:14px; padding-bottom:8px; border-bottom:2px solid var(--border); }
 
   /* Roadmap view */
   .kalkyl-wrap { padding:20px 24px; overflow-y:auto; }
   .kalkyl-segment { margin-bottom:28px; }
-  .kalkyl-segment-title { font-size:0.88rem; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--accent2); padding:6px 0 8px; border-bottom:1px solid var(--border); margin-bottom:8px; }
+  .kalkyl-segment-title { font-size:0.88rem; font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--accent2); padding:6px 0 8px; border-bottom:1px solid var(--border); margin-bottom:8px; }
   .kalkyl-table { width:auto; border-collapse:collapse; font-size:0.84rem; margin-bottom:8px; table-layout:auto; }
-  .kalkyl-table th { font-family:'JetBrains Mono',monospace; font-size:0.86rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:4px 10px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; overflow:hidden; }
+  .kalkyl-table th { font-family:'IBM Plex Mono',monospace; font-size:0.86rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:4px 10px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; overflow:hidden; }
   .kalkyl-table td { padding:4px 10px; border-bottom:1px solid rgba(125,133,144,.1); vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .kalkyl-table tr.kalkyl-total td { border-top:2px solid var(--border); font-weight:700; color:var(--accent2); font-family:'JetBrains Mono',monospace; }
+  .kalkyl-table tr.kalkyl-total td { border-top:2px solid var(--border); font-weight:700; color:var(--accent2); font-family:'IBM Plex Mono',monospace; }
   .kalkyl-table tbody tr:hover td { background:rgba(88,166,255,.04); }
   .kalkyl-summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:24px; }
-  .kalkyl-summary-title { font-size:0.7rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:12px; }
+  .kalkyl-summary-title { font-size:0.7rem; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:12px; }
   .kalkyl-sum-card { background:var(--surface2); border-radius:6px; padding:10px 16px; min-width:100px; }
-  .kalkyl-sum-label { font-size:0.86rem; color:var(--muted); font-family:'JetBrains Mono',monospace; text-transform:uppercase; margin-bottom:3px; }
-  .kalkyl-sum-val { font-size:1.2rem; font-weight:700; font-family:'JetBrains Mono',monospace; color:var(--accent2); }
+  .kalkyl-sum-label { font-size:0.86rem; color:var(--muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; margin-bottom:3px; }
+  .kalkyl-sum-val { font-size:1.2rem; font-weight:700; font-family:'IBM Plex Mono',monospace; color:var(--accent2); }
   .rm-wrap { display:flex; flex-direction:column; height:100%; overflow:hidden; }
   .rm-swimlane-toggle { display:flex; align-items:center; gap:16px; padding:12px 20px; border-bottom:1px solid var(--border); flex-shrink:0; font-size:0.88rem; color:var(--muted); }
   .rm-cols { display:flex; gap:0; flex:1; overflow:hidden; }
   .rm-col { flex:1; display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
   .rm-col:last-child { border-right:none; }
-  .rm-col-header { padding:12px 16px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; border-bottom:2px solid; flex-shrink:0; }
+  .rm-col-header { padding:12px 16px; font-family:'IBM Plex Mono',monospace; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; border-bottom:2px solid; flex-shrink:0; }
   .rm-col-now    .rm-col-header { color:#8df0a0; border-color:#8df0a0; background:rgba(63,185,80,.13); }
   .rm-col-next   .rm-col-header { color:#9ecdff; border-color:#9ecdff; background:rgba(88,166,255,.13); }
   .rm-col-later  .rm-col-header { color:#ffb0a9; border-color:#ffb0a9; background:rgba(248,81,73,.13); }
@@ -4004,7 +3991,7 @@
   .rm-col-continous .rm-col-header { color:#e2bbff; border-color:#e2bbff; background:rgba(167,105,218,.13); }
   .rm-col-completed .rm-col-header { color:#d0d7e2; border-color:#d0d7e2; background:rgba(125,133,144,.13); }
   .rm-simple-group { padding:0; }
-  .rm-simple-group-label { font-size:0.86rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.06em; color:var(--accent2); padding:6px 12px 3px; font-weight:700; }
+  .rm-simple-group-label { font-size:0.86rem; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.06em; color:var(--accent2); padding:6px 12px 3px; font-weight:700; }
   .rm-simple-row { display:flex; align-items:center; gap:6px; padding:3px 12px 3px 20px; cursor:pointer; border-radius:3px; transition:background .1s; }
   .rm-simple-row:hover { background:rgba(88,166,255,.07); }
   .rm-simple-row::before { content:'◆'; font-size:0.45rem; color:var(--muted); flex-shrink:0; }
@@ -4022,11 +4009,11 @@
     font-size: 0.76rem;
     color: var(--muted);
     opacity: 0.55;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     padding: 2px 10px 0;
   }
   .rm-swimlane { margin-bottom:4px; }
-  .rm--label { font-size:0.88rem; font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--accent2); padding:4px 2px 6px; border-bottom:1px solid var(--border); margin-bottom:6px; letter-spacing:.02em; }
+  .rm--label { font-size:0.88rem; font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--accent2); padding:4px 2px 6px; border-bottom:1px solid var(--border); margin-bottom:6px; letter-spacing:.02em; }
   .rm-draggable { cursor: grab; }
   .rm-draggable:active { cursor: grabbing; opacity: 0.7; }
   .rm-col-drag-over { outline: 2px dashed var(--accent2); outline-offset: -4px; background: rgba(88,166,255,.06); }
@@ -4067,7 +4054,7 @@
   .rm-grid-lane:last-child { border-bottom:2px dashed rgba(125,133,144,.35); }
   .rm-grid-lane-title {
     font-size:0.88rem;
-    font-family:'JetBrains Mono',monospace;
+    font-family:'IBM Plex Mono',monospace;
     font-weight:700;
     color:var(--accent2);
     letter-spacing:.02em;
@@ -4119,26 +4106,26 @@
   .rm-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; cursor:pointer; transition:border-color .15s, box-shadow .15s; }
   .rm-card:hover { border-color:var(--accent2); box-shadow:0 2px 12px rgba(0,0,0,.3); }
   .rm-card-title { font-size:0.8rem; font-weight:600; color:var(--text); margin-bottom:6px; line-height:1.3; }
-  .rm-card-meta { display:flex; flex-wrap:wrap; gap:4px; font-size:0.71rem; font-family:'JetBrains Mono',monospace; color:var(--muted); }
+  .rm-card-meta { display:flex; flex-wrap:wrap; gap:4px; font-size:0.71rem; font-family:'IBM Plex Mono',monospace; color:var(--muted); }
   .rm-meta-chip { background:var(--surface2); border-radius:3px; padding:1px 5px; }
   .rm-meta-chip.highlight { color:var(--accent2); }
 
   /* Dashboard */
   .dash-ao-filter { display:flex; align-items:center; gap:10px; margin-bottom:24px; }
-  .dash-ao-filter label { font-size:0.84rem; color:var(--muted); font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.06em; }
-  .dash-ao-filter select { background:var(--surface2); border:1px solid var(--border); border-radius:5px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.88rem; padding:4px 8px; outline:none; }
+  .dash-ao-filter label { font-size:0.84rem; color:var(--muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.06em; }
+  .dash-ao-filter select { background:var(--surface2); border:1px solid var(--border); border-radius:5px; color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:0.88rem; padding:4px 8px; outline:none; }
   .dash-cards { display:flex; gap:16px; margin-bottom:28px; flex-wrap:wrap; }
   .dash-card { flex:1; min-width:160px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 20px; }
-  .dash-card-label { font-size:0.71rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px; }
+  .dash-card-label { font-size:0.71rem; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px; }
   .dash-card-value { font-size:1.6rem; font-weight:700; color:var(--text); line-height:1; }
   .dash-card-sub { font-size:0.84rem; color:var(--muted); margin-top:4px; }
   .dash-section { margin-bottom:32px; }
-  .dash-section-title { font-size:0.7rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:14px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+  .dash-section-title { font-size:0.7rem; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:14px; padding-bottom:6px; border-bottom:1px solid var(--border); }
   .dash-bar-row { display:flex; align-items:center; gap:10px; margin-bottom:7px; }
   .dash-bar-label { font-size:0.88rem; color:var(--text); min-width:180px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .dash-bar-track { flex:1; background:var(--surface2); border-radius:4px; height:16px; overflow:hidden; position:relative; }
   .dash-bar-fill { height:100%; border-radius:4px; transition:width .3s; }
-  .dash-bar-num { font-size:0.7rem; font-family:'JetBrains Mono',monospace; color:var(--muted); min-width:40px; text-align:right; }
+  .dash-bar-num { font-size:0.7rem; font-family:'IBM Plex Mono',monospace; color:var(--muted); min-width:40px; text-align:right; }
   .dash-prio-cols { display:flex; gap:16px; flex-wrap:wrap; }
   .dash-prio-col { flex:1; min-width:140px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
   .dash-prio-title { font-size:0.84rem; font-weight:700; margin-bottom:10px; }
@@ -4204,7 +4191,7 @@
   .settings-col-group h3 {
     font-size: 0.84rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
     letter-spacing: .06em;
     margin: 0 0 8px;
@@ -4255,21 +4242,21 @@
   .text-label-xs {
     font-size: 0.66rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
   .text-label-sm {
     font-size: 0.7rem;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
   .text-label-md {
     font-size: 0.72rem;
     color: var(--accent2);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
@@ -4304,13 +4291,13 @@
   <div class="top-section-switch" aria-label="Sektioner">
     <button class="top-section-btn active" id="section-backlog" onclick="setTopSection('backlog')">Backlog</button>
   </div>
-  <button id="globalEditBtn" onclick="toggleEditMode()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;font-weight:400;" onmouseover="if(!globalEditMode){this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'}else{this.style.opacity='0.8'}" onmouseout="if(!globalEditMode){this.style.borderColor='var(--border)';this.style.color='var(--muted)'}else{this.style.opacity='1'}">✎ Editera</button>
-  <button id="settingsNavBtn" onclick="showTab('settings')" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Inter',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Inställningar</button>
+  <button id="globalEditBtn" onclick="toggleEditMode()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Manrope',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;font-weight:400;" onmouseover="if(!globalEditMode){this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'}else{this.style.opacity='0.8'}" onmouseout="if(!globalEditMode){this.style.borderColor='var(--border)';this.style.color='var(--muted)'}else{this.style.opacity='1'}">✎ Editera</button>
+  <button id="settingsNavBtn" onclick="showTab('settings')" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.84rem;font-family:'Manrope',sans-serif;padding:6px 14px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Inställningar</button>
 </header>
 
 <div class="main">
   <!-- Sidebar -->
-  <aside>
+  <aside class="main-sidebar">
     <!-- Connection -->
     <div>
       <div class="section-label">Anslutning</div>
@@ -5963,7 +5950,7 @@ function statusBuildListRowHtml(item) {
   return `<tr onclick="openWorkItemModal(${item.id})" style="cursor:pointer;">
     <td class="title-cell"><a href="#" onclick="openWorkItemModal(${item.id});return false;" title="${escHtml(title)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;color:var(--text);text-decoration:none;">${escHtml(title)}</a></td>
     <td data-col="status"><span class="badge ${stateBadgeClass(state)}">${escHtml(state || '–')}</span></td>
-    <td data-col="remaining" style="font-family:'JetBrains Mono',monospace;text-align:right;">${escHtml(remaining)}</td>
+    <td data-col="remaining" style="font-family:'IBM Plex Mono',monospace;text-align:right;">${escHtml(remaining)}</td>
   </tr>`;
 }
 
@@ -6396,14 +6383,14 @@ function statusBurndownDebugHtml(debugRows) {
   const rowsHtml = debugRows.map(row => {
     const itemsHtml = row.contributors.length
       ? row.contributors.map(t => {
-          return `<div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);margin-top:2px;">#${t.itemId} ${escHtml(t.title)} | burn ${t.burn} | prev ${t.prev} -> now ${t.curr}</div>`;
+          return `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);margin-top:2px;">#${t.itemId} ${escHtml(t.title)} | burn ${t.burn} | prev ${t.prev} -> now ${t.curr}</div>`;
         }).join('')
-      : '<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.72rem;color:var(--muted);margin-top:2px;">-</div>';
+      : '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:0.72rem;color:var(--muted);margin-top:2px;">-</div>';
     return `<div style="border-top:1px dashed rgba(125,133,144,.25);padding:6px 0;">
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);min-width:72px;">${row.dayKey.slice(5)}</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent2);">bar/netto ${row.delta}</span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:#16a34a;">gross burn ${row.grossBurn}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--text);min-width:72px;">${row.dayKey.slice(5)}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--accent2);">bar/netto ${row.delta}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:#16a34a;">gross burn ${row.grossBurn}</span>
       </div>
       ${itemsHtml}
     </div>`;
@@ -6411,7 +6398,7 @@ function statusBurndownDebugHtml(debugRows) {
 
   return `<div class="status-burndown-debug">
     <details>
-      <summary style="cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);">Burndown per dag (netto vs gross burn)</summary>
+      <summary style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--muted);">Burndown per dag (netto vs gross burn)</summary>
       <div class="status-burndown-debug-body">${rowsHtml}</div>
     </details>
   </div>`;
@@ -6469,9 +6456,9 @@ function statusBurndownSvg(series, options = {}) {
     const fill = delta > 0 ? 'rgb(22,163,74)' : 'rgba(125,133,144,.18)';
     const showLabel = i === 0 || i === series.length - 1 || (i % labelStep) === 0;
     barsHtml += `<rect x="${barX.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${barH.toFixed(2)}" fill="${fill}" rx="2"></rect>`;
-    barValueLabelsHtml += `<text x="${cx.toFixed(2)}" y="${deltaLabelY.toFixed(2)}" text-anchor="middle" fill="${delta > 0 ? 'rgb(22,163,74)' : 'var(--muted)'}" font-size="9" font-family="JetBrains Mono,monospace">${escHtml(deltaLabel)}</text>`;
+    barValueLabelsHtml += `<text x="${cx.toFixed(2)}" y="${deltaLabelY.toFixed(2)}" text-anchor="middle" fill="${delta > 0 ? 'rgb(22,163,74)' : 'var(--muted)'}" font-size="9" font-family="IBM Plex Mono,monospace">${escHtml(deltaLabel)}</text>`;
     if (showLabel) {
-      barLabelsHtml += `<text x="${cx.toFixed(2)}" y="${(height - 8).toFixed(2)}" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="JetBrains Mono,monospace">${escHtml(label)}</text>`;
+      barLabelsHtml += `<text x="${cx.toFixed(2)}" y="${(height - 8).toFixed(2)}" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="IBM Plex Mono,monospace">${escHtml(label)}</text>`;
     }
   });
 
@@ -6481,14 +6468,14 @@ function statusBurndownSvg(series, options = {}) {
     const yVal = maxY * v;
     const y = yFor(yVal);
     return `<line x1="${padL}" y1="${y.toFixed(2)}" x2="${(width - padR).toFixed(2)}" y2="${y.toFixed(2)}" stroke="rgba(125,133,144,.22)" stroke-dasharray="3 3"></line>
-      <text x="${(padL - 6).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="end" fill="var(--muted)" font-size="10" font-family="JetBrains Mono,monospace">${(Math.round(yVal * 100) / 100).toString()}</text>`;
+      <text x="${(padL - 6).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="end" fill="var(--muted)" font-size="10" font-family="IBM Plex Mono,monospace">${(Math.round(yVal * 100) / 100).toString()}</text>`;
   }).join('');
 
   // Right axis ticks for daily delta
   const deltaAxisTicks = [0, 0.5, 1].map(v => {
     const dVal = Math.round(maxDelta * v * 100) / 100;
     const y = baselineY - ((dVal / maxDelta) * barMaxH);
-    return `<text x="${(width - padR + 6).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="start" fill="rgba(22,163,74,.8)" font-size="9" font-family="JetBrains Mono,monospace">${dVal.toString()}</text>`;
+    return `<text x="${(width - padR + 6).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="start" fill="rgba(22,163,74,.8)" font-size="9" font-family="IBM Plex Mono,monospace">${dVal.toString()}</text>`;
   }).join('');
 
   return `<svg viewBox="0 0 ${width} ${height}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Burndown chart">
@@ -7663,7 +7650,7 @@ function standardHierarchyGroupingToolbarHtml(options = {}) {
     `<button class="group-btn${groupMode===k?' active':''}"${buttonIdPrefix ? ` id="${buttonIdPrefix}${k}"` : ''} onclick="${modeVarName}='${k}';${renderFnName}()">${labels[k]}</button>`
   ).join('');
   return `<div${classAttr} style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;${styleExtra}">` +
-    `<span${labelClassAttr} style="font-size:0.71rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;flex-shrink:0;">${labelText}</span>` +
+    `<span${labelClassAttr} style="font-size:0.71rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;flex-shrink:0;">${labelText}</span>` +
     buttons +
     extraHtml +
   `</div>`;
@@ -7701,7 +7688,7 @@ function standardHierarchyListMainHeaderHtml(options = {}) {
   const gap = options.gap || '6px';
   const labelStyle = options.labelStyle || 'flex:1;';
 
-  return `<div style="width:100%;display:flex;align-items:center;gap:${gap};padding:${padding};font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);box-sizing:border-box;overflow:hidden;">` +
+  return `<div style="width:100%;display:flex;align-items:center;gap:${gap};padding:${padding};font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);box-sizing:border-box;overflow:hidden;">` +
     listActions +
     `<span style="${labelStyle}">${label}</span>` +
     extraHtml +
@@ -7799,7 +7786,7 @@ function hierarchyGroupRowLeadHtml(label, options = {}) {
     borderRight = '2px solid var(--border)',
     prefix = '',
   } = options;
-  return `<div style="width:${width};flex-shrink:0;display:flex;align-items:center;padding:0 12px;font-size:0.7rem;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);border-right:${borderRight};box-sizing:border-box;">${prefix}${label}</div>`;
+  return `<div style="width:${width};flex-shrink:0;display:flex;align-items:center;padding:0 12px;font-size:0.7rem;font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--accent2);border-right:${borderRight};box-sizing:border-box;">${prefix}${label}</div>`;
 }
 
 function renderActiveView() {
@@ -9188,7 +9175,7 @@ function renderProjectCheckboxes(projects) {
         if (!expanded) return;
 
         const header = document.createElement('div');
-        header.style.cssText = 'padding:5px 2px 2px 2px;font-size:0.84rem;color:var(--muted);font-family:"JetBrains Mono",monospace;letter-spacing:.04em;';
+        header.style.cssText = 'padding:5px 2px 2px 2px;font-size:0.84rem;color:var(--muted);font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;';
         header.textContent = `Team i ${p}`;
         container.appendChild(header);
 
@@ -9244,7 +9231,7 @@ function renderProjectCheckboxes(projects) {
       div.innerHTML = `
         <span style="font-size:0.84rem;color:${isHidden ? 'var(--muted)' : 'var(--text)'};text-decoration:${isHidden ? 'line-through' : 'none'};flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p}</span>
         <button onclick="toggleProjectHidden('${p.replace(/'/g,"\\'")}') " title="${isHidden ? 'Visa projekt' : 'Dölj projekt'}"
-          style="background:none;border:1px solid ${isHidden ? 'rgba(248,81,73,.4)' : 'var(--border)'};border-radius:4px;color:${isHidden ? '#ff8a80' : 'var(--muted)'};font-size:0.71rem;padding:1px 6px;cursor:pointer;white-space:nowrap;font-family:'JetBrains Mono',monospace;">
+          style="background:none;border:1px solid ${isHidden ? 'rgba(248,81,73,.4)' : 'var(--border)'};border-radius:4px;color:${isHidden ? '#ff8a80' : 'var(--muted)'};font-size:0.71rem;padding:1px 6px;cursor:pointer;white-space:nowrap;font-family:'IBM Plex Mono',monospace;">
           ${isHidden ? '👁 Visa' : '✕ Dölj'}
         </button>`;
       container.appendChild(div);
@@ -10209,7 +10196,7 @@ function renderTable() {
   const backlogListMainHeader = standardHierarchyListMainHeaderHtml({
     listActions: backlogListActions,
     label: 'Epic',
-    labelStyle: "flex:1;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);"
+    labelStyle: "flex:1;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);"
   });
 
   // Build per-group effort sum over VISIBLE (non-hidden) epics
@@ -10239,10 +10226,10 @@ function renderTable() {
       const projEffort = effortByProject[lookupKey];
       const projRemaining = remainingByProject[lookupKey];
       const effortCell = projEffort != null
-        ? `<span style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--accent2);font-weight:700;">${projEffort} <span style="color:var(--muted);font-size:0.71rem">Σ</span></span>`
+        ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:var(--accent2);font-weight:700;">${projEffort} <span style="color:var(--muted);font-size:0.71rem">Σ</span></span>`
         : '';
       const remainingCell = projRemaining != null
-        ? `<span style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--muted);font-weight:700;">${projRemaining} <span style="color:var(--muted);font-size:0.71rem">Σ</span></span>`
+        ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:var(--muted);font-weight:700;">${projRemaining} <span style="color:var(--muted);font-size:0.71rem">Σ</span></span>`
         : '';
       return `<tr class="project-row">
         <td class="title-cell"><a style="color:${roadmapModeBacklog && roadmapKey && roadmapKey !== '–' ? ({'Now':'#6bdb78','Next':'#79c0ff','Later':'#ff8a80','Finishing':'#f0c040','Continous':'#d2a8ff'}[roadmapKey]||'var(--accent2)') : 'var(--accent2)'};text-decoration:none;font-weight:700;" class="ao-badge ${aoMode ? aoClass(projectName) : ''}">${projectName}</a></td>
@@ -10331,7 +10318,7 @@ function renderTable() {
           ${[['XS',5],['S',8],['M',13],['L',21],['XL',34]].map(function(pair) {
             var label = pair[0], v = pair[1];
             return `<button onclick="setEffort(${item.id}, ${v}, this.closest('td').querySelector('.effort-input'))"
-              style="padding:1px 4px;font-size:0.64rem;font-family:'JetBrains Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:${Number(val)===v ? 'rgba(88,166,255,.2)' : 'var(--surface2)'};color:${Number(val)===v ? 'var(--accent)' : 'var(--muted)'};transition:all .1s;"
+              style="padding:1px 4px;font-size:0.64rem;font-family:'IBM Plex Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:${Number(val)===v ? 'rgba(88,166,255,.2)' : 'var(--surface2)'};color:${Number(val)===v ? 'var(--accent)' : 'var(--muted)'};transition:all .1s;"
               onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
               onmouseout="this.style.borderColor='var(--border)';this.style.color='${Number(val)===v ? 'var(--accent)' : 'var(--muted)'}'">
               ${label}
@@ -10393,7 +10380,7 @@ function renderTable() {
       if (rr  != null) parts.push(`<span title="Risk: ${rrStr}"><span style="color:var(--muted);font-size:0.6rem">RR</span>${rr}</span>`);
       wsjfCell = `<div class="wsjf-display" style="flex-direction:row;gap:5px;align-items:center;justify-content:center;">
         ${wsjfVal != null ? `<span class="wsjf-score ${wsjfClass}" title="WSJF = (BV+TC+(10-RR×3))/Effort">${wsjfVal}</span>` : '<span style="color:var(--muted);font-size:0.7rem">–</span>'}
-        ${parts.length ? `<span data-col="wsjf-details" style="display:flex;gap:4px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--text);">${parts.join('')}</span>` : ''}
+        ${parts.length ? `<span data-col="wsjf-details" style="display:flex;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:0.86rem;color:var(--text);">${parts.join('')}</span>` : ''}
       </div>`;
     }
 
@@ -10401,19 +10388,19 @@ function renderTable() {
       <td class="title-cell">${expandBtn}<a href="#" onclick="openWorkItemModal(${item.id});return false;" title="${title}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;color:${titleMeta.titleColor};font-weight:${titleMeta.titleWeight};font-size:${titleMeta.titleSize};">${title}</a></td>
       <td data-col="id" class="id-cell">#${item.id}</td>
       <td data-col="typ"><span class="badge ${typeBadgeClass(type)}">${type}</span></td>
-      <td data-col="effort" style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.88rem; color:var(--muted); vertical-align:middle; white-space:nowrap;">${effortDisplay}</td>
+      <td data-col="effort" style="text-align:center; font-family:'IBM Plex Mono',monospace; font-size:0.88rem; color:var(--muted); vertical-align:middle; white-space:nowrap;">${effortDisplay}</td>
       <td data-col="tshirt" style="text-align:center;">${globalEditMode
         ? `<div style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;">
             ${['XS','S','M','L','XL','XXL'].map(v => {
               const active = f['Custom.Tshirt'] === v;
               return `<button onclick="saveField(${item.id},'Custom.Tshirt','${active ? '' : v}')"
-                style="padding:1px 4px;font-size:0.64rem;font-family:'JetBrains Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active ? 'transparent' : 'var(--border)'};background:${active ? 'rgba(88,166,255,.2)' : 'var(--surface2)'};color:${active ? 'var(--accent)' : 'var(--muted)'};transition:all .1s;flex-shrink:0;"
+                style="padding:1px 4px;font-size:0.64rem;font-family:'IBM Plex Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active ? 'transparent' : 'var(--border)'};background:${active ? 'rgba(88,166,255,.2)' : 'var(--surface2)'};color:${active ? 'var(--accent)' : 'var(--muted)'};transition:all .1s;flex-shrink:0;"
                 title="${active ? 'Klicka för att rensa' : v}">${v}</button>`;
             }).join('')}
           </div>`
         : f['Custom.Tshirt'] ? `<span class="tshirt-badge ${tshirtClass(f['Custom.Tshirt'])}">${f['Custom.Tshirt']}</span>` : '<span style="color:var(--muted)">–</span>'
       }</td>
-      <td data-col="remaining" style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.88rem; color:var(--muted)">${remainingDisplay}</td>
+      <td data-col="remaining" style="text-align:center; font-family:'IBM Plex Mono',monospace; font-size:0.88rem; color:var(--muted)">${remainingDisplay}</td>
       <td data-col="roadmap" style="text-align:center;">${globalEditMode
         ? `<select class="prio-select" onchange="saveField(${item.id},'Custom.Roadmap',this.value)">
             <option value="" ${!f['Custom.Roadmap']?'selected':''}>–</option>
@@ -10421,23 +10408,23 @@ function renderTable() {
           </select>`
         : roadmapValue(item, '') ? `<span class="roadmap-badge ${roadmapClass(roadmapValue(item, ''))}">${roadmapValue(item, '')}</span>` : '<span style="color:var(--muted)">–</span>'
       }</td>
-      <td data-col="milestone" style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--accent2)">${f['Custom.Milestone'] || '<span style="color:var(--muted)">–</span>'}</td>
-      <td data-col="superepic" style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--muted)">${globalEditMode
+      <td data-col="milestone" style="font-family:'IBM Plex Mono',monospace;font-size:0.84rem;color:var(--accent2)">${f['Custom.Milestone'] || '<span style="color:var(--muted)">–</span>'}</td>
+      <td data-col="superepic" style="font-family:'IBM Plex Mono',monospace;font-size:0.84rem;color:var(--muted)">${globalEditMode
         ? `<input type="text" class="prio-select" value="${f['Custom.SuperEpic']||''}" placeholder="–"
             onchange="saveField(${item.id},'Custom.SuperEpic',this.value)"
-            style="width:110px;font-family:'JetBrains Mono',monospace;font-size:0.84rem;" />`
+            style="width:110px;font-family:'IBM Plex Mono',monospace;font-size:0.84rem;" />`
         : f['Custom.SuperEpic'] || '<span style="color:var(--muted)">–</span>'
       }</td>
-      <td data-col="maconomy" style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--muted)">${globalEditMode
+      <td data-col="maconomy" style="font-family:'IBM Plex Mono',monospace;font-size:0.84rem;color:var(--muted)">${globalEditMode
         ? `<input type="text" class="prio-select" value="${f['Custom.Maconomy']||''}" placeholder="–"
             onchange="saveField(${item.id},'Custom.Maconomy',this.value)"
-            style="width:90px;font-family:'JetBrains Mono',monospace;font-size:0.84rem;" />`
+            style="width:90px;font-family:'IBM Plex Mono',monospace;font-size:0.84rem;" />`
         : f['Custom.Maconomy'] || '<span style="color:var(--muted)">–</span>'
       }</td>
       <td data-col="targetapps" style="font-size:0.86rem;color:var(--text)">${globalEditMode
         ? `<input type="text" class="prio-select" value="${f['Custom.Targetapps']||''}" placeholder="–"
             onchange="saveField(${item.id},'Custom.Targetapps',this.value)"
-            style="width:110px;font-family:'JetBrains Mono',monospace;font-size:0.84rem;" />`
+            style="width:110px;font-family:'IBM Plex Mono',monospace;font-size:0.84rem;" />`
         : f['Custom.Targetapps'] || '<span style="color:var(--muted)">–</span>'
       }</td>
       <td data-col="status"><span class="badge ${stateBadgeClass(state)}">${state}</span></td>
@@ -10451,8 +10438,8 @@ function renderTable() {
         : f['Custom.Typ'] ? `<span class="customtyp-badge ${customTypClass(f['Custom.Typ'])}">${f['Custom.Typ']}</span>` : '<span style="color:var(--muted)">–</span>'
       }</td>
       <td data-col="valuearea" style="text-align:center;">${valueAreaCell}</td>
-      <td data-col="app" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--muted);white-space:nowrap;">${aoMode ? project : ''}</td>
-      <td data-col="andrad" style="font-family:'JetBrains Mono',monospace; font-size:0.84rem; color:var(--muted)">${changed}</td>
+      <td data-col="app" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--muted);white-space:nowrap;">${aoMode ? project : ''}</td>
+      <td data-col="andrad" style="font-family:'IBM Plex Mono',monospace; font-size:0.84rem; color:var(--muted)">${changed}</td>
     </tr>`;
   }).join('');
 
@@ -10739,8 +10726,8 @@ function renderAuditTable(data) {
         <tr>
           ${i === 0 ? `<td style="font-size:0.88rem;padding:8px 14px;font-weight:700;vertical-align:top;" rowspan="${user.projects.length}">${escHtml(user.name)}</td>` : ''}
           <td style="font-size:0.88rem;padding:8px 14px;">${escHtml(p.proj)}</td>
-          <td style="font-size:0.84rem;padding:8px 14px;font-family:'JetBrains Mono',monospace;color:${p.role === 'Admin' ? 'var(--accent2)' : 'var(--text)'};">${escHtml(p.role || 'User')}</td>
-          <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml(p.teams.join(', '))}</td>
+          <td style="font-size:0.84rem;padding:8px 14px;font-family:'IBM Plex Mono',monospace;color:${p.role === 'Admin' ? 'var(--accent2)' : 'var(--text)'};">${escHtml(p.role || 'User')}</td>
+          <td style="font-size:0.88rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml(p.teams.join(', '))}</td>
         </tr>`).join('');
     }).join('');
 
@@ -10758,8 +10745,8 @@ function renderAuditTable(data) {
     const memberRows = members.map(m => `
       <tr>
         <td style="font-size:0.88rem;padding:8px 14px;">${escHtml(m.name)}</td>
-        <td style="font-size:0.84rem;padding:8px 14px;font-family:'JetBrains Mono',monospace;color:${m.role === 'Admin' ? 'var(--accent2)' : 'var(--text)'};">${escHtml(m.role || 'User')}</td>
-        <td style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml((m.teams || []).join(', '))}</td>
+        <td style="font-size:0.84rem;padding:8px 14px;font-family:'IBM Plex Mono',monospace;color:${m.role === 'Admin' ? 'var(--accent2)' : 'var(--text)'};">${escHtml(m.role || 'User')}</td>
+        <td style="font-size:0.88rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);padding:8px 14px;">${escHtml((m.teams || []).join(', '))}</td>
       </tr>`).join('');
     return `
       <tr class="project-row">
@@ -13554,7 +13541,7 @@ function sprintBuildToolbarHtml(teams, goalCount, hasFocusPath, currentSprintFoc
     : (isCurrentFocus ? 'Avsluta fokus' : 'Fokus på nuvarande sprint');
   const focusBtnClass = (isCurrentFocus || canRestoreCurrentSprints) ? ' active text-accent-sm' : '';
   return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;flex-wrap:wrap;">
-      <span style="font-size:0.71rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;">Team</span>
+      <span style="font-size:0.71rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em;">Team</span>
       <select class="col-filter sprint-team-filter" onchange="sprintTeamFilter=this.value;renderSprintGoals()">
         <option value="">Alla team</option>
         ${teams.map(t => `<option value="${escHtml(t)}" ${sprintTeamFilter===t?'selected':''}>${escHtml(t)}</option>`).join('')}
@@ -13562,7 +13549,7 @@ function sprintBuildToolbarHtml(teams, goalCount, hasFocusPath, currentSprintFoc
 
       <button class="btn btn-outline sprint-focus-current-btn${focusBtnClass}" data-focus-path="${escHtml(currentSprintFocusPath)}" ${focusBtnDisabled ? 'disabled' : ''} style="width:auto;padding:4px 10px;font-size:0.8rem;white-space:nowrap;">${focusBtnLabel}</button>
 
-      <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);">Sprint goal: ${goalCount}</span>
+      <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--muted);">Sprint goal: ${goalCount}</span>
     </div>`;
 }
 
@@ -14116,7 +14103,7 @@ function renderSprintGoals() {
 
           return `<section style="display:flex;flex-direction:column;gap:8px;min-width:0;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px;">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">${escHtml(proj)}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">${escHtml(proj)}</div>
               <span></span>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;overflow-x:auto;padding-bottom:4px;">
@@ -14288,7 +14275,7 @@ function renderSprintGoals() {
     if (!sprintFocusGroupByGoal) {
       rowsHtml = rowsToRender.map(r => {
         if (r.type === 'group') {
-          return `<div style="padding:4px 10px 2px;font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-family:'JetBrains Mono',monospace;border-top:1px solid var(--border);background:var(--surface);">${escHtml(r.label)}</div>`;
+          return `<div style="padding:4px 10px 2px;font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--border);background:var(--surface);">${escHtml(r.label)}</div>`;
         }
         return renderFocusRow(r);
       }).join('');
@@ -14365,7 +14352,7 @@ function renderSprintGoals() {
         return `<div style="border-bottom:1px solid var(--border);">
           <div style="padding:8px 10px;background:rgba(88,166,255,.08);border-bottom:1px solid var(--border);font-size:0.75rem;font-weight:700;color:var(--text);display:flex;justify-content:space-between;gap:8px;">
             <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(goalTitle)}</span>
-            <span style="font-family:'JetBrains Mono',monospace;color:var(--muted);">${groupRows.length}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;color:var(--muted);">${groupRows.length}</span>
           </div>
           <div>${groupRows.length ? groupRows.map(renderFocusRow).join('') : '<div style="padding:8px 10px;color:var(--muted);font-size:0.78rem;">Inga länkade epics/features/stories</div>'}</div>
         </div>`;
@@ -14395,7 +14382,7 @@ function renderSprintGoals() {
 
     return `<div style="min-width:562px;max-width:702px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;">
       <div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">Epics & Features</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">Epics & Features</span>
         <div style="display:flex;gap:4px;">
           <button class="btn btn-outline sprint-focus-collapse-btn" data-all-expanded="${allExpanded ? '1' : '0'}" style="width:auto;min-width:28px;padding:2px 6px;font-size:0.8rem;line-height:1.2;" title="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}" aria-label="${allExpanded ? 'Kollapsa allt' : 'Expandera allt'}">${allExpanded ? '▾' : '▸'}</button>
           <button class="btn btn-outline sprint-focus-group-btn ${sprintFocusGroupByGoal ? 'active' : ''}" style="width:auto;padding:2px 8px;font-size:0.72rem;line-height:1.2;${sprintFocusGroupByGoal ? 'border-color:var(--accent2);color:var(--accent2);' : ''}" title="Gruppera per sprintmål">${sprintFocusGroupByGoal ? 'Grupperat: mål' : 'Gruppera: mål'}</button>
@@ -14404,7 +14391,7 @@ function renderSprintGoals() {
         </div>
       </div>
       <div style="padding:4px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;background:var(--surface);flex-shrink:0;">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);margin-right:2px;">Gruppera:</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--muted);margin-right:2px;">Gruppera:</span>
         ${['projekt','ao','roadmap','maconomy'].map(k => {
           const label = {'projekt':'Projekt','ao':'Affärsområde','roadmap':'Roadmap','maconomy':'Maconomy'}[k];
           return `<button class="group-btn sprint-focus-listgroup-btn${sprintFocusListGroupMode===k?' active':''}" data-sfgmode="${k}" style="font-size:0.7rem;padding:1px 7px;">${label}</button>`;
@@ -14531,7 +14518,7 @@ function renderDashboard(aoFilter) {
     <div class="dash-bar-row">
       <div style="display:flex;align-items:center;gap:5px;min-width:0;width:380px;flex-shrink:0;overflow:hidden;">
         <div style="font-size:0.88rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;" title="${e.title}">${e.title}</div>
-        ${e.app ? `<span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;background:var(--surface2);border-radius:3px;padding:1px 4px;color:var(--muted);white-space:nowrap;flex-shrink:0;">${e.app}</span>` : ''}
+        ${e.app ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;background:var(--surface2);border-radius:3px;padding:1px 4px;color:var(--muted);white-space:nowrap;flex-shrink:0;">${e.app}</span>` : ''}
         ${e.ao ? `<span class="ao-badge ${aoClass(e.ao)}" style="font-size:0.6rem;padding:1px 4px;border-radius:3px;white-space:nowrap;flex-shrink:0;">${e.ao}</span>` : ''}
       </div>
       <div class="dash-bar-track" style="flex:1;">
@@ -14610,7 +14597,7 @@ function renderDashboard(aoFilter) {
     const cols = seg.map(s => {
       const subtitle = dashEffortMode ? `Σ ${segEffort(s.arr)}` : s.arr.length;
       return `<div style="flex:1;min-width:0;">
-        <div style="font-size:0.86rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;">${s.label} (${subtitle})</div>
+        <div style="font-size:0.86rem;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;">${s.label} (${subtitle})</div>
         ${makeDistBars(s.arr, keyFn, colorFn)}
       </div>`;
     }).join('');
@@ -14751,7 +14738,7 @@ function renderKalkyl() {
     : { Now:'#6bdb78', Next:'#79c0ff', Later:'#ff8a80', Finishing:'#f0c040', Continous:'#d2a8ff', Completed:'#b0bcc8' };
 
   const rmHeaders = RM_VALS.map(r =>
-    `<th style="text-align:right;width:65px;color:${rmColors[r]};font-family:'JetBrains Mono',monospace;font-size:0.86rem;padding-right:12px;">${r}</th>`
+    `<th style="text-align:right;width:65px;color:${rmColors[r]};font-family:'IBM Plex Mono',monospace;font-size:0.86rem;padding-right:12px;">${r}</th>`
   ).join('');
 
   const allRows = segKeys.map(sk => {
@@ -14765,12 +14752,12 @@ function renderKalkyl() {
       const superEpic = ep.fields['Custom.SuperEpic'] || '';
       const rmCells = RM_VALS.map(r =>
         r === rm && fte != null
-          ? `<td style="text-align:right;font-family:'JetBrains Mono',monospace;color:${rmColors[r]};padding-right:12px;">${fte}</td>`
+          ? `<td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:${rmColors[r]};padding-right:12px;">${fte}</td>`
           : `<td style="text-align:right;color:var(--muted);opacity:0.2;padding-right:12px;">–</td>`
       ).join('');
       return `<tr>
         <td style="font-size:0.84rem;color:var(--text);">${ep.fields['System.Title'] || '#'+ep.id}</td>
-        <td style="font-size:0.84rem;font-family:'JetBrains Mono',monospace;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${superEpic || '<span style="opacity:0.3">–</span>'}</td>
+        <td style="font-size:0.84rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${superEpic || '<span style="opacity:0.3">–</span>'}</td>
         <td style="text-align:center;">${tshirt !== '–' ? `<span class="tshirt-badge ${tshirtClass(tshirt)}">${tshirt}</span>` : '<span style="color:var(--muted)">–</span>'}</td>
         ${rmCells}
       </tr>`;
@@ -14782,20 +14769,20 @@ function renderKalkyl() {
         const f = getFTE(ep); return s + (f != null ? f : 0);
       }, 0);
       return sum > 0
-        ? `<td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;color:${rmColors[r]};padding-right:12px;">${sum.toFixed(1)}</td>`
+        ? `<td style="text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:700;color:${rmColors[r]};padding-right:12px;">${sum.toFixed(1)}</td>`
         : `<td></td>`;
     }).join('');
 
     return `
       <tr style="background:rgba(0,0,0,0);">
         <td colspan="${3 + RM_VALS.length}" style="padding:14px 10px 6px;border-bottom:2px solid var(--border);">
-          <span style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);">${sk}</span>
+          <span style="font-size:0.88rem;font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--accent2);">${sk}</span>
           <span style="font-size:0.84rem;color:var(--muted);margin-left:8px;">Σ ${grandTotal.toFixed(1)} Manmånader</span>
         </td>
       </tr>
       ${dataRows}
       <tr style="border-top:1px solid var(--border);background:rgba(88,166,255,.04);">
-        <td style="font-family:'JetBrains Mono',monospace;font-size:0.86rem;font-weight:700;color:var(--accent2);padding:4px 10px;">Σ Manmånader</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:0.86rem;font-weight:700;color:var(--accent2);padding:4px 10px;">Σ Manmånader</td>
         <td></td><td></td>
         ${colTotals}
       </tr>
@@ -14828,7 +14815,7 @@ function renderKalkyl() {
   });
   const typColors = { 'Projekt':'#79c0ff', 'Underhåll':'#f0c040', 'Förbättring':'#6bdb78' };
 
-  const fteSubLabel = n => `<div style="font-size:0.86rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;">Årspers: ${(n/loadMonthsPerYear()).toFixed(1)}</div>`;
+  const fteSubLabel = n => `<div style="font-size:0.86rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:2px;">Årspers: ${(n/loadMonthsPerYear()).toFixed(1)}</div>`;
 
   const rmSumCards = RM_VALS.filter(r => byRm[r]).map(r =>
     `<div class="kalkyl-sum-card">
@@ -14869,28 +14856,28 @@ function renderKalkyl() {
       const pc   = pct!=null?(pct>60?(isLight?'#b71c1c':'#ff8a80'):pct>40?(isLight?'#825500':'#f0c040'):(isLight?'#1b5e20':'#6bdb78')):'var(--muted)';
       return `<tr style="border-bottom:1px solid rgba(125,133,144,.07);">
         <td style="font-size:0.76rem;color:var(--text);padding:3px 12px 3px 0;white-space:nowrap;">${sk}</td>
-        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--accent2);padding:3px 8px;">${mm.toFixed(1)}</td>
-        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:3px 8px;">${ars}</td>
-        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--muted);padding:3px 8px;">${andel}%</td>
-        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:${pc};font-weight:700;padding:3px 8px;">${pct!=null?pct+'%':'–'}</td>
+        <td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--accent2);padding:3px 8px;">${mm.toFixed(1)}</td>
+        <td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--muted);padding:3px 8px;">${ars}</td>
+        <td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--muted);padding:3px 8px;">${andel}%</td>
+        <td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:${pc};font-weight:700;padding:3px 8px;">${pct!=null?pct+'%':'–'}</td>
       </tr>`;
     }).join('');
   };
 
   const AFFARSOM_FIELD_K = 'Custom.bc7657eb-88c5-4322-947f-73e86a65dc14';
   const mkHeader = (label) => `<thead><tr style="border-bottom:1px solid var(--border);">
-    <th style="text-align:left;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 12px 2px 0;text-transform:uppercase;min-width:100px;">${label}</th>
-    <th style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 8px;text-transform:uppercase;">Manmån</th>
-    <th style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 8px;text-transform:uppercase;">Årspers</th>
-    <th style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 8px;text-transform:uppercase;">Andel</th>
-    <th style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 8px;text-transform:uppercase;">Förvaltn.</th>
+    <th style="text-align:left;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 12px 2px 0;text-transform:uppercase;min-width:100px;">${label}</th>
+    <th style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 8px;text-transform:uppercase;">Manmån</th>
+    <th style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 8px;text-transform:uppercase;">Årspers</th>
+    <th style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 8px;text-transform:uppercase;">Andel</th>
+    <th style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;color:var(--muted);padding:2px 8px;text-transform:uppercase;">Förvaltn.</th>
   </tr></thead>`;
 
   const appRows = buildNyckelRows(e => workItemProject(e, '–') || '–');
   const aoRows  = buildNyckelRows(e => e.fields[AFFARSOM_FIELD_K]||'–');
 
   const nyckeltaHtml = `<div style="margin-bottom:20px;">
-    <div style="font-size:0.86rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border);">Nyckeltal</div>
+    <div style="font-size:0.86rem;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border);">Nyckeltal</div>
     <div style="display:flex;gap:32px;flex-wrap:wrap;">
       <div>
         <table style="border-collapse:collapse;font-size:0.76rem;white-space:nowrap;">${mkHeader('App')}<tbody>${appRows}</tbody></table>
@@ -15012,17 +14999,17 @@ function renderTshirtCalc() {
     const cls = tshirtColors[row.size] || '';
     const veckorCell = globalEditMode
       ? `<input class="tsc-input" type="number" min="0" step="0.5" value="${row.veckor}" onchange="updateTshirtField(${idx},'veckor',this.value)" />`
-      : `<span style="font-family:'JetBrains Mono',monospace;">${row.veckor}</span>`;
+      : `<span style="font-family:'IBM Plex Mono',monospace;">${row.veckor}</span>`;
     const persCell = globalEditMode
       ? `<input class="tsc-input" type="number" min="0" step="0.5" value="${row.pers}" onchange="updateTshirtField(${idx},'pers',this.value)" />`
-      : `<span style="font-family:'JetBrains Mono',monospace;">${row.pers}</span>`;
+      : `<span style="font-family:'IBM Plex Mono',monospace;">${row.pers}</span>`;
     return `<tr>
       <td><span class="tsc-badge tshirt-badge ${cls}">${row.size}</span></td>
-      <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--muted);">${row.fibonacci}</td>
+      <td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--muted);">${row.fibonacci}</td>
       <td style="text-align:right;">${veckorCell}</td>
       <td style="text-align:right;">${persCell}</td>
-      <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${fte}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--muted);">${row.ticketSize}</td>
+      <td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--accent2);">${fte}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:0.84rem;color:var(--muted);">${row.ticketSize}</td>
       <td style="font-size:0.84rem;color:var(--text);">${row.kommentar}</td>
     </tr>`;
   }).join('');
@@ -15032,7 +15019,7 @@ function renderTshirtCalc() {
     const cls2 = tshirtColors2[row2item.size] || '';
     const fteCell = globalEditMode
       ? `<input class="tsc-input" type="number" min="0" step="1" value="${row2item.fte}" onchange="updateTshirt2Field(${idx},'fte',this.value)" />`
-      : `<span style="font-family:'JetBrains Mono',monospace;">${row2item.fte}</span>`;
+      : `<span style="font-family:'IBM Plex Mono',monospace;">${row2item.fte}</span>`;
     return `<tr>
       <td><span class="tsc-badge tshirt-badge ${cls2}">${row2item.size}</span></td>
       <td style="text-align:right;">${fteCell}</td>
@@ -15153,7 +15140,7 @@ function renderTshirtCalc() {
           <input type="number" min="0" max="200" step="1"
             value="${loadQaPadding()}"
             ${globalEditMode ? `onchange="saveQaPadding(this.value);renderTshirtCalc()"` : 'disabled'}
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:0.90rem;font-weight:700;padding:3px 6px;width:60px;outline:none;text-align:right;${globalEditMode ? '' : 'opacity:0.5;cursor:default;'}" />
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-size:0.90rem;font-weight:700;padding:3px 6px;width:60px;outline:none;text-align:right;${globalEditMode ? '' : 'opacity:0.5;cursor:default;'}" />
           <span style="font-size:0.84rem;color:var(--muted);">%</span>
           <span style="font-size:0.84rem;color:var(--muted);margin-left:4px;">→ multiplicerar Manmånader med <strong style="color:var(--accent2);">${(1 + loadQaPadding()/100).toFixed(2)}x</strong> i Kalkyl</span>
         </div>
@@ -15164,7 +15151,7 @@ function renderTshirtCalc() {
           <input type="number" min="1" max="12" step="1"
             value="${loadMonthsPerYear()}"
             ${globalEditMode ? `onchange="saveMonthsPerYear(this.value);renderTshirtCalc()"` : 'disabled'}
-            style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:0.90rem;font-weight:700;padding:3px 6px;width:60px;outline:none;text-align:right;${globalEditMode ? '' : 'opacity:0.5;cursor:default;'}" />
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-size:0.90rem;font-weight:700;padding:3px 6px;width:60px;outline:none;text-align:right;${globalEditMode ? '' : 'opacity:0.5;cursor:default;'}" />
           <span style="font-size:0.84rem;color:var(--muted);">mån</span>
           <span style="font-size:0.84rem;color:var(--muted);margin-left:4px;">→ Årspers = Manmånader / <strong style="color:var(--accent2);">${loadMonthsPerYear()}</strong> i Kalkyl</span>
         </div>
@@ -15179,16 +15166,16 @@ function renderTshirtCalc() {
           📂 Välj Excel-fil
           <input type="file" accept=".xlsx,.xls" style="display:none" onchange="importMaconomyExcel(this.files[0])">
         </label>
-        <span id="maconomy-import-status" style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);"></span>
+        <span id="maconomy-import-status" style="font-size:0.88rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);"></span>
         ${(()=>{ const db = loadMaconomyDB(); const n = Object.keys(db).length; return n > 0
-          ? `<span style="font-size:0.84rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">${n} koder lagrade
+          ? `<span style="font-size:0.84rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;">${n} koder lagrade
               <button onclick="if(confirm('Rensa all Maconomy-data?')){localStorage.removeItem('${LS_MACONOMY_DB}');renderTshirtCalc();}"
                 style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.7rem;margin-left:4px;">✕ Rensa</button>
             </span>`
           : ''; })()}
       </div>
       ${(()=>{ const db = loadMaconomyDB(); const entries = Object.entries(db).slice(0,5); return entries.length
-        ? `<div style="margin-top:10px;"><table style="border-collapse:collapse;font-size:0.7rem;font-family:'JetBrains Mono',monospace;">
+        ? `<div style="margin-top:10px;"><table style="border-collapse:collapse;font-size:0.7rem;font-family:'IBM Plex Mono',monospace;">
             <tr><th style="text-align:left;color:var(--muted);padding:2px 12px 2px 0;">Kod</th><th style="text-align:left;color:var(--muted);">Namn</th></tr>
             ${entries.map(([k,v])=>`<tr><td style="padding:2px 12px 2px 0;color:var(--accent2);">${k}</td><td style="color:var(--text);">${v}</td></tr>`).join('')}
             ${Object.keys(db).length > 5 ? `<tr><td colspan="2" style="color:var(--muted);padding-top:4px;">… och ${Object.keys(db).length-5} till</td></tr>` : ''}
@@ -15200,7 +15187,7 @@ function renderTshirtCalc() {
       <div style="font-size:0.88rem;color:var(--text);line-height:1.6;background:rgba(88,166,255,.08);border-radius:6px;padding:12px;border-left:3px solid var(--accent2);">
         <div style="margin-bottom:8px;"><strong>Formel:</strong> WSJF = (BV + TC + RR) / Effort</div>
         <div style="margin-bottom:12px;"><strong>Skalor:</strong></div>
-        <ul style="margin:0;padding-left:16px;font-family:'JetBrains Mono',monospace;">
+        <ul style="margin:0;padding-left:16px;font-family:'IBM Plex Mono',monospace;">
           <li><strong>BV</strong> (Business Value): 1–13 (Fibonacci)</li>
           <li><strong>TC</strong> (Time Criticality): 1–13 (Fibonacci)</li>
           <li><strong>RR</strong> (Risk Reduction/Enablement): 1–3 (High, Medium, Low)</li>
@@ -15507,7 +15494,7 @@ function renderRoadmapView() {
   const seRmCols = RM_VALS2.filter(r => epics.some(e => roadmapValue(e, '') === r));
 
   const seHeaderCols = seRmCols.map(r =>
-    `<th style="text-align:right;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:${rmColors2[r]};padding:2px 5px;">${r}</th>`
+    `<th style="text-align:right;white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:${rmColors2[r]};padding:2px 5px;">${r}</th>`
   ).join('');
 
   const seRows = seKeys.map(sk => {
@@ -15522,26 +15509,26 @@ function renderRoadmapView() {
     const aos  = [...new Set(eps.map(e => e.fields[AFFARSOM_RM]).filter(Boolean))].sort().join(', ');
     const rmCells = seRmCols.map(r =>
       rmFTE[r]
-        ? `<td style="text-align:right;font-family:'JetBrains Mono',monospace;color:${rmColors2[r]};font-weight:600;padding:2px 5px;">${rmFTE[r].toFixed(1)}</td>`
+        ? `<td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:${rmColors2[r]};font-weight:600;padding:2px 5px;">${rmFTE[r].toFixed(1)}</td>`
         : `<td style="text-align:right;color:var(--muted);opacity:0.2;padding:2px 5px;">–</td>`
     ).join('');
     return `<tr style="border-bottom:1px solid rgba(125,133,144,.07);">
       <td style="font-size:0.84rem;font-weight:600;color:var(--text);padding:2px 16px 2px 0;white-space:nowrap;">${sk}</td>
       ${rmCells}
-      <td style="font-size:0.86rem;color:var(--muted);font-family:'JetBrains Mono',monospace;padding:2px 6px;">${apps || '–'}</td>
+      <td style="font-size:0.86rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;padding:2px 6px;">${apps || '–'}</td>
       <td style="font-size:0.86rem;padding:2px 6px;color:var(--muted);">${aos || '–'}</td>
     </tr>`;
   }).join('');
 
   const seSummaryHtml = `<div style="padding:8px 12px 0;flex-shrink:0;overflow-x:auto;">
-    <div style="font-size:0.64rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:5px;">Teman &amp; Projekt</div>
+    <div style="font-size:0.64rem;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:5px;">Teman &amp; Projekt</div>
     <table style="border-collapse:collapse;font-size:0.7rem;white-space:nowrap;">
       <thead>
         <tr style="border-bottom:1px solid var(--border);">
-          <th style="text-align:lefttmily:'JetBrains Mono',monospace;font-size:0.55rem;color:var(--muted);padding:2px 16px 2px 0;text-transform:uppercase;min-width:120px;">Tema / Projekt</th>
+          <th style="text-align:lefttmily:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--muted);padding:2px 16px 2px 0;text-transform:uppercase;min-width:120px;">Tema / Projekt</th>
           ${seHeaderCols}
-          <th style="text-align:left;font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:var(--muted);padding:2px 6px;text-transform:uppercase;">Apps</th>
-          <th style="text-align:left;font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:var(--muted);padding:2px 6px;text-transform:uppercase;">Affärsområden</th>
+          <th style="text-align:left;font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--muted);padding:2px 6px;text-transform:uppercase;">Apps</th>
+          <th style="text-align:left;font-family:'IBM Plex Mono',monospace;font-size:0.55rem;color:var(--muted);padding:2px 6px;text-transform:uppercase;">Affärsområden</th>
         </tr>
       </thead>
       <tbody>${seRows}</tbody>
@@ -15732,7 +15719,7 @@ function renderEstimering() {
   const TDt = (txt) => `<td style="padding:1px 4px;color:var(--text);white-space:nowrap;">${txt}</td>`;
   const mkLegend = (title, tbody) =>
     `<div style=\"display:flex;flex-direction:column;gap:3px;\">` +
-    `<table style=\"border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.68rem;\">` +
+    `<table style=\"border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:0.68rem;\">` +
     `<tbody>${tbody}</tbody></table></div>`;
 
   const effortLegend = mkLegend(
@@ -15773,16 +15760,16 @@ function renderEstimering() {
       : `<span style="color:var(--muted)">–</span>`;
     const effortBtns = [['XS',5],['S',8],['M',13],['L',21],['XL',34]].map(([lbl,v]) => {
       const active = Number(val)===v;
-      return `<button onclick="setEffort(${item.id}, ${v}, this.parentElement.querySelector('.effort-input'))" style="padding:1px 4px;font-size:0.64rem;font-family:'JetBrains Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'transparent':'var(--border)'};background:${active?'rgba(88,166,255,.2)':'var(--surface2)'};color:${active?'var(--accent)':'var(--muted)'};transition:all .1s;flex-shrink:0;">${lbl}</button>`;
+      return `<button onclick="setEffort(${item.id}, ${v}, this.parentElement.querySelector('.effort-input'))" style="padding:1px 4px;font-size:0.64rem;font-family:'IBM Plex Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'transparent':'var(--border)'};background:${active?'rgba(88,166,255,.2)':'var(--surface2)'};color:${active?'var(--accent)':'var(--muted)'};transition:all .1s;flex-shrink:0;">${lbl}</button>`;
     }).join('');
     const effortCell = globalEditMode
       ? `<div style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;"><input class="effort-input" type="text" inputmode="numeric" value="${val}" placeholder="\u2013" onblur="saveEffort(${item.id}, this)" onkeydown="effortKeydown(event,${item.id},this,'${val}')" style="width:54px;"/>${effortBtns}</div>`
-      : `<span style="font-family:'JetBrains Mono',monospace;font-size:0.88rem;color:var(--muted);">${val||'\u2013'}</span>`;
+      : `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.88rem;color:var(--muted);">${val||'\u2013'}</span>`;
 
     const ts = f['Custom.Tshirt'] || '';
     const tshirtBtns = ['XS','S','M','L','XL','XXL'].map(v => {
       const active = ts===v;
-      return `<button onclick="saveField(${item.id},'Custom.Tshirt','${active?'':v}')" style="padding:1px 4px;font-size:0.64rem;font-family:'JetBrains Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'transparent':'var(--border)'};background:${active?'rgba(88,166,255,.2)':'var(--surface2)'};color:${active?'var(--accent)':'var(--muted)'};transition:all .1s;flex-shrink:0;" title="${active?'Klicka för att rensa':v}">${v}</button>`;
+      return `<button onclick="saveField(${item.id},'Custom.Tshirt','${active?'':v}')" style="padding:1px 4px;font-size:0.64rem;font-family:'IBM Plex Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'transparent':'var(--border)'};background:${active?'rgba(88,166,255,.2)':'var(--surface2)'};color:${active?'var(--accent)':'var(--muted)'};transition:all .1s;flex-shrink:0;" title="${active?'Klicka för att rensa':v}">${v}</button>`;
     }).join('');
     const tshirtCell = globalEditMode
       ? `<div style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;">${tshirtBtns}</div>`
@@ -15820,7 +15807,7 @@ function renderEstimering() {
   const sizingGuidePanel = estSizingGuideOpen
     ? `<div style="position:absolute;top:108px;right:14px;z-index:12;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 16px 28px rgba(0,0,0,.35);padding:10px 12px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;text-transform:uppercase;color:var(--muted);">${sizingGuideTitle}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;text-transform:uppercase;color:var(--muted);">${sizingGuideTitle}</span>
           <button class="btn btn-outline btn-xs-icon" onclick="toggleEstSizingGuide('${estSizingGuideOpen}')" title="Stang">x</button>
         </div>
         ${sizingGuideBody}
@@ -15833,13 +15820,13 @@ function renderEstimering() {
     `<div style="flex:1;overflow:hidden;display:flex;flex-direction:column;">` +
       `<div style="display:flex;height:32px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);align-items:center;">` +
         `<div style="width:${EST_LIST_W}px;flex-shrink:0;border-right:2px solid var(--border);box-sizing:border-box;">${estListMainHeader}</div>` +
-        `<div class="est-col-effort" style="flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:2px solid var(--border);box-sizing:border-box;">` +
+        `<div class="est-col-effort" style="flex-shrink:0;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:2px solid var(--border);box-sizing:border-box;">` +
           `<button class="btn btn-outline" style="width:auto;padding:2px 8px;font-size:0.64rem;line-height:1.1;" onclick="toggleEstSizingGuide('effort')">Effort</button>` +
         `</div>` +
-        `<div class="est-col-tshirt" style="flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--border);box-sizing:border-box;">` +
+        `<div class="est-col-tshirt" style="flex-shrink:0;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--border);box-sizing:border-box;">` +
           `<button class="btn btn-outline" style="width:auto;padding:2px 8px;font-size:0.64rem;line-height:1.1;" onclick="toggleEstSizingGuide('tshirt')">T-shirt</button>` +
         `</div>` +
-        `<div class="est-col-bar" style="flex-shrink:0;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--border);box-sizing:border-box;">Storlek</div>` +
+        `<div class="est-col-bar" style="flex-shrink:0;padding:0 10px;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--border);box-sizing:border-box;">Storlek</div>` +
       `</div>` +
       `<div style="flex:1;overflow-y:auto;" id="est-scroll">${rowsHtml}</div>` +
     `</div>` +
@@ -16044,9 +16031,9 @@ function renderPrioritering() {
   const prioListMainHeader = standardHierarchyListMainHeaderHtml({
     listActions,
     label: 'Epic',
-    labelStyle: "flex:1;font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;color:var(--muted);",
+    labelStyle: "flex:1;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;color:var(--muted);",
     extraHtml:
-      `<span style="width:38px;flex-shrink:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">T-shirt</span>` +
+      `<span style="width:38px;flex-shrink:0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">T-shirt</span>` +
       `<span style="width:90px;flex-shrink:0;padding-left:8px;">` +
         `<select class="col-filter inline-muted-select" onchange="prioTypFilter=this.value.toLowerCase();renderPrioritering()">` +
           `<option value="">Typ: Alla</option>` +
@@ -16062,7 +16049,7 @@ function renderPrioritering() {
   });
 
   // Formula header for panel
-  const formulaHeader = `<div style="display:flex;align-items:center;padding:0 10px;background:var(--surface2);border-bottom:2px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:4px;height:100%;box-sizing:border-box;">
+  const formulaHeader = `<div style="display:flex;align-items:center;padding:0 10px;background:var(--surface2);border-bottom:2px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:4px;height:100%;box-sizing:border-box;">
     <span style="color:var(--accent2);font-weight:700;">WSJF</span>
     <span>=</span>
     <span style="color:#79c0ff;">(BV</span>
@@ -16122,7 +16109,7 @@ function renderPrioritering() {
           <div class="wsjf-bar-track" ${drag} style="flex:1;${globalEditMode?'cursor:ew-resize;':''}">
             <div class="wsjf-bar-fill" style="width:${pct}%;background:${color};"></div>
           </div>
-          <span style="font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--text);width:18px;flex-shrink:0;text-align:right;">${val!=null?val:'–'}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:0.86rem;color:var(--text);width:18px;flex-shrink:0;text-align:right;">${val!=null?val:'–'}</span>
         </div>`;
       };
 
@@ -16138,7 +16125,7 @@ function renderPrioritering() {
           ${barCell(bv, '#79c0ff', 'Microsoft.VSTS.Common.BusinessValue')}
           ${barCell(tc, '#d2a8ff', 'Microsoft.VSTS.Common.TimeCriticality')}
           ${barCell(rr, '#ff8a80', 'Custom.RiskreductionOpportunityEnablement')}
-          <div style="width:${EFF_W}px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--muted);height:100%;box-sizing:border-box;">${effort!=null?effort:'–'}</div>
+          <div style="width:${EFF_W}px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:0.84rem;color:var(--muted);height:100%;box-sizing:border-box;">${effort!=null?effort:'–'}</div>
           ${trashBtn}
         </div>
       </div>`;
@@ -16162,18 +16149,18 @@ function renderPrioritering() {
         ? [1,2,3,4,5].map(v => {
             const active = reach === v;
             return `<button onclick="prioSetReach(${item.id},${v})"
-              style="padding:2px 7px;font-size:0.86rem;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;border:2px solid ${active?'var(--accent2)':'var(--border)'};background:${active?'rgba(88,166,255,.2)':'var(--surface2)'};color:${active?'var(--accent2)':'var(--muted)'};font-weight:${active?'700':'400'};">${v}</button>`;
+              style="padding:2px 7px;font-size:0.86rem;font-family:'IBM Plex Mono',monospace;border-radius:4px;cursor:pointer;border:2px solid ${active?'var(--accent2)':'var(--border)'};background:${active?'rgba(88,166,255,.2)':'var(--surface2)'};color:${active?'var(--accent2)':'var(--muted)'};font-weight:${active?'700':'400'};">${v}</button>`;
           }).join('')
-        : `<span style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--text);">${reach != null ? reach : '–'}</span>`;
+        : `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.84rem;color:var(--text);">${reach != null ? reach : '–'}</span>`;
 
       // Confidence buttons
       const confBtns = globalEditMode
         ? CONF_OPTS.map(o => {
             const active = confidence === o.val;
             return `<button onclick="prioSetConfidence(${item.id},${o.val})"
-              style="padding:2px 8px;font-size:0.86rem;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;border:2px solid ${active?'#d2a8ff':'var(--border)'};background:${active?'rgba(167,105,218,.2)':'var(--surface2)'};color:${active?'#d2a8ff':'var(--muted)'};font-weight:${active?'700':'400'};">${o.label}</button>`;
+              style="padding:2px 8px;font-size:0.86rem;font-family:'IBM Plex Mono',monospace;border-radius:4px;cursor:pointer;border:2px solid ${active?'#d2a8ff':'var(--border)'};background:${active?'rgba(167,105,218,.2)':'var(--surface2)'};color:${active?'#d2a8ff':'var(--muted)'};font-weight:${active?'700':'400'};">${o.label}</button>`;
           }).join('')
-        : `<span style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--text);">${confidence != null ? (confidence*100)+'%' : '–'}</span>`;
+        : `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.84rem;color:var(--text);">${confidence != null ? (confidence*100)+'%' : '–'}</span>`;
 
       const trashRice = globalEditMode
         ? `<button onclick="prioResetRiceFields(${item.id})"
@@ -16192,12 +16179,12 @@ function renderPrioritering() {
         ? `<div style="width:${RICE_REACH_W}px;flex-shrink:0;display:flex;align-items:center;gap:3px;padding:0 8px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
             ${[1,2,3,4,5].map(v => {
               const active = reach === v;
-              return `<button onclick="prioSetReach(${item.id},${v})" style="flex:1;padding:2px 0;font-size:0.86rem;font-family:'JetBrains Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'var(--accent2)':'var(--border)'};background:${active?'rgba(88,166,255,.25)':'var(--surface2)'};color:${active?'var(--accent2)':'var(--muted)'};">${v}</button>`;
+              return `<button onclick="prioSetReach(${item.id},${v})" style="flex:1;padding:2px 0;font-size:0.86rem;font-family:'IBM Plex Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'var(--accent2)':'var(--border)'};background:${active?'rgba(88,166,255,.25)':'var(--surface2)'};color:${active?'var(--accent2)':'var(--muted)'};">${v}</button>`;
             }).join('')}
           </div>`
         : `<div style="width:${RICE_REACH_W}px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
             <div class="wsjf-bar-track" style="flex:1;"><div class="wsjf-bar-fill" style="width:${reachPct}%;background:#6bdb78;"></div></div>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--text);width:12px;text-align:right;">${reach!=null?reach:'–'}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:0.86rem;color:var(--text);width:12px;text-align:right;">${reach!=null?reach:'–'}</span>
           </div>`;
 
       // Impact: bar, draggable in edit mode (BV field, Fibonacci 1-13)
@@ -16205,7 +16192,7 @@ function renderPrioritering() {
       const impactDrag = globalEditMode ? `onmousedown="wsjfBarDrag(event,${item.id},'Microsoft.VSTS.Common.BusinessValue',13)"` : '';
       const impactCell = `<div style="width:${RICE_IMPACT_W}px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
         <div class="wsjf-bar-track" ${impactDrag} style="flex:1;${globalEditMode?'cursor:ew-resize;':''}"><div class="wsjf-bar-fill" style="width:${impactPct}%;background:#79c0ff;"></div></div>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--text);width:14px;text-align:right;">${impact!=null?impact:'–'}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.86rem;color:var(--text);width:14px;text-align:right;">${impact!=null?impact:'–'}</span>
       </div>`;
 
       // Confidence: buttons or text
@@ -16213,20 +16200,20 @@ function renderPrioritering() {
         ? `<div style="width:${RICE_CONF_W}px;flex-shrink:0;display:flex;align-items:center;gap:4px;padding:0 8px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
             ${CONF_OPTS.map(o => {
               const active = confidence === o.val;
-              return `<button onclick="prioSetConfidence(${item.id},${o.val})" style="flex:1;padding:2px 0;font-size:0.86rem;font-family:'JetBrains Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'#d2a8ff':'var(--border)'};background:${active?'rgba(167,105,218,.2)':'var(--surface2)'};color:${active?'#d2a8ff':'var(--muted)'};">${o.label}</button>`;
+              return `<button onclick="prioSetConfidence(${item.id},${o.val})" style="flex:1;padding:2px 0;font-size:0.86rem;font-family:'IBM Plex Mono',monospace;border-radius:3px;cursor:pointer;border:1px solid ${active?'#d2a8ff':'var(--border)'};background:${active?'rgba(167,105,218,.2)':'var(--surface2)'};color:${active?'#d2a8ff':'var(--muted)'};">${o.label}</button>`;
             }).join('')}
           </div>`
         : `<div style="width:${RICE_CONF_W}px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
-            <span style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:#d2a8ff;">${confidence!=null?(confidence*100)+'%':'–'}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:0.84rem;color:#d2a8ff;">${confidence!=null?(confidence*100)+'%':'–'}</span>
           </div>`;
 
       return `<div style="display:flex;height:${ROW_H}px;border-bottom:1px solid rgba(125,133,144,.08);box-sizing:border-box;flex-shrink:0;align-items:center;">
         ${listSide}
-        <span style="font-family:'JetBrains Mono',monospace;font-size:0.9rem;font-weight:700;color:var(--accent2);width:${RICE_SCORE_W}px;flex-shrink:0;text-align:center;" title="RICE=(Reach×Impact×Confidence)/Effort">${rice!=null?rice:'–'}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.9rem;font-weight:700;color:var(--accent2);width:${RICE_SCORE_W}px;flex-shrink:0;text-align:center;" title="RICE=(Reach×Impact×Confidence)/Effort">${rice!=null?rice:'–'}</span>
         ${reachCell}
         ${impactCell}
         ${confCell}
-        <div style="width:${RICE_EFF_W}px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--muted);height:100%;box-sizing:border-box;">${effort!=null?effort:'–'}</div>
+        <div style="width:${RICE_EFF_W}px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:0.84rem;color:var(--muted);height:100%;box-sizing:border-box;">${effort!=null?effort:'–'}</div>
         ${trashRice}
       </div>`;
     }
@@ -16246,7 +16233,7 @@ function renderPrioritering() {
               onblur="prioSaveTimeSaveInt(${item.id},this)"
               onclick="event.stopPropagation()" />
           </div>`
-        : `<div style="width:160px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--text);">${timeSaveInt != null && Number.isFinite(timeSaveInt) ? timeSaveInt : '–'}</div>`;
+        : `<div style="width:160px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;font-family:'IBM Plex Mono',monospace;font-size:0.9rem;color:var(--text);">${timeSaveInt != null && Number.isFinite(timeSaveInt) ? timeSaveInt : '–'}</div>`;
 
       const textCell = globalEditMode
         ? `<div style="flex:1;min-width:240px;display:flex;align-items:center;padding:0 10px;border-left:1px solid var(--border);box-sizing:border-box;height:100%;">
@@ -16277,14 +16264,14 @@ function renderPrioritering() {
               const active = priority === v;
               const color = v <= 2 ? '#ff8a80' : v === 3 ? '#f0c040' : '#6bdb78';
               return `<button onclick="prioSetMsPriority(${item.id},${v})"
-                style="padding:3px 10px;font-size:0.86rem;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;border:2px solid ${active?color:'var(--border)'};background:${active?color+'22':'var(--surface2)'};color:${active?color:'var(--muted)'};font-weight:${active?'700':'400'};transition:all .1s;">${v}</button>`;
+                style="padding:3px 10px;font-size:0.86rem;font-family:'IBM Plex Mono',monospace;border-radius:4px;cursor:pointer;border:2px solid ${active?color:'var(--border)'};background:${active?color+'22':'var(--surface2)'};color:${active?color:'var(--muted)'};font-weight:${active?'700':'400'};transition:all .1s;">${v}</button>`;
             }).join('')}
             <button onclick="saveField(${item.id},'Microsoft.VSTS.Common.Priority','')"
               style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.90rem;padding:0 4px;opacity:0.6;" title="Rensa">🗑</button>
           </div>`
         : `<div style="padding:0 14px;">
             ${priority != null
-              ? `<span style="font-family:'JetBrains Mono',monospace;font-size:0.88rem;font-weight:700;color:${priority<=2?'#ff8a80':priority===3?'#f0c040':'#6bdb78'};">Prio ${priority}</span>`
+              ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:0.88rem;font-weight:700;color:${priority<=2?'#ff8a80':priority===3?'#f0c040':'#6bdb78'};">Prio ${priority}</span>`
               : '<span style="color:var(--muted);font-size:0.84rem;">–</span>'}
           </div>`;
 
@@ -16304,7 +16291,7 @@ function renderPrioritering() {
           ${MOSCOW_OPTS.map(v => {
             const active = curPrio === v;
             return `<button onclick="(()=>{const item=allItems.find(i=>i.id===${item.id});if(!item)return;const val=item.fields['${PRIORITY_FIELD}']===\'${v}\' ? \'\' : \'${v}\';item.fields['${PRIORITY_FIELD}']=val||null;savePriorityLevel(${item.id},val);})()"
-              style="padding:3px 9px;font-size:0.86rem;font-family:'JetBrains Mono',monospace;border-radius:4px;cursor:pointer;border:2px solid ${active?MOSCOW_COLORS[v]:'var(--border)'};background:${active?MOSCOW_COLORS[v]+'22':'var(--surface2)'};color:${active?MOSCOW_COLORS[v]:'var(--muted)'};font-weight:${active?'700':'400'};transition:all .1s;">${v}</button>`;
+              style="padding:3px 9px;font-size:0.86rem;font-family:'IBM Plex Mono',monospace;border-radius:4px;cursor:pointer;border:2px solid ${active?MOSCOW_COLORS[v]:'var(--border)'};background:${active?MOSCOW_COLORS[v]+'22':'var(--surface2)'};color:${active?MOSCOW_COLORS[v]:'var(--muted)'};font-weight:${active?'700':'400'};transition:all .1s;">${v}</button>`;
           }).join('')}
           <button onclick="(async()=>{const item=allItems.find(i=>i.id===${item.id});if(!item)return;item.fields['${PRIORITY_FIELD}']=null;await savePriorityLevel(${item.id},'');})()"
             style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.90rem;padding:0 4px;opacity:0.6;" title="Rensa">🗑</button>
@@ -16329,7 +16316,7 @@ function renderPrioritering() {
         <div style="width:${PRIO_LIST_W}px;flex-shrink:0;border-right:2px solid var(--border);"></div>
         <div style="flex:1;display:flex;align-items:center;min-width:fit-content;">
           ${prioModel === 'moscow'
-            ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:6px;">
+            ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'IBM Plex Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:6px;">
                 <span style="color:var(--accent2);font-weight:700;">MoSCoW</span>
                 <span>·</span><span style="color:#ff8a80;">Must</span>
                 <span>·</span><span style="color:#f0c040;">Should</span>
@@ -16337,18 +16324,18 @@ function renderPrioritering() {
                 <span>·</span><span style="color:#b0bcc8;">Won't</span>
               </span>`
             : prioModel === 'prio15'
-            ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:6px;">
+            ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'IBM Plex Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:6px;">
                 <span style="color:var(--accent2);font-weight:700;">Prio 1-5</span>
                 <span>·</span><span>1 = högst prioritet</span>
                 <span>·</span><span>5 = lägst prioritet</span>
               </span>`
             : prioModel === 'timesave'
-            ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:6px;">
+            ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'IBM Plex Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:6px;">
                 <span style="color:var(--accent2);font-weight:700;">Tidsbesparing</span>
                 <span>·</span><span>Bedömd besparing och motivering</span>
               </span>`
             : prioModel === 'rice'
-            ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:4px;">
+            ? `<span style="display:flex;align-items:center;padding:0 14px;font-family:'IBM Plex Mono',monospace;font-size:0.86rem;color:var(--muted);white-space:nowrap;gap:4px;">
                 <span style="color:var(--accent2);font-weight:700;">RICE</span>
                 <span>=</span>
                 <span style="color:#6bdb78;">(Reach</span>
@@ -16365,7 +16352,7 @@ function renderPrioritering() {
       <!-- Column sub-headers for panel -->
       <div style="display:flex;height:32px;flex-shrink:0;background:var(--surface2);border-bottom:1px solid var(--border);">
         <div style="width:${PRIO_LIST_W}px;flex-shrink:0;border-right:2px solid var(--border);box-sizing:border-box;overflow:hidden;">${prioListMainHeader}</div>
-        <div style="flex:1;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);min-width:fit-content;">
+        <div style="flex:1;display:flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);min-width:fit-content;">
           ${(prioModel === 'moscow' || prioModel === 'prio15' || prioModel === 'rice' || prioModel === 'timesave') ? '' : `
           <span style="min-width:48px;text-align:center;flex-shrink:0;">WSJF</span>
           <span style="width:${BAR_W}px;flex-shrink:0;text-align:center;border-left:1px solid var(--border);">Business Value</span>
@@ -16571,7 +16558,7 @@ function renderTimeline() {
   const gridLines = months.map((_,i) => `<div style="position:absolute;left:${i*COL_W}px;top:0;bottom:0;width:1px;background:var(--border);opacity:0.4;pointer-events:none;"></div>`).join('');
   const monthHeaders = months.map(m => {
     const isCur = m.getFullYear()===today.getFullYear() && m.getMonth()===today.getMonth();
-    return `<div style="width:${COL_W}px;flex-shrink:0;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;${isCur?'color:var(--accent2);font-weight:700;':'color:var(--muted);'}">${m.toLocaleDateString('sv-SE',{month:'short',year:'2-digit'})}</div>`;
+    return `<div style="width:${COL_W}px;flex-shrink:0;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;${isCur?'color:var(--accent2);font-weight:700;':'color:var(--muted);'}">${m.toLocaleDateString('sv-SE',{month:'short',year:'2-digit'})}</div>`;
   }).join('');
 
   const headerH = 36;
@@ -16609,7 +16596,7 @@ function renderTimeline() {
       </div>`;
     }
     return `<div style="height:${ROW_H}px;${borderBtm}box-sizing:border-box;display:flex;align-items:center;justify-content:center;">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:0.71rem;color:${v?'var(--text)':'var(--muted)'};">${v||'–'}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:0.71rem;color:${v?'var(--text)':'var(--muted)'};">${v||'–'}</span>
     </div>`;
   };
   const startHtml  = rows.map(r => makeCell(r, SF)).join('');
@@ -16649,9 +16636,9 @@ function renderTimeline() {
     const rice = (reach!=null&&impact!=null&&conf!=null&&eff) ? +((reach*impact*conf)/eff).toFixed(1) : null;
 
     return `<div style="height:${ROW_H}px;${borderBtm}box-sizing:border-box;display:flex;align-items:center;">
-      <span style="width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${wsjf!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;" title="WSJF">${wsjf!=null?wsjf:'–'}</span>
+      <span style="width:${SCORE_W}px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.74rem;font-weight:700;color:${wsjf!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;" title="WSJF">${wsjf!=null?wsjf:'–'}</span>
       <span style="width:${SCORE_W}px;text-align:center;font-size:0.74rem;flex-shrink:0;border-left:1px solid var(--border);" title="MoSCoW">${moscow?`<span style="color:${moscowColor};font-weight:700;font-size:0.66rem;">${moscow}</span>`:'–'}</span>
-      <span style="width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${rice!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);" title="RICE">${rice!=null?rice:'–'}</span>
+      <span style="width:${SCORE_W}px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.74rem;font-weight:700;color:${rice!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);" title="RICE">${rice!=null?rice:'–'}</span>
     </div>`;
   }).join('');
 
@@ -16681,14 +16668,14 @@ function renderTimeline() {
       const dimmed = !t ? ';opacity:0.65' : '';
       if (globalEditMode) {
         bar = `<div class="tl-draggable" data-id="${item.id}" data-sf="${SF}" data-tf="${TF}"
-          style="position:absolute;left:${x1}px;width:${w}px;height:16px;top:${(ROW_H-16)/2}px;border-radius:8px;background:${color}${dimmed};display:flex;align-items:center;padding:0 4px;overflow:hidden;font-size:0.86rem;font-family:'JetBrains Mono',monospace;color:#fff;font-weight:700;white-space:nowrap;cursor:grab;"
+          style="position:absolute;left:${x1}px;width:${w}px;height:16px;top:${(ROW_H-16)/2}px;border-radius:8px;background:${color}${dimmed};display:flex;align-items:center;padding:0 4px;overflow:hidden;font-size:0.86rem;font-family:'IBM Plex Mono',monospace;color:#fff;font-weight:700;white-space:nowrap;cursor:grab;"
           title="${fmt(s)} → ${t?fmt(t):'idag'}${!t?' ⚠':''}" >
           <div class="tl-drag-left tl-drag-handle"></div>
           <span style="flex:1;overflow:hidden;text-overflow:ellipsis;pointer-events:none;">${ts}</span>
           <div class="tl-drag-right tl-drag-handle"></div>
         </div>`;
       } else {
-        bar = `<div style="position:absolute;left:${x1}px;width:${w}px;height:16px;top:${(ROW_H-16)/2}px;border-radius:8px;background:${color}${dimmed};display:flex;align-items:center;padding:0 6px;overflow:hidden;font-size:0.86rem;font-family:'JetBrains Mono',monospace;color:#fff;font-weight:700;white-space:nowrap;"
+        bar = `<div style="position:absolute;left:${x1}px;width:${w}px;height:16px;top:${(ROW_H-16)/2}px;border-radius:8px;background:${color}${dimmed};display:flex;align-items:center;padding:0 6px;overflow:hidden;font-size:0.86rem;font-family:'IBM Plex Mono',monospace;color:#fff;font-weight:700;white-space:nowrap;"
           title="${fmt(s)} → ${t?fmt(t):'idag'}${!t?' ⚠':''}">${ts}</div>`;
       }
     } else if (x1!==null) {
@@ -16754,7 +16741,7 @@ function renderTimeline() {
     <div class="tl-body">
       <!-- Epic labels + Score columns: WSJF | MoSCoW | RICE | Tidsbesparing -->
       <div style="flex-shrink:0;width:${TL_LIST_W}px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
-        <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;padding:0 12px;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">
+        <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;padding:0 12px;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">
           ${timelineListMainHeader}
         </div>
         ${rows.map((r,i) => {
@@ -16788,10 +16775,10 @@ function renderTimeline() {
                 const timeSave = f[PRIO_TIME_SAVE_INT_FIELD] != null && f[PRIO_TIME_SAVE_INT_FIELD] !== ''
                   ? Number(f[PRIO_TIME_SAVE_INT_FIELD])
                   : null;
-                return `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${wsjf!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;\" title=\"WSJF\">${wsjf!=null?wsjf:'–'}</span>`+
+                return `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.74rem;font-weight:700;color:${wsjf!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;\" title=\"WSJF\">${wsjf!=null?wsjf:'–'}</span>`+
                   `<span style=\"width:${SCORE_W}px;text-align:center;font-size:0.74rem;flex-shrink:0;border-left:1px solid var(--border);\" title=\"MoSCoW\">${moscow?`<span style=\\"color:${moscowColor};font-weight:700;font-size:0.66rem;\\">${moscow}</span>`:'–'}</span>`+
-                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${rice!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"RICE\">${rice!=null?rice:'–'}</span>`+
-                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700;color:${timeSave!=null&&Number.isFinite(timeSave)?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"Tidsbesparing\">${timeSave!=null&&Number.isFinite(timeSave)?Math.round(timeSave):'–'}</span>`;
+                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.74rem;font-weight:700;color:${rice!=null?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"RICE\">${rice!=null?rice:'–'}</span>`+
+                  `<span style=\"width:${SCORE_W}px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.74rem;font-weight:700;color:${timeSave!=null&&Number.isFinite(timeSave)?'var(--accent2)':'var(--muted)'};flex-shrink:0;border-left:1px solid var(--border);\" title=\"Tidsbesparing\">${timeSave!=null&&Number.isFinite(timeSave)?Math.round(timeSave):'–'}</span>`;
               })();
           return `<div style=\"display:flex;align-items:center;\">${rLabel}${rScore}</div>`;
         }).join('')}
@@ -16804,11 +16791,11 @@ function renderTimeline() {
       <!-- Date columns — only in edit mode, direkt efter chart -->
       ${globalEditMode ? `
       <div style="flex-shrink:0;width:${DATE_COL_W}px;border-left:2px solid var(--border);display:flex;flex-direction:column;">
-        <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">Start</div>
+        <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">Start</div>
         ${startHtml}
       </div>
       <div style="flex-shrink:0;width:${DATE_COL_W}px;border-left:1px solid var(--border);display:flex;flex-direction:column;">
-        <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">Target</div>
+        <div style="height:${headerH}px;flex-shrink:0;background:var(--surface2);border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:0.64rem;text-transform:uppercase;color:var(--muted);">Target</div>
         ${targetHtml}
       </div>` : ''}
     </div>
@@ -16973,7 +16960,7 @@ function renderKostnader() {
 
   const importSection = `<div style="margin-bottom:4px;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border);">
-      <div style="font-size:0.8rem;font-family:'Inter',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent2);">Importera kostnadsdata</div>
+      <div style="font-size:0.8rem;font-family:'Manrope',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent2);">Importera kostnadsdata</div>
       ${mappBtn}
     </div>
     <div style="font-size:0.86rem;color:var(--muted);margin-bottom:10px;">Excel-fil med Maconomy-koder i kolumn A och månadsdata i kolumnerna B→. Första numeriska raden med ÅÅÅÅ-MM som rubriker identifieras automatiskt.</div>
@@ -16983,7 +16970,7 @@ function renderKostnader() {
         📂 Välj Excel-fil
         <input type="file" accept=".xlsx,.xls" style="display:none" onchange="importKostnadExcel(this.files[0])">
       </label>
-      <span id="kostnad-import-status" style="font-size:0.88rem;font-family:'JetBrains Mono',monospace;color:var(--muted);">${db ? `${db.rows.length} rader, ${db.months.length} månader inlästa` : 'Ingen data importerad'}</span>
+      <span id="kostnad-import-status" style="font-size:0.88rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);">${db ? `${db.rows.length} rader, ${db.months.length} månader inlästa` : 'Ingen data importerad'}</span>
       ${db ? `<button onclick="localStorage.removeItem('${LS_KOSTNAD_DB}');renderKostnader();" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.7rem;">✕ Rensa</button>` : ''}
     </div>
   </div>`;
@@ -17072,7 +17059,7 @@ function renderKostnader() {
 
     const rowCount = Math.max(eps.length, 1);
     const span = rowCount > 1 ? ` rowspan="${rowCount}"` : '';
-    const leftStyle = `style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);vertical-align:top;padding:8px 0;"`;
+    const leftStyle = `style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--accent2);vertical-align:top;padding:8px 0;"`;
 
     const epicRows = eps.length === 0
       ? `<td style="color:var(--muted);font-size:0.84rem;padding:8px 8px;">–</td><td></td><td></td><td></td><td></td>`
@@ -17088,9 +17075,9 @@ function renderKostnader() {
         }).join('');
 
     return `<tr style="background:rgba(88,166,255,.07);border-top:3px solid var(--border);">
-      <td${span} ${leftStyle} style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);vertical-align:top;padding:8px 10px 8px 0;white-space:nowrap;font-size:0.84rem;">${code}</td>
+      <td${span} ${leftStyle} style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--accent2);vertical-align:top;padding:8px 10px 8px 0;white-space:nowrap;font-size:0.84rem;">${code}</td>
       <td${span} style="font-weight:700;color:var(--accent2);font-size:0.84rem;vertical-align:top;padding:8px 12px 8px 0;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${namn}</td>
-      <td${span} class="num" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);vertical-align:top;padding:8px 16px 8px 0;white-space:nowrap;">${val > 0 ? fmt(val) : ''}</td>
+      <td${span} class="num" style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--accent2);vertical-align:top;padding:8px 16px 8px 0;white-space:nowrap;">${val > 0 ? fmt(val) : ''}</td>
       ${epicRows}
     </tr>
     <tr style="background:rgba(0,0,0,0);"><td colspan="8" style="height:16px;border:none;background:rgba(125,133,144,.08);"></td></tr>`;
@@ -17117,7 +17104,7 @@ function renderKostnader() {
   wrap.innerHTML = `<div class="kost-wrap">
     ${importSection}
     <div>
-      <div style="font-size:0.8rem;font-family:'Inter',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent2);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border);">Epics per Maconomy</div>
+      <div style="font-size:0.8rem;font-family:'Manrope',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent2);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border);">Epics per Maconomy</div>
       ${costTable}
       ${epicTable.replace(/<div>/, '').replace(/<\/div>$/, '')}
     </div>
@@ -17191,7 +17178,7 @@ function renderKostnadMapping() {
   // — Column header bars (left panel has Projekt col, right panel does not)
   const colHeaderLeft = `
     <div style="display:flex;align-items:center;padding:3px 8px;background:var(--surface2);
-                border-bottom:2px solid var(--border);font-family:'JetBrains Mono',monospace;
+                border-bottom:2px solid var(--border);font-family:'IBM Plex Mono',monospace;
                 font-size:0.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
                 flex-shrink:0;">
       <div style="flex:1;min-width:0;padding-right:8px;">Epic</div>
@@ -17202,7 +17189,7 @@ function renderKostnadMapping() {
     </div>`;
   const colHeader = `
     <div style="display:flex;align-items:center;padding:3px 8px;background:var(--surface2);
-                border-bottom:2px solid var(--border);font-family:'JetBrains Mono',monospace;
+                border-bottom:2px solid var(--border);font-family:'IBM Plex Mono',monospace;
                 font-size:0.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
                 flex-shrink:0;">
       <div style="flex:1;min-width:0;padding-right:8px;">Epic</div>
@@ -17310,7 +17297,7 @@ function renderKostnadMapping() {
     ? `<div style="color:var(--muted);font-size:0.88rem;padding:16px;">Alla epics är mappade. 🎉</div>`
     : sortedGroupKeys.map(gk => `
         <div>
-          <div style="font-size:0.7rem;font-family:'JetBrains Mono',monospace;font-weight:700;
+          <div style="font-size:0.7rem;font-family:'IBM Plex Mono',monospace;font-weight:700;
                       text-transform:uppercase;letter-spacing:.06em;color:var(--accent2);
                       padding:5px 8px;background:var(--surface);border-bottom:1px solid var(--border);
                       border-top:1px solid var(--border);position:sticky;top:0;z-index:1;">
@@ -17334,11 +17321,11 @@ function renderKostnadMapping() {
           <div style="padding:5px 10px;background:var(--surface2);border-bottom:1px solid var(--border);
                       border-top:2px solid var(--border);display:flex;align-items:baseline;gap:8px;
                       position:sticky;top:0;z-index:1;">
-            <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent2);
+            <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--accent2);
                          font-size:0.84rem;flex-shrink:0;">${code}</span>
             ${name ? `<span style="font-size:0.84rem;color:var(--text);flex:1;overflow:hidden;
                             text-overflow:ellipsis;white-space:nowrap;" title="${name}">${name}</span>` : ''}
-            <span style="font-size:0.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;flex-shrink:0;">
+            <span style="font-size:0.7rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;flex-shrink:0;">
               ${codeEpics.length ? codeEpics.length + ' epic' + (codeEpics.length>1?'s':'') : 'Tom'}
             </span>
           </div>
@@ -17364,7 +17351,7 @@ function renderKostnadMapping() {
 
   container.innerHTML = `
     <div style="display:flex;align-items:center;gap:6px;padding:6px 0 10px;flex-wrap:wrap;">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:0.71rem;text-transform:uppercase;
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:0.71rem;text-transform:uppercase;
                    letter-spacing:.05em;color:var(--muted);margin-right:4px;">Gruppering:</span>
       ${grpBtns}
     </div>
@@ -17375,9 +17362,9 @@ function renderKostnadMapping() {
                   border:1px solid var(--border);border-radius:8px;overflow:hidden;">
         <div style="display:flex;align-items:center;justify-content:space-between;
                     padding:6px 10px;background:var(--surface2);border-bottom:2px solid var(--border);flex-shrink:0;">
-          <span style="font-size:0.7rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;
+          <span style="font-size:0.7rem;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;
                        letter-spacing:.08em;color:var(--muted);">Ej mappade epics</span>
-          <span style="font-size:0.7rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${unmapped.length}</span>
+          <span style="font-size:0.7rem;font-family:'IBM Plex Mono',monospace;color:var(--accent2);">${unmapped.length}</span>
         </div>
         ${colHeaderLeft}
         <div id="kost-mapp-left" style="flex:1;overflow-y:auto;"
@@ -17393,9 +17380,9 @@ function renderKostnadMapping() {
                   border:1px solid var(--border);border-radius:8px;overflow:hidden;">
         <div style="display:flex;align-items:center;justify-content:space-between;
                     padding:6px 10px;background:var(--surface2);border-bottom:2px solid var(--border);flex-shrink:0;">
-          <span style="font-size:0.7rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;
+          <span style="font-size:0.7rem;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;
                        letter-spacing:.08em;color:var(--muted);">Maconomy-koder</span>
-          <span style="font-size:0.7rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${allCodes.length}</span>
+          <span style="font-size:0.7rem;font-family:'IBM Plex Mono',monospace;color:var(--accent2);">${allCodes.length}</span>
         </div>
         ${colHeader}
         <div id="kost-mapp-right" style="flex:1;overflow-y:auto;">
@@ -17478,7 +17465,7 @@ function renderAnalys() {
     `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
       <span style="font-size:0.84rem;color:var(--text);min-width:100px;">${label}</span>
       <div class="analys-score-bar" style="width:100px;"><div class="analys-score-fill" style="width:${Math.round(n/epics.length*100)}%;background:#ff8a80;"></div></div>
-      <span style="font-size:0.7rem;font-family:'JetBrains Mono',monospace;color:var(--muted);">${n} saknas</span>
+      <span style="font-size:0.7rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);">${n} saknas</span>
     </div>`
   ).join('');
 
@@ -17500,11 +17487,11 @@ function renderAnalys() {
     </div>
     <div style="display:flex;gap:32px;flex-wrap:wrap;">
       <div>
-        <div style="font-size:0.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:8px;">Saknade fält (av ${epics.length} epics)</div>
+        <div style="font-size:0.6rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;margin-bottom:8px;">Saknade fält (av ${epics.length} epics)</div>
         ${missingHtml}
       </div>
       <div>
-        <div style="font-size:0.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:8px;">Lägst score (top 10)</div>
+        <div style="font-size:0.6rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;margin-bottom:8px;">Lägst score (top 10)</div>
         <table class="analys-table"><tbody>${completeRows}</tbody></table>
       </div>
     </div>
@@ -17519,7 +17506,7 @@ function renderAnalys() {
   const hierCard = (label, n, total, color) => `<div class="analys-card">
     <div class="analys-card-label">${label}</div>
     <div class="analys-card-val" style="color:${n===0?'#6bdb78':color};">${n}</div>
-    <div style="font-size:0.86rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">${Math.round(n/total*100)}% av ${total}</div>
+    <div style="font-size:0.86rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;">${Math.round(n/total*100)}% av ${total}</div>
   </div>`;
 
   const hierHtml = `<div class="analys-section">
@@ -17546,7 +17533,7 @@ function renderAnalys() {
 
   const rgtBar = (vals, label) => `
     <div style="margin-bottom:8px;">
-      <div style="font-size:0.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">${label}</div>
+      <div style="font-size:0.6rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:4px;">${label}</div>
       <div class="analys-rgt-bar">
         <div class="analys-rgt-seg" style="width:${vals.run}%;background:#b0bcc8;">${vals.run>8?vals.run+'%':''}</div>
         <div class="analys-rgt-seg" style="width:${vals.grow}%;background:#79c0ff;">${vals.grow>8?vals.grow+'%':''}</div>
@@ -17568,7 +17555,7 @@ function renderAnalys() {
         return `<div class="analys-card">
           <div class="analys-card-label" style="color:${colors[i]};">${labels[i]}</div>
           <div class="analys-card-val" style="color:${colors[i]};">${rgtActual[k]}%</div>
-          <div style="font-size:0.71rem;font-family:'JetBrains Mono',monospace;color:${diff>5?'#ff8a80':diff<-5?'#f0c040':'#6bdb78'};">mål ${rgtTarget[k]}% (${diff>0?'+':''}${diff}pp)</div>
+          <div style="font-size:0.71rem;font-family:'IBM Plex Mono',monospace;color:${diff>5?'#ff8a80':diff<-5?'#f0c040':'#6bdb78'};">mål ${rgtTarget[k]}% (${diff>0?'+':''}${diff}pp)</div>
         </div>`;
       }).join('')}
     </div>
@@ -17577,7 +17564,7 @@ function renderAnalys() {
       ${['run','grow','transform'].map((k,i) => {
         const labels=['Run','Grow','Transform'];
         return `<label style="display:flex;align-items:center;gap:4px;">${labels[i]}<input type="number" min="0" max="100" step="5" value="${rgtTarget[k]}"
-          style="width:48px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:0.88rem;padding:2px 5px;outline:none;text-align:right;"
+          style="width:48px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-size:0.88rem;padding:2px 5px;outline:none;text-align:right;"
           onchange="const t=JSON.parse(localStorage.getItem('devops_analys_rgt')||'{\"run\":70,\"grow\":20,\"transform\":10}');t['${k}']=Number(this.value);localStorage.setItem('devops_analys_rgt',JSON.stringify(t));renderAnalys()">%</label>`;
       }).join('')}
     </div>
@@ -17603,7 +17590,7 @@ function renderAnalys() {
         <div class="analys-card-val" style="color:var(--muted);">${capTarget}</div>
         <div style="font-size:0.86rem;color:var(--muted);">
           <input type="number" min="1" step="1" value="${capTarget}"
-            style="width:55px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:0.88rem;padding:2px 5px;outline:none;text-align:right;"
+            style="width:55px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--accent2);font-family:'IBM Plex Mono',monospace;font-size:0.88rem;padding:2px 5px;outline:none;text-align:right;"
             onchange="localStorage.setItem('devops_analys_capacity',this.value);renderAnalys()"> Manmån
         </div>
       </div>
@@ -17616,7 +17603,7 @@ function renderAnalys() {
       <div class="analys-score-bar" style="height:14px;">
         <div class="analys-score-fill" style="width:${Math.min(capPct,100)}%;background:${capColor};"></div>
       </div>
-      <div style="font-size:0.86rem;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;">${capPct>100?'⚠ Övertecknat med '+(capPct-100)+'%':capPct>90?'⚡ Nära full kapacitet':'✓ Kapacitet finns'}</div>
+      <div style="font-size:0.86rem;color:var(--muted);margin-top:4px;font-family:'IBM Plex Mono',monospace;">${capPct>100?'⚠ Övertecknat med '+(capPct-100)+'%':capPct>90?'⚡ Nära full kapacitet':'✓ Kapacitet finns'}</div>
     </div>
   </div>`;
 
@@ -17634,8 +17621,8 @@ function renderAnalys() {
       const risky = pct >= 40;
       return `<tr>
         <td style="padding-right:12px;">${k}</td>
-        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--accent2);padding-right:12px;">${v.toFixed(1)}</td>
-        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:${risky?'#ff8a80':'var(--muted)'};font-weight:${risky?700:400};padding-right:12px;">${pct}%${risky?' ⚠':''}</td>
+        <td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--accent2);padding-right:12px;">${v.toFixed(1)}</td>
+        <td style="text-align:right;font-family:'IBM Plex Mono',monospace;color:${risky?'#ff8a80':'var(--muted)'};font-weight:${risky?700:400};padding-right:12px;">${pct}%${risky?' ⚠':''}</td>
         <td style="min-width:100px;"><div class="analys-score-bar" style="width:100px;"><div class="analys-score-fill" style="width:${pct}%;background:${risky?'#ff8a80':'#79c0ff'};opacity:0.7;"></div></div></td>
       </tr>`;
     }).join('');
@@ -17645,14 +17632,14 @@ function renderAnalys() {
     <div class="analys-section-title">Koncentrationsrisk (≥40% = ⚠)</div>
     <div style="display:flex;gap:32px;flex-wrap:wrap;">
       <div>
-        <div style="font-size:0.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:6px;">Per App</div>
+        <div style="font-size:0.6rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;margin-bottom:6px;">Per App</div>
         <table class="analys-table">
           <thead><tr><th>App</th><th style="text-align:right;">Manmån</th><th style="text-align:right;">Andel</th><th></th></tr></thead>
           <tbody>${concRisk(ep => workItemProject(ep, ''), 'App')}</tbody>
         </table>
       </div>
       <div>
-        <div style="font-size:0.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:6px;">Per Affärsområde</div>
+        <div style="font-size:0.6rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;margin-bottom:6px;">Per Affärsområde</div>
         <table class="analys-table">
           <thead><tr><th>Affärsområde</th><th style="text-align:right;">Manmån</th><th style="text-align:right;">Andel</th><th></th></tr></thead>
           <tbody>${concRisk(ep => ep.fields[AFFARSOM_FIELD], 'AO')}</tbody>
@@ -18717,7 +18704,7 @@ function boardNativeRenderSprintChips(runtime) {
   rows.forEach(row => {
     const projectLabel = row.project || 'Okänt projekt';
     rowsHtml += '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">';
-    rowsHtml += `<span style="font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;min-width:120px;">Sprint (${escHtml(projectLabel)}):</span>`;
+    rowsHtml += `<span style="font-size:.68rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;min-width:120px;">Sprint (${escHtml(projectLabel)}):</span>`;
     rowsHtml += addPhaseButton('Föregående', 'previous', row.previous, row.project);
     rowsHtml += addPhaseButton('Aktiv', 'active', row.active, row.project);
     rowsHtml += addPhaseButton('Kommande', 'next', row.next, row.project);
@@ -18732,7 +18719,7 @@ function boardNativeRenderSprintChips(runtime) {
     </button>
     <div class="board-sprint-popover ${boardSprintPanelOpen ? 'open' : ''}">
       <div class="board-sprint-popover-head">
-        <span style="font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">Projekt x Sprintar</span>
+        <span style="font-size:.7rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;">Projekt x Sprintar</span>
         <button type="button" class="board-sprint-popover-close" onclick="boardToggleSprintPanel(false)" title="Stäng">x</button>
       </div>
       ${rowsHtml}
@@ -22756,9 +22743,9 @@ function renderKanbanTab() {
 
   wrap.innerHTML = `
     <div class="kanban-layout${kanbanLeftCollapsed ? ' kanban-left-collapsed' : ''}">
+      <div class="kanban-left-shell">
       <aside class="kanban-left">
         <div class="kanban-left-head">
-          <button class="kanban-collapse-btn" onclick="kanbanToggleLeftCollapsed()" title="${kanbanLeftCollapsed ? 'Expandera vänsterpanel' : 'Kollapsa vänsterpanel'}" aria-label="${kanbanLeftCollapsed ? 'Expandera vänsterpanel' : 'Kollapsa vänsterpanel'}">${kanbanLeftCollapsed ? '→' : '←'}</button>
           <span class="kanban-left-head-text">Sprintfilter</span>
           <span class="kanban-left-head-actions" style="display:flex;align-items:center;gap:6px;">
             <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.68rem;line-height:1.1;" onclick="kanbanRefreshSprints()" title="Läs in alla sprintar på nytt" aria-label="Läs in alla sprintar på nytt">↻</button>
@@ -22775,12 +22762,11 @@ function renderKanbanTab() {
         </div>
         <div class="kanban-left-body">${leftPanelHtml}</div>
       </aside>
+      <button class="kanban-sidebar-collapse-btn" onclick="kanbanToggleLeftCollapsed()" title="${kanbanLeftCollapsed ? 'Expandera vänsterpanelen' : 'Kollapsa vänsterpanelen'}" aria-label="${kanbanLeftCollapsed ? 'Expandera vänsterpanelen' : 'Kollapsa vänsterpanelen'}">${kanbanLeftCollapsed ? '›' : '‹'}</button>
+      </div>
       <section class="kanban-right" id="kanbanRightPane">
         <div class="kanban-right-head">
-          <span style="display:inline-flex;align-items:center;gap:8px;">
-            <button class="kanban-expand-btn" onclick="kanbanToggleLeftCollapsed()" title="Expandera vänsterpanel" aria-label="Expandera vänsterpanel">←</button>
-            <span>Tickets per state</span>
-          </span>
+          <span>Tickets per state</span>
           <span style="font-size:0.68rem;color:var(--muted);">${kanbanSelectedSprintLabel()}</span>
         </div>
         <div class="kanban-filter-bar">
@@ -22789,7 +22775,7 @@ function renderKanbanTab() {
             <button class="btn btn-outline kanban-assignee-filter-btn${!kanbanAssigneeFilter ? ' active' : ''}" type="button" onclick="kanbanSetAssigneeFilter('')">Alla</button>
             ${assignees.map(name => `<button class="btn btn-outline kanban-assignee-filter-btn${kanbanAssigneeFilter===name?' active':''}" type="button" onclick="kanbanSetAssigneeFilter(${JSON.stringify(name).replace(/"/g, '&quot;')})">${escHtml(name)}</button>`).join('')}
           </span>
-          <label style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:0.72rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;user-select:none;cursor:pointer;">
+          <label style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:0.72rem;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.04em;user-select:none;cursor:pointer;">
             <input type="checkbox" ${kanbanShowEmptyColumns ? 'checked' : ''} onchange="kanbanToggleShowEmptyColumns(this.checked)" style="margin:0;accent-color:var(--accent2);" />
             Visa tomma kolumner
           </label>
@@ -22868,7 +22854,7 @@ async function renderBoardTab() {
       <div class="board-right">
         <div class="board-right-head">
           <div style="display:flex;align-items:center;gap:6px;min-width:0;max-width:48%;">
-            <div style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:0.8rem;" title="${escHtml(boardTitle)}">🧩 ${escHtml(boardTitle)}</div>
+            <div style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;" title="${escHtml(boardTitle)}">🧩 ${escHtml(boardTitle)}</div>
             <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:.72rem;line-height:1.1;flex-shrink:0;" onclick="boardRenameActiveTicket()" title="Byt namn pa board">✎</button>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
@@ -22887,7 +22873,7 @@ async function renderBoardTab() {
             </label>
             <div id="boardTimeScaleControls" style="display:none;align-items:center;gap:4px;">
               <button class="btn btn-outline btn-xs-icon" style="width:auto;padding:2px 7px;font-size:.75rem;line-height:1;" onclick="boardAdjustTimeScale(-8)" title="Minska avstånd mellan veckstreck">−</button>
-              <span id="boardTimeScaleValue" style="min-width:58px;text-align:center;color:var(--muted);font-size:.68rem;font-family:'JetBrains Mono',monospace;">56 px/v</span>
+              <span id="boardTimeScaleValue" style="min-width:58px;text-align:center;color:var(--muted);font-size:.68rem;font-family:'IBM Plex Mono',monospace;">56 px/v</span>
               <button class="btn btn-outline btn-xs-icon" style="width:auto;padding:2px 7px;font-size:.75rem;line-height:1;" onclick="boardAdjustTimeScale(8)" title="Öka avstånd mellan veckstreck">+</button>
             </div>
             <label style="display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted);">
@@ -23837,7 +23823,7 @@ async function renderStatusTab() {
     <div class="status-right">
       <div class="status-menu-bar">
         <div class="status-sprint-filter-group">
-          <label style="display:flex;align-items:center;gap:4px;color:var(--muted);font-size:0.78rem;font-family:'JetBrains Mono',monospace;white-space:nowrap;">
+          <label style="display:flex;align-items:center;gap:4px;color:var(--muted);font-size:0.78rem;font-family:'IBM Plex Mono',monospace;white-space:nowrap;">
             <input type="checkbox" id="statusFilterBySprintToggle" ${statusFilterBySprint ? 'checked' : ''} onchange="statusToggleSprintFilter(this.checked)">
             <span>Filtrera sprint</span>
           </label>
@@ -23846,11 +23832,11 @@ async function renderStatusTab() {
           </select>
         </div>
         <div class="status-date-row">
-          <label style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.78rem;font-family:'JetBrains Mono',monospace;">
+          <label style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.78rem;font-family:'IBM Plex Mono',monospace;">
             <span>Från</span>
             <input id="statusFromDate" type="date" class="col-filter" value="${escHtml(statusTabFromDate || '')}" onchange="statusSetFromDate(this.value)">
           </label>
-          <label style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.78rem;font-family:'JetBrains Mono',monospace;">
+          <label style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:0.78rem;font-family:'IBM Plex Mono',monospace;">
             <span>Till</span>
             <input id="statusToDate" type="date" class="col-filter" value="${escHtml(statusTabToDate || '')}" onchange="statusSetToDate(this.value)">
           </label>
@@ -23858,7 +23844,7 @@ async function renderStatusTab() {
           <button class="btn btn-outline" style="width:auto;padding:5px 8px;font-size:0.72rem;line-height:1.1;" onclick="statusApplyDatePreset(7)">1 vecka</button>
           <button class="btn btn-outline" style="width:auto;padding:5px 10px;" onclick="statusRefresh()">↻</button>
           <button class="btn btn-outline" style="width:auto;padding:5px 10px;font-size:0.72rem;line-height:1.1;" onclick="statusExportPdf()" title="Exportera till PDF">⬇ PDF</button>
-          <span style="margin-left:auto;color:var(--muted);font-size:0.75rem;font-family:'JetBrains Mono',monospace;">${escHtml(from ? from.toLocaleDateString('sv-SE') : '–')} → ${escHtml(to ? to.toLocaleDateString('sv-SE') : '–')}</span>
+          <span style="margin-left:auto;color:var(--muted);font-size:0.75rem;font-family:'IBM Plex Mono',monospace;">${escHtml(from ? from.toLocaleDateString('sv-SE') : '–')} → ${escHtml(to ? to.toLocaleDateString('sv-SE') : '–')}</span>
         </div>
       </div>
       <div class="status-right-body" id="statusRightBody">
